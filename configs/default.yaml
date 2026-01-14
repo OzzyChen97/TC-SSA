@@ -1,0 +1,318 @@
+# Example Configuration for WSI Classification with MoE Token Compression
+# This YAML file provides example configurations for different experimental scenarios
+
+# ==============================================================================
+# BASIC CONFIGURATION
+# ==============================================================================
+basic:
+  # Data paths
+  train_csv: "data/train.csv"
+  val_csv: "data/val.csv"
+  features_dir: "data/features"
+  feature_dim: 1024
+
+  # Model settings
+  model_type: "moe"
+  num_slots: 64
+  num_classes: 2
+  hidden_dim: 512
+  dropout: 0.25
+  temperature: 1.0
+
+  # Training settings
+  num_epochs: 50
+  lr: 0.0001
+  weight_decay: 0.00001
+  aux_loss_weight: 0.01
+  grad_accum_steps: 8
+
+  # Optimization
+  optimizer: "adamw"
+  scheduler: "cosine"
+  warmup_epochs: 5
+
+  # System
+  seed: 42
+  num_workers: 4
+  use_amp: true
+  device: "cuda"
+
+  # Output
+  output_dir: "./outputs/basic_experiment"
+  log_interval: 10
+  save_freq: 10
+
+
+# ==============================================================================
+# HIGH COMPRESSION CONFIGURATION (fewer slots, more compression)
+# ==============================================================================
+high_compression:
+  train_csv: "data/train.csv"
+  val_csv: "data/val.csv"
+  features_dir: "data/features"
+  feature_dim: 1024
+
+  model_type: "moe"
+  num_slots: 32  # Fewer slots = higher compression
+  num_classes: 2
+  hidden_dim: 512
+  dropout: 0.25
+  temperature: 0.8  # Lower temperature for more discrete routing
+
+  num_epochs: 50
+  lr: 0.0001
+  weight_decay: 0.00001
+  aux_loss_weight: 0.02  # Higher weight to enforce load balancing
+  grad_accum_steps: 8
+
+  optimizer: "adamw"
+  scheduler: "cosine"
+  warmup_epochs: 5
+
+  seed: 42
+  num_workers: 4
+  use_amp: true
+  device: "cuda"
+
+  output_dir: "./outputs/high_compression"
+  log_interval: 10
+  save_freq: 10
+
+
+# ==============================================================================
+# LOW COMPRESSION CONFIGURATION (more slots, retain more information)
+# ==============================================================================
+low_compression:
+  train_csv: "data/train.csv"
+  val_csv: "data/val.csv"
+  features_dir: "data/features"
+  feature_dim: 1024
+
+  model_type: "moe"
+  num_slots: 128  # More slots = lower compression
+  num_classes: 2
+  hidden_dim: 1024  # Larger classifier
+  dropout: 0.3
+  temperature: 1.5  # Higher temperature for softer routing
+
+  num_epochs: 100
+  lr: 0.00005  # Lower LR for larger model
+  weight_decay: 0.00001
+  aux_loss_weight: 0.005  # Lower weight for aux loss
+  grad_accum_steps: 16
+
+  optimizer: "adamw"
+  scheduler: "cosine"
+  warmup_epochs: 10
+
+  seed: 42
+  num_workers: 4
+  use_amp: true
+  device: "cuda"
+
+  output_dir: "./outputs/low_compression"
+  log_interval: 10
+  save_freq: 10
+
+
+# ==============================================================================
+# MULTI-CLASS CONFIGURATION (for >2 classes)
+# ==============================================================================
+multiclass:
+  train_csv: "data/train_multiclass.csv"
+  val_csv: "data/val_multiclass.csv"
+  features_dir: "data/features"
+  feature_dim: 1024
+
+  model_type: "moe"
+  num_slots: 64
+  num_classes: 5  # Example: 5 cancer subtypes
+  hidden_dim: 512
+  dropout: 0.25
+  temperature: 1.0
+
+  num_epochs: 75
+  lr: 0.0001
+  weight_decay: 0.00001
+  aux_loss_weight: 0.01
+  grad_accum_steps: 8
+
+  optimizer: "adamw"
+  scheduler: "cosine"
+  warmup_epochs: 5
+
+  seed: 42
+  num_workers: 4
+  use_amp: true
+  device: "cuda"
+
+  output_dir: "./outputs/multiclass_experiment"
+  log_interval: 10
+  save_freq: 10
+
+
+# ==============================================================================
+# MIL BASELINE CONFIGURATION (for comparison)
+# ==============================================================================
+mil_baseline:
+  train_csv: "data/train.csv"
+  val_csv: "data/val.csv"
+  features_dir: "data/features"
+  feature_dim: 1024
+
+  model_type: "mil_baseline"  # Use attention-based MIL instead of MoE
+  num_slots: 64  # Not used for MIL, but kept for compatibility
+  num_classes: 2
+  hidden_dim: 512
+  dropout: 0.25
+  temperature: 1.0  # Not used for MIL
+
+  num_epochs: 50
+  lr: 0.0001
+  weight_decay: 0.00001
+  aux_loss_weight: 0.0  # No aux loss for MIL baseline
+  grad_accum_steps: 8
+
+  optimizer: "adamw"
+  scheduler: "cosine"
+  warmup_epochs: 5
+
+  seed: 42
+  num_workers: 4
+  use_amp: true
+  device: "cuda"
+
+  output_dir: "./outputs/mil_baseline"
+  log_interval: 10
+  save_freq: 10
+
+
+# ==============================================================================
+# FINE-TUNING CONFIGURATION (for transfer learning)
+# ==============================================================================
+fine_tuning:
+  train_csv: "data/train_small.csv"  # Smaller dataset
+  val_csv: "data/val_small.csv"
+  features_dir: "data/features"
+  feature_dim: 1024
+
+  model_type: "moe"
+  num_slots: 64
+  num_classes: 2
+  hidden_dim: 512
+  dropout: 0.4  # Higher dropout for small dataset
+  temperature: 1.0
+
+  num_epochs: 30  # Fewer epochs
+  lr: 0.00005  # Lower LR for fine-tuning
+  weight_decay: 0.0001  # Higher weight decay
+  aux_loss_weight: 0.01
+  grad_accum_steps: 4
+
+  optimizer: "adamw"
+  scheduler: "cosine"
+  warmup_epochs: 3
+
+  seed: 42
+  num_workers: 4
+  use_amp: true
+  device: "cuda"
+
+  output_dir: "./outputs/fine_tuning"
+  log_interval: 5
+  save_freq: 5
+
+
+# ==============================================================================
+# LARGE SCALE CONFIGURATION (for big datasets)
+# ==============================================================================
+large_scale:
+  train_csv: "data/train_large.csv"
+  val_csv: "data/val_large.csv"
+  features_dir: "data/features"
+  feature_dim: 1024
+
+  model_type: "moe"
+  num_slots: 96
+  num_classes: 2
+  hidden_dim: 768
+  dropout: 0.25
+  temperature: 1.0
+
+  num_epochs: 100
+  lr: 0.0002  # Higher LR for large dataset
+  weight_decay: 0.00001
+  aux_loss_weight: 0.01
+  grad_accum_steps: 16  # Larger effective batch size
+
+  optimizer: "adamw"
+  scheduler: "cosine"
+  warmup_epochs: 10
+
+  seed: 42
+  num_workers: 8  # More workers for faster data loading
+  use_amp: true
+  device: "cuda"
+
+  output_dir: "./outputs/large_scale"
+  log_interval: 20
+  save_freq: 10
+
+
+# ==============================================================================
+# CPU CONFIGURATION (for testing without GPU)
+# ==============================================================================
+cpu_test:
+  train_csv: "data/train_small.csv"
+  val_csv: "data/val_small.csv"
+  features_dir: "data/features"
+  feature_dim: 1024
+
+  model_type: "moe"
+  num_slots: 32  # Smaller for faster CPU inference
+  num_classes: 2
+  hidden_dim: 256
+  dropout: 0.25
+  temperature: 1.0
+
+  num_epochs: 10
+  lr: 0.0001
+  weight_decay: 0.00001
+  aux_loss_weight: 0.01
+  grad_accum_steps: 4
+
+  optimizer: "adamw"
+  scheduler: "none"
+  warmup_epochs: 0
+
+  seed: 42
+  num_workers: 2
+  use_amp: false  # AMP not beneficial on CPU
+  device: "cpu"
+
+  output_dir: "./outputs/cpu_test"
+  log_interval: 5
+  save_freq: 5
+
+
+# ==============================================================================
+# NOTES
+# ==============================================================================
+#
+# To use these configurations with train.py, you would typically:
+# 1. Parse the YAML file in Python
+# 2. Override argparse defaults with YAML values
+#
+# Example Python code:
+#
+#   import yaml
+#   with open('config.yaml') as f:
+#       config = yaml.safe_load(f)['basic']
+#
+#   # Then pass these to your training script
+#   python train.py --train_csv {config['train_csv']} ...
+#
+# Alternatively, you can modify train.py to accept a --config argument
+# that loads settings from this YAML file.
+#
+# ==============================================================================
