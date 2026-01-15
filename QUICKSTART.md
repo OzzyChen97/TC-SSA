@@ -301,7 +301,7 @@ cat eval_results/metrics.json
 
 ## Performance Benchmarks
 
-On typical WSI datasets (e.g., CAMELYON16):
+On the CPathPatchFeature dataset:
 
 | Configuration | Accuracy | AUC | Training Time (50 epochs) |
 |--------------|----------|-----|---------------------------|

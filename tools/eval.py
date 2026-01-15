@@ -22,17 +22,115 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 import numpy as np
 import pandas as pd
-from sklearn.metrics import (
-    accuracy_score,
-    roc_auc_score,
-    precision_recall_fscore_support,
-    confusion_matrix,
-    classification_report
-)
 
 from src.data import WSIFeatureDataset, collate_fn_variable_length
 from src.models import build_model
 from src.utils import set_seed, setup_logger
+
+
+def compute_accuracy(labels, preds):
+    """Compute accuracy using PyTorch."""
+    labels = torch.tensor(labels) if not isinstance(labels, torch.Tensor) else labels
+    preds = torch.tensor(preds) if not isinstance(preds, torch.Tensor) else preds
+    return (labels == preds).float().mean().item()
+
+
+def compute_confusion_matrix(labels, preds, num_classes):
+    """Compute confusion matrix using PyTorch."""
+    labels = torch.tensor(labels, dtype=torch.long) if not isinstance(labels, torch.Tensor) else labels
+    preds = torch.tensor(preds, dtype=torch.long) if not isinstance(preds, torch.Tensor) else preds
+
+    cm = torch.zeros(num_classes, num_classes, dtype=torch.long)
+    for t, p in zip(labels, preds):
+        cm[t, p] += 1
+    return cm.numpy()
+
+
+def compute_roc_auc(labels, probs, num_classes):
+    """Compute ROC AUC using PyTorch."""
+    labels = torch.tensor(labels, dtype=torch.long) if not isinstance(labels, torch.Tensor) else labels
+    probs = torch.tensor(probs, dtype=torch.float32) if not isinstance(probs, torch.Tensor) else probs
+
+    if num_classes == 2:
+        # Binary classification
+        pos_probs = probs[:, 1]
+        # Sort by predicted probability
+        sorted_indices = torch.argsort(pos_probs, descending=True)
+        sorted_labels = labels[sorted_indices]
+
+        # Compute TPR and FPR
+        n_pos = (labels == 1).sum().item()
+        n_neg = (labels == 0).sum().item()
+
+        if n_pos == 0 or n_neg == 0:
+            return 0.0
+
+        tpr = torch.cumsum(sorted_labels, dim=0).float() / n_pos
+        fpr = torch.cumsum(1 - sorted_labels, dim=0).float() / n_neg
+
+        # Compute AUC using trapezoidal rule
+        auc = torch.trapz(tpr, fpr).item()
+        return abs(auc)
+    else:
+        # Multi-class: one-vs-rest
+        aucs = []
+        for c in range(num_classes):
+            binary_labels = (labels == c).long()
+            if binary_labels.sum() == 0 or (1 - binary_labels).sum() == 0:
+                continue
+
+            pos_probs = probs[:, c]
+            sorted_indices = torch.argsort(pos_probs, descending=True)
+            sorted_labels = binary_labels[sorted_indices]
+
+            n_pos = binary_labels.sum().item()
+            n_neg = (1 - binary_labels).sum().item()
+
+            tpr = torch.cumsum(sorted_labels, dim=0).float() / n_pos
+            fpr = torch.cumsum(1 - sorted_labels, dim=0).float() / n_neg
+
+            auc = torch.trapz(tpr, fpr).item()
+            aucs.append(abs(auc))
+
+        return np.mean(aucs) if aucs else 0.0
+
+
+def compute_precision_recall_f1(labels, preds, num_classes, average='weighted'):
+    """Compute precision, recall, and F1 score using PyTorch."""
+    labels = torch.tensor(labels, dtype=torch.long) if not isinstance(labels, torch.Tensor) else labels
+    preds = torch.tensor(preds, dtype=torch.long) if not isinstance(preds, torch.Tensor) else preds
+
+    precision_per_class = []
+    recall_per_class = []
+    f1_per_class = []
+    support_per_class = []
+
+    for c in range(num_classes):
+        tp = ((preds == c) & (labels == c)).sum().float()
+        fp = ((preds == c) & (labels != c)).sum().float()
+        fn = ((preds != c) & (labels == c)).sum().float()
+        support = (labels == c).sum().item()
+
+        precision = tp / (tp + fp) if (tp + fp) > 0 else torch.tensor(0.0)
+        recall = tp / (tp + fn) if (tp + fn) > 0 else torch.tensor(0.0)
+        f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else torch.tensor(0.0)
+
+        precision_per_class.append(precision.item())
+        recall_per_class.append(recall.item())
+        f1_per_class.append(f1.item())
+        support_per_class.append(support)
+
+    if average == 'weighted':
+        total_support = sum(support_per_class)
+        if total_support > 0:
+            precision = sum(p * s for p, s in zip(precision_per_class, support_per_class)) / total_support
+            recall = sum(r * s for r, s in zip(recall_per_class, support_per_class)) / total_support
+            f1 = sum(f * s for f, s in zip(f1_per_class, support_per_class)) / total_support
+        else:
+            precision = recall = f1 = 0.0
+        return precision, recall, f1, support_per_class, precision_per_class, recall_per_class, f1_per_class
+    else:
+        return precision_per_class, recall_per_class, f1_per_class, support_per_class
 
 
 def parse_args():
@@ -132,7 +230,7 @@ def evaluate_model(model, dataloader, device, logger):
 
 def compute_detailed_metrics(results, num_classes, logger):
     """
-    Compute detailed evaluation metrics.
+    Compute detailed evaluation metrics using PyTorch.
 
     Args:
         results: Dictionary with predictions
@@ -147,31 +245,21 @@ def compute_detailed_metrics(results, num_classes, logger):
     probs = results['probs']
 
     # Overall accuracy
-    accuracy = accuracy_score(labels, preds)
+    accuracy = compute_accuracy(labels, preds)
 
     # AUC (for binary and multi-class)
-    if num_classes == 2:
-        # Binary classification: use probability of positive class
-        auc = roc_auc_score(labels, probs[:, 1])
-    else:
-        # Multi-class: use one-vs-rest
-        try:
-            auc = roc_auc_score(labels, probs, multi_class='ovr')
-        except ValueError:
-            auc = 0.0
-            logger.warning("Could not compute AUC (possibly missing classes in predictions)")
+    try:
+        auc = compute_roc_auc(labels, probs, num_classes)
+    except Exception as e:
+        auc = 0.0
+        logger.warning(f"Could not compute AUC: {e}")
 
     # Precision, Recall, F1
-    precision, recall, f1, support = precision_recall_fscore_support(
-        labels, preds, average='weighted', zero_division=0
-    )
+    precision, recall, f1, support, per_class_precision, per_class_recall, per_class_f1 = \
+        compute_precision_recall_f1(labels, preds, num_classes, average='weighted')
 
     # Confusion matrix
-    cm = confusion_matrix(labels, preds)
-
-    # Per-class metrics
-    per_class_precision, per_class_recall, per_class_f1, per_class_support = \
-        precision_recall_fscore_support(labels, preds, average=None, zero_division=0)
+    cm = compute_confusion_matrix(labels, preds, num_classes)
 
     metrics = {
         'accuracy': accuracy,
@@ -181,10 +269,10 @@ def compute_detailed_metrics(results, num_classes, logger):
         'f1': f1,
         'confusion_matrix': cm.tolist(),
         'per_class_metrics': {
-            'precision': per_class_precision.tolist(),
-            'recall': per_class_recall.tolist(),
-            'f1': per_class_f1.tolist(),
-            'support': per_class_support.tolist()
+            'precision': per_class_precision,
+            'recall': per_class_recall,
+            'f1': per_class_f1,
+            'support': support
         }
     }
 

@@ -6,7 +6,6 @@ Includes seeding, metric calculation, and logging helpers.
 import random
 import numpy as np
 import torch
-from sklearn.metrics import roc_auc_score, accuracy_score
 import logging
 from typing import Optional
 
@@ -66,7 +65,7 @@ def setup_logger(name: str = "WSI_MoE", log_file: Optional[str] = None) -> loggi
 
 def compute_metrics(y_true, y_pred, y_probs):
     """
-    Compute classification metrics: Accuracy and AUC.
+    Compute classification metrics: Accuracy and AUC using PyTorch.
 
     Args:
         y_true: Ground truth labels (numpy array or list)
@@ -81,22 +80,84 @@ def compute_metrics(y_true, y_pred, y_probs):
     y_pred = np.array(y_pred)
     y_probs = np.array(y_probs)
 
-    # Calculate metrics
-    accuracy = accuracy_score(y_true, y_pred)
+    # Calculate accuracy
+    accuracy = np.mean(y_true == y_pred)
 
-    # AUC requires at least two classes in y_true
+    # Calculate AUC using PyTorch
     try:
         if len(np.unique(y_true)) > 1:
-            auc = roc_auc_score(y_true, y_probs)
+            # Convert to tensors
+            y_true_tensor = torch.tensor(y_true, dtype=torch.long)
+            y_probs_tensor = torch.tensor(y_probs, dtype=torch.float32)
+
+            # Calculate AUC manually
+            auc = compute_auc_pytorch(y_true_tensor, y_probs_tensor)
         else:
             auc = 0.0  # Cannot compute AUC with single class
-    except ValueError:
+    except Exception:
         auc = 0.0
 
     return {
-        'accuracy': accuracy,
-        'auc': auc
+        'accuracy': float(accuracy),
+        'auc': float(auc)
     }
+
+
+def compute_auc_pytorch(y_true, y_probs):
+    """
+    Compute AUC score using PyTorch (manual implementation).
+
+    Args:
+        y_true: True labels (torch.Tensor)
+        y_probs: Predicted probabilities for positive class (torch.Tensor)
+
+    Returns:
+        AUC score (float)
+    """
+    # Sort by predicted probabilities
+    sorted_indices = torch.argsort(y_probs, descending=True)
+    y_true_sorted = y_true[sorted_indices]
+
+    # Count positives and negatives
+    n_pos = torch.sum(y_true_sorted == 1).item()
+    n_neg = torch.sum(y_true_sorted == 0).item()
+
+    if n_pos == 0 or n_neg == 0:
+        return 0.0
+
+    # Calculate AUC using trapezoidal rule
+    tpr_list = []
+    fpr_list = []
+
+    tp = 0
+    fp = 0
+
+    for label in y_true_sorted:
+        if label == 1:
+            tp += 1
+        else:
+            fp += 1
+
+        tpr = tp / n_pos
+        fpr = fp / n_neg
+
+        tpr_list.append(tpr)
+        fpr_list.append(fpr)
+
+    # Convert to tensors
+    tpr_tensor = torch.tensor(tpr_list)
+    fpr_tensor = torch.tensor(fpr_list)
+
+    # Calculate area using trapezoidal rule
+    # Sort by fpr to ensure proper integration
+    sorted_indices = torch.argsort(fpr_tensor)
+    fpr_sorted = fpr_tensor[sorted_indices]
+    tpr_sorted = tpr_tensor[sorted_indices]
+
+    # Compute AUC
+    auc = torch.trapz(tpr_sorted, fpr_sorted).item()
+
+    return auc
 
 
 class AverageMeter:
