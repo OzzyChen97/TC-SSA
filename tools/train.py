@@ -7,6 +7,19 @@ Supports:
 - Comprehensive metrics (Accuracy, AUC)
 - Auxiliary load-balancing loss
 - Checkpointing and logging
+
+python tools/train.py \
+    --train_csv data/train.csv \
+    --val_csv data/val.csv \
+    --features_dir /workspace/moe/CPathPatchFeature/brca/uni/pt_files \
+    --model_type moe \
+    --num_slots 64 \
+    --num_classes 2 \
+    --num_epochs 50 \
+    --lr 1e-4 \
+    --aux_loss_weight 0.01 \
+    --use_amp \
+    --output_dir outputs/full_experiment
 """
 
 import sys
@@ -76,9 +89,15 @@ def parse_args():
     parser.add_argument('--optimizer', type=str, default='adamw',
                         choices=['adam', 'adamw', 'sgd'],
                         help='Optimizer type (default: adamw)')
-    parser.add_argument('--scheduler', type=str, default='cosine',
-                        choices=['cosine', 'step', 'none'],
-                        help='Learning rate scheduler (default: cosine)')
+    parser.add_argument('--scheduler', type=str, default='plateau',
+                        choices=['cosine', 'step', 'plateau', 'none'],
+                        help='Learning rate scheduler (default: plateau)')
+    parser.add_argument('--lr_patience', type=int, default=5,
+                        help='Patience for ReduceLROnPlateau (default: 5)')
+    parser.add_argument('--lr_factor', type=float, default=0.5,
+                        help='Factor to reduce LR by (default: 0.5)')
+    parser.add_argument('--min_lr', type=float, default=1e-6,
+                        help='Minimum learning rate (default: 1e-6)')
 
     # System parameters
     parser.add_argument('--seed', type=int, default=42,
@@ -330,9 +349,15 @@ def main():
 
     scheduler = None
     if args.scheduler == 'cosine':
-        scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.num_epochs, eta_min=args.lr * 0.01)
+        scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.num_epochs, eta_min=args.min_lr)
     elif args.scheduler == 'step':
         scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=args.num_epochs // 3, gamma=0.1)
+    elif args.scheduler == 'plateau':
+        scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+            optimizer, mode='max', factor=args.lr_factor,
+            patience=args.lr_patience, min_lr=args.min_lr
+        )
+        logger.info(f"Using ReduceLROnPlateau: patience={args.lr_patience}, factor={args.lr_factor}, min_lr={args.min_lr}")
 
     scaler = GradScaler() if args.use_amp else None
 
@@ -363,6 +388,19 @@ def main():
                 )
                 logger.info(f"Saved best model with AUC: {best_val_auc:.4f}")
 
+            # Update learning rate based on validation AUC
+            if scheduler:
+                if args.scheduler == 'plateau':
+                    scheduler.step(val_metrics['auc'])
+                    current_lr = optimizer.param_groups[0]['lr']
+                    logger.info(f"Current learning rate: {current_lr:.6f}")
+                else:
+                    scheduler.step()
+        else:
+            # No validation set, use cosine/step scheduler normally
+            if scheduler and args.scheduler != 'plateau':
+                scheduler.step()
+
         if epoch % args.save_freq == 0:
             save_checkpoint(
                 {
@@ -375,9 +413,6 @@ def main():
                 },
                 filename=os.path.join(args.output_dir, f'checkpoint_epoch_{epoch}.pth')
             )
-
-        if scheduler:
-            scheduler.step()
 
     logger.info("Training completed!")
     if val_loader:

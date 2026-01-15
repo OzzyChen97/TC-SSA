@@ -64,6 +64,7 @@ runs/
 *.pth
 *.pt
 *.ckpt
+*.h5
 
 # System files
 .DS_Store

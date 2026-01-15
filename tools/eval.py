@@ -6,6 +6,13 @@ This script evaluates a trained model on a test dataset and generates:
 - Per-slide predictions CSV
 - Confusion matrix
 - ROC curve (optional)
+
+python tools/eval.py \
+    --test_csv data/test.csv \
+    --features_dir /workspace/moe/CPathPatchFeature/brca/uni/pt_files \
+    --checkpoint outputs/full_experiment/best_model.pth \
+    --output_dir eval_results \
+    --save_predictions
 """
 
 import argparse
