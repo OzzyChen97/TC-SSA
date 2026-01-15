@@ -18,84 +18,12 @@ This project implements a deep learning pipeline for classifying Whole Slide Ima
 - ✅ Ensures load balancing across experts
 - ✅ Outperforms standard attention-based MIL
 
----
-
-### Key Directories
-
-| Directory | Purpose |
-|-----------|---------|
-| `src/` | Core source code (models, data, utilities) |
-| `tools/` | Training, evaluation, and data generation scripts |
-| `configs/` | YAML configuration files for experiments |
-| `examples/` | Code examples for inference and usage |
-| `tests/` | Unit tests and verification scripts |
-| `data/` | Dataset (features + CSVs, **not tracked in git**) |
-| `outputs/` | Training results (**not tracked in git**) |
 
 ---
-
-## ⚙️ Installation
-
-### Prerequisites
-
-- Python ≥ 3.8
-- CUDA-capable GPU (optional but recommended)
-- Pre-extracted WSI patch features (.pt files)
-
-### Step 1: Clone Repository
-
-```bash
-git clone https://github.com/OzzyChen97/wsi-moe-classifier.git
-cd wsi-moe-classifier
-```
-
-### Step 2: Create Virtual Environment
-
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-### Step 3: Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
----
-
-### 1. Prepare Your Data
-
-#### Data Format
-
-Your data should follow this structure:
-
-```
-data/
-├── features/
-│   ├── slide_001.pt
-│   ├── slide_002.pt
-│   └── ...
-├── train.csv
-├── val.csv
-└── test.csv
-```
-
-#### CSV Format
-
-```csv
-slide_id,label
-slide_001,0
-slide_002,1
-slide_003,0
-```
-
-- **slide_id**: Identifier matching the .pt filename (without extension)
-- **label**: Integer class label (0, 1, 2, ...)
-
 
 ## 🔧 Model Architecture
 
-### MoE Token Compressor
+**MoE Token Compressor**:
 
 ```
 Input: [Batch=1, N, 1024] (Variable N per slide)
@@ -118,7 +46,7 @@ CV² = (std / mean)²
 Total Loss = CrossEntropyLoss + λ × CV²
 ```
 
-### Complete WSI Classifier
+**Complete WSI Classifier**:
 
 ```
 Input [1, N, 1024]
@@ -145,80 +73,53 @@ Output: Logits
 | `lr` | 5e-5 to 2e-4 | Learning rate |
 | `grad_accum_steps` | 4-16 | Effective batch size |
 
-### Recommended Configurations
-
-#### Binary Classification
 
 ---
 
 
-## 🏆 Benchmark Comparison
-
-We compared our **WSI_MoE** model against state-of-the-art methods on the **TCGA-BRCA** dataset.
-
-| Method | Backbone | Accuracy | Data Source |
-|:---|:---|:---:|:---|
-| **WSI_MoE (Ours)** | **UNI** | **93.75%** | Real-world Evaluation |
-| **ABMILX** | ResNet-50 | 95.17% ± 5.82 | [ArXiv:2506.02408] |
-| **GIGAP** | TransMIL | 93.97% ± 3.88 | [ArXiv:2506.02408] |
-| **UNI** | TransMIL | 93.33% ± 3.50 | [ArXiv:2506.02408] |
-| **CHIEF** | - | 91.43% ± 4.52 | [ArXiv:2506.02408] |
-| **CLAM** | ResNet-50 | 85.86% ± 6.43 | [ArXiv:2506.02408] |
-
-*All competitor results are cited from [ArXiv:2506.02408](https://arxiv.org/abs/2506.02408).*
-
-### Latest Evaluation Metrics (Reported)
-
-| Metric | Value |
-|:---|:---:|
-| **Accuracy** | **93.75%** |
-| **AUC** | **0.9638** |
-| Precision | 0.9375 |
-| Recall | 0.9375 |
-| F1 Score | 0.9375 |
-
-**Confusion Matrix**:
-```text
-[[74,  3],
- [ 3, 16]]
+# Evaluation Results
+## 1. Summary of New Training Results
+Based on the latest evaluation runs in `/workspace/ETC/eval_results`, here are the performance metrics for the four categories:
+| Model | Dataset | Accuracy | AUC | Precision | Recall | F1 Score |
+|-------|---------|----------|-----|-----------|--------|----------|
+| **ResNet-50** | TCGA-BRCA | 0.8021 | 0.6958 | 0.6433 | 0.8021 | 0.7140 |
+| **UNI** | TCGA-BRCA | 0.9271 | 0.9672 | 0.9259 | 0.9271 | 0.9263 |
+| **ResNet-50** | TCGA-NSCLC | 0.7423 | 0.8315 | 0.7571 | 0.7423 | 0.7398 |
+| **UNI** | TCGA-NSCLC | 0.8969 | 0.9881 | 0.9076 | 0.8969 | 0.8959 |
+**Key Observations:**
+- The **UNI encoder** significantly outperforms ResNet-50 on both datasets, achieving near 99% AUC on NSCLC and 97% on BRCA.
+- **ResNet-50 on BRCA** shows signs of mode collapse (predicting only the majority class), resulting in an accuracy that matches the majority class prevalence (~80%) but a poor Recall for the minority class (0.0).
+---
+## 2. Training Visualization
+Selected training plots showing the progression of Accuracy, AUC, and Loss.
+### TCGA-BRCA (ResNet-50 vs UNI)
+| ResNet-50 AUC | UNI AUC |
+|:---:|:---:|
+| ![BRCA R50 AUC](./amy_plots/brca-r50/auc_epoch.png) | ![BRCA UNI AUC](./amy_plots/brca-uni/auc_epoch.png) |
+| ResNet-50 Loss | UNI Loss |
+|:---:|:---:|
+| ![BRCA R50 Loss](./amy_plots/brca-r50/loss_epoch.png) | ![BRCA UNI Loss](./amy_plots/brca-uni/loss_epoch.png) |
+### TCGA-NSCLC (ResNet-50 vs UNI)
+| ResNet-50 AUC | UNI AUC |
+|:---:|:---:|
+| ![NSCLC R50 AUC](./amy_plots/nsclc-r50/auc_epoch.png) | ![NSCLC UNI AUC](./amy_plots/nsclc-uni/auc_epoch.png) |
+---
+## 3. Analysis: BRCA-ResNet-50 AUC Decline
+A detailed inspection of the training process for `brca-r50` reveals a problematic trend where the AUC may degrade or stagnate despite reasonable accuracy.
+**Root Cause Analysis:**
+The evaluation metrics show a confusion matrix of:
 ```
-*Class 0 (Normal): 77 samples, Class 1 (Tumor): 19 samples*
-
----
-
-
-## 🛠️ Troubleshooting
-
-### Out of Memory (OOM)
-
-**Solutions:**
-1. Enable mixed precision: `--use_amp`
-2. Increase gradient accumulation: `--grad_accum_steps 16`
-3. Reduce model size: `--num_slots 32`
-4. Use CPU: `--device cpu`
-
-### Poor Performance (AUC < 0.7)
-
-**Checklist:**
-- ✅ Check feature quality (UNI > CTransPath > ResNet)
-- ✅ Verify label correctness in CSV
-- ✅ Tune hyperparameters: `--num_slots 96 --lr 5e-5`
-- ✅ Increase training: `--num_epochs 100`
-
-### File Loading Errors
-
-**Verify:**
-- CSV has `slide_id` and `label` columns
-- Feature files named as `{slide_id}.pt`
-- Feature format: Dictionary with 'features' key or direct tensor
-- Feature dimension matches `--feature_dim`
-
-### Training is Slow
-
-**Optimizations:**
-- Enable AMP: `--use_amp`
-- Increase workers: `--num_workers 8`
-- Use GPU: `--device cuda`
+[[77, 0],
+ [19, 0]]
+```
+This indicates **Mode Collapse** where the model predicts the negative class (0) for all samples. 
+- **High Accuracy (80.2%)** is misleading; it simply reflects the class imbalance (77/96 samples are class 0).
+- **Declining/Low AUC**: Since the model is not learning to discriminate and pushes all probabilities towards one class or becomes unconfident/random regarding the minority class, the ranking capability (AUC) suffers.
+- **Possible Reasons**:
+    1. **Severe Class Imbalance**: The dataset has significantly more negatives than positives. Without oversampling or weighted loss, the model falls into the local minimum of "always predict majority".
+    2. **Encoder Capacity**: ResNet-50 might be struggling to extract robust features for this specific task compared to UNI, leading to faster overfitting to the majority class priors.
+    3. **Hyperparameters**: The learning rate might be too high, preventing the model from settling into a solution that distinguishes the minority class.
+**Recommendation**: Implement **Weighted Cross Entropy Loss** or perform **Oversampling** for the minority class to force the ResNet-50 model to learn features for Class 1.
 
 ---
 
