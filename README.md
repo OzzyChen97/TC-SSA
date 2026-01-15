@@ -95,14 +95,13 @@ Selected training plots showing the progression of Accuracy, AUC, and Loss.
 ### TCGA-BRCA (ResNet-50 vs UNI)
 | ResNet-50 AUC | UNI AUC |
 |:---:|:---:|
-| ![BRCA R50 AUC](./amy_plots/brca-r50/auc_epoch.png) | ![BRCA UNI AUC](./amy_plots/brca-uni/auc_epoch.png) |
+| ![BRCA R50 AUC](./eval_results/amy_plots/brca-r50/auc_epoch.png) | ![BRCA UNI AUC](./eval_results/amy_plots/brca-uni/auc_epoch.png) |
 | ResNet-50 Loss | UNI Loss |
-|:---:|:---:|
-| ![BRCA R50 Loss](./amy_plots/brca-r50/loss_epoch.png) | ![BRCA UNI Loss](./amy_plots/brca-uni/loss_epoch.png) |
+| ![BRCA R50 Loss](./eval_results/amy_plots/brca-r50/loss_epoch.png) | ![BRCA UNI Loss](./eval_results/amy_plots/brca-uni/loss_epoch.png) |
 ### TCGA-NSCLC (ResNet-50 vs UNI)
 | ResNet-50 AUC | UNI AUC |
 |:---:|:---:|
-| ![NSCLC R50 AUC](./amy_plots/nsclc-r50/auc_epoch.png) | ![NSCLC UNI AUC](./amy_plots/nsclc-uni/auc_epoch.png) |
+| ![NSCLC R50 AUC](./eval_results/amy_plots/nsclc-r50/auc_epoch.png) | ![NSCLC UNI AUC](./eval_results/amy_plots/nsclc-uni/auc_epoch.png) |
 ---
 ## 3. Analysis: BRCA-ResNet-50 AUC Decline
 A detailed inspection of the training process for `brca-r50` reveals a problematic trend where the AUC may degrade or stagnate despite reasonable accuracy.
