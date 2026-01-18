@@ -15,7 +15,7 @@ class Expert(nn.Module):
     Individual Expert module with residual connection.
     Each expert processes features assigned to its slot.
     """
-    def __init__(self, dim=1024, hidden_dim=512, act_layer=nn.GELU, drop=0.2):
+    def __init__(self, dim=1024, hidden_dim=512, act_layer=nn.GELU, drop=0.25):
         super().__init__()
         self.net = nn.Sequential(
             nn.Linear(dim, hidden_dim),
@@ -53,7 +53,7 @@ class MoE_Compressor(nn.Module):
         5. Load Balancing Loss: Ensures uniform expert utilization
     """
 
-    def __init__(self, num_slots=64, top_k=1, input_dim=1024):
+    def __init__(self, num_slots=64, top_k=2, input_dim=1024):
         """
         Initialize MoE Compressor.
 

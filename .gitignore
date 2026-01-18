@@ -64,6 +64,8 @@ runs/
 *.pth
 *.pt
 *.ckpt
+*.csv
+*.npy
 *.h5
 
 # System files

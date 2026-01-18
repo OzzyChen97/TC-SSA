@@ -9,17 +9,17 @@ Supports:
 - Checkpointing and logging
 
 python tools/train.py \
-    --train_csv data/train.csv \
-    --val_csv data/val.csv \
-    --features_dir /workspace/moe/CPathPatchFeature/brca/uni/pt_files \
+    --train_csv /workspace/ETC/data/cptac_nsclc/train.csv \
+    --val_csv /workspace/ETC/data/cptac_nsclc/val.csv \
+    --features_dir /workspace/ETC/CPathPatchFeature/cptac_nsclc/uni/pt_files \
     --model_type moe \
-    --num_slots 64 \
+    --num_slots 16 \
     --num_classes 2 \
-    --num_epochs 50 \
+    --num_epochs 100 \
     --lr 1e-4 \
-    --aux_loss_weight 0.01 \
+    --aux_loss_weight 0.1 \
     --use_amp \
-    --output_dir outputs/full_experiment
+    --output_dir outputs/cptac_nsclc_uni_moe_experiment
 """
 
 import sys
