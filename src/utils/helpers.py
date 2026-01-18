@@ -66,11 +66,14 @@ def setup_logger(name: str = "WSI_MoE", log_file: Optional[str] = None) -> loggi
 def compute_metrics(y_true, y_pred, y_probs):
     """
     Compute classification metrics: Accuracy and AUC using PyTorch.
+    Supports both binary and multi-class (One-vs-Rest Micro/Macro avg).
 
     Args:
         y_true: Ground truth labels (numpy array or list)
         y_pred: Predicted class labels (numpy array or list)
-        y_probs: Predicted probabilities for positive class (numpy array or list)
+        y_probs: Predicted probabilities (numpy array or list).
+                 Shape [N] for binary (prob of positive class),
+                 Shape [N, C] for multi-class.
 
     Returns:
         Dictionary containing accuracy and AUC scores
@@ -83,18 +86,49 @@ def compute_metrics(y_true, y_pred, y_probs):
     # Calculate accuracy
     accuracy = np.mean(y_true == y_pred)
 
-    # Calculate AUC using PyTorch
+    # Calculate AUC
+    auc = 0.0
     try:
-        if len(np.unique(y_true)) > 1:
-            # Convert to tensors
-            y_true_tensor = torch.tensor(y_true, dtype=torch.long)
-            y_probs_tensor = torch.tensor(y_probs, dtype=torch.float32)
-
-            # Calculate AUC manually
-            auc = compute_auc_pytorch(y_true_tensor, y_probs_tensor)
-        else:
-            auc = 0.0  # Cannot compute AUC with single class
-    except Exception:
+        classes = np.unique(y_true)
+        num_classes = len(classes)
+        
+        # Check if we have probability scores
+        if y_probs.ndim == 1 or (y_probs.ndim == 2 and y_probs.shape[1] == 1):
+            # Binary classification case
+            # Assumes y_true has 0 and 1, or needs mapping if not
+            if num_classes <= 2:
+                # Convert to tensors for helper
+                y_true_tensor = torch.tensor(y_true, dtype=torch.long)
+                y_probs_tensor = torch.tensor(y_probs.flatten(), dtype=torch.float32)
+                auc = compute_auc_pytorch(y_true_tensor, y_probs_tensor)
+        
+        elif y_probs.ndim == 2 and y_probs.shape[1] > 1:
+            # Multi-class case: Calculate Macro-Average AUC (One-vs-Rest)
+            aucs = []
+            # We iterate over all possible classes (based on prob shape, not just present labels)
+            # This handles cases where a batch might miss a class, but model outputs probs for it
+            num_model_classes = y_probs.shape[1]
+            
+            for c in range(num_model_classes):
+                # Create binary labels for class c (1 vs Rest 0)
+                y_true_binary = (y_true == c).astype(int)
+                
+                # If a class is not present in y_true, we cannot compute AUC for it correctly
+                # (it would have 0 positives). Skippping or handling gracefully.
+                if np.sum(y_true_binary == 1) > 0 and np.sum(y_true_binary == 0) > 0:
+                    y_probs_binary = y_probs[:, c]
+                    
+                    y_true_tensor = torch.tensor(y_true_binary, dtype=torch.long)
+                    y_probs_tensor = torch.tensor(y_probs_binary, dtype=torch.float32)
+                    
+                    class_auc = compute_auc_pytorch(y_true_tensor, y_probs_tensor)
+                    aucs.append(class_auc)
+            
+            if aucs:
+                auc = np.mean(aucs)
+    
+    except Exception as e:
+        print(f"Metrics computation error: {e}")
         auc = 0.0
 
     return {

@@ -4,20 +4,20 @@ Training script for WSI-VQA with SlideChat data.
 Adapted specifically for SlideChat dataset format.
 
 Usage:
-    /workspace/gaoyonghan/miniconda3/envs/etc/bin/torchrun \
+/workspace/gaoyonghan/miniconda3/envs/etc/bin/torchrun \
     --nproc_per_node=4 \
     vqa/tools/train_slidechat.py \
     --stage 1 \
-    --moe_checkpoint outputs/cptac_nsclc_uni_moe_experiment/best_model.pth \
+    --moe_checkpoint /workspace/ETC/outputs/moe_tcga_experiment/best_model.pth \
     --llm_path vqa/data/Qwen3-4B-Instruct-2507 \
-    --data_path vqa/data/SlideChat/SlideInstruct_train_stage1_caption.json \
+    --data_path vqa/data/SlideChat/SlideInstruct_train_stage1_caption_filtered.json \
     --features_dir vqa/data/GTEx-TCGA-Embeddings \
     --output_dir vqa/outputs/slidechat_stage1 \
-    --batch_size 32 \
-    --gradient_accumulation_steps 1 \
-    --num_epochs 5 \
+    --batch_size 10 \
+    --gradient_accumulation_steps 8 \
+    --num_epochs 15 \
     --lr 1e-3 \
-    --visual_dim 1024 \
+    --visual_dim 512 \
     --moe_num_slots 32
 """
 
@@ -36,7 +36,7 @@ import swanlab
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 from vqa.src.vqa_model import MoE_Qwen_VQA
-from vqa.src.slidechat_dataset import SlideChatDataset, collate_fn
+from vqa.src.slidechat_dataset import SlideChatDataset
 
 
 def setup_ddp():
@@ -109,7 +109,7 @@ def parse_args():
                        help='Max gradient norm')
     parser.add_argument('--save_steps', type=int, default=1000,
                        help='Save every N steps')
-    parser.add_argument('--log_steps', type=int, default=10,
+    parser.add_argument('--log_steps', type=int, default=1,
                        help='Log every N steps')
 
     # Dataset arguments
@@ -280,11 +280,10 @@ def main():
     dataloader = DataLoader(
         dataset,
         batch_size=args.batch_size,
-        sampler=sampler,
-        shuffle=(sampler is None),
-        collate_fn=collate_fn,
-        num_workers=4,
-        pin_memory=True
+        shuffle=True,
+        num_workers=0,  # Set to 0 to debug bus error/shm issues
+        pin_memory=True,
+        collate_fn=dataset.collate_fn
     )
 
     # Setup optimizer

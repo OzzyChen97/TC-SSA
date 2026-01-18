@@ -172,7 +172,28 @@ class SlideChatDataset(Dataset):
         if features_path.endswith('.pt') or features_path.endswith('.pth'):
             features = torch.load(features_path, map_location='cpu')
         elif features_path.endswith('.npy'):
-            features = torch.from_numpy(np.load(features_path))
+            data = np.load(features_path, allow_pickle=True)
+            # data could be a 0-d array wrapping a dict
+            if data.ndim == 0 and data.dtype == object:
+                try:
+                    data_dict = data.item()
+                    if 'feature' in data_dict:
+                        feat_obj = data_dict['feature']
+                        if isinstance(feat_obj, torch.Tensor):
+                            features = feat_obj
+                        elif isinstance(feat_obj, np.ndarray):
+                            features = torch.from_numpy(feat_obj)
+                        else:
+                            # Try converting whatever it is
+                            features = torch.tensor(feat_obj)
+                    else:
+                        features = torch.from_numpy(data) # Fallback
+                except Exception as e:
+                    # If extraction fails, try using data directly if compatible
+                    # But if data is object array, this fails. 
+                    raise ValueError(f"Failed to extract features from {features_path}: {e}")
+            else:
+                features = torch.from_numpy(data)
         elif features_path.endswith('.csv'):
             # SlideChat stores features as CSV
             df = pd.read_csv(features_path, header=None)
@@ -295,145 +316,33 @@ class SlideChatDataset(Dataset):
         """Get a single training sample."""
         return self._create_sample(self.data[idx])
 
-
-class SlideChatBenchmarkDataset(Dataset):
-    """
-    Dataset for SlideBench evaluation from CSV.
-    """
-
-    def __init__(self, csv_path, features_dir, tokenizer, num_visual_tokens=16):
+    @staticmethod
+    def collate_fn(batch):
         """
-        Args:
-            csv_path: Path to SlideBench CSV file
-            features_dir: Directory containing features
-            tokenizer: HuggingFace tokenizer
-            num_visual_tokens: Number of visual tokens
+        Custom collate function for training.
         """
-        self.features_dir = features_dir
-        self.tokenizer = tokenizer
-        self.num_visual_tokens = num_visual_tokens
+        max_patches = max([item['patch_features'].shape[0] for item in batch])
 
-        # Load CSV
-        self.df = pd.read_csv(csv_path)
-        print(f"Loaded {len(self.df)} benchmark samples from {csv_path}")
+        # Pad patch features
+        padded_features = []
+        for item in batch:
+            features = item['patch_features']
+            N = features.shape[0]
 
-        # Check columns
-        required_cols = ['Slide', 'Question', 'A', 'B', 'C', 'D', 'Answer', 'Broad Category']
-        for col in required_cols:
-            if col not in self.df.columns:
-                raise ValueError(f"Missing required column: {col}")
+            if N < max_patches:
+                padding = torch.zeros(max_patches - N, features.shape[1])
+                features = torch.cat([features, padding], dim=0)
 
-        self.image_token_id = tokenizer.convert_tokens_to_ids("<image>")
+            padded_features.append(features)
 
-    def _get_features_path(self, slide_id):
-        """Get features path from slide ID."""
-        # Try different extensions
-        for ext in ['.pt', '.pth', '.npy', '.csv']:
-            feat_path = os.path.join(self.features_dir, f"{slide_id}{ext}")
-            if os.path.exists(feat_path):
-                return feat_path
-
-        return os.path.join(self.features_dir, f"{slide_id}.csv")
-
-    def _load_patch_features(self, features_path):
-        """Load features."""
-        if not os.path.exists(features_path):
-            raise FileNotFoundError(f"Features not found: {features_path}")
-
-        if features_path.endswith('.pt') or features_path.endswith('.pth'):
-            features = torch.load(features_path, map_location='cpu')
-        elif features_path.endswith('.npy'):
-            features = torch.from_numpy(np.load(features_path))
-        elif features_path.endswith('.csv'):
-            df = pd.read_csv(features_path, header=None)
-            features = torch.from_numpy(df.values)
-        else:
-            raise ValueError(f"Unsupported format: {features_path}")
-
-        if features.dtype != torch.float32:
-            features = features.float()
-
-        # Expand ConCH features if needed
-        if features.shape[-1] == 512:
-            features = torch.cat([features, features], dim=-1)
-
-        return features
-
-    def __len__(self):
-        return len(self.df)
-
-    def __getitem__(self, idx):
-        """Get benchmark sample."""
-        row = self.df.iloc[idx]
-
-        slide_id = row['Slide']
-        question = row['Question']
-        choices = [row['A'], row['B'], row['C'], row['D']]
-        answer = row['Answer']
-        category = row['Broad Category']
-
-        # Format prompt
-        choices_text = "\n".join([
-            f"A) {choices[0]}",
-            f"B) {choices[1]}",
-            f"C) {choices[2]}",
-            f"D) {choices[3]}"
-        ])
-        prompt = f"<image> {question}\n{choices_text}\nAnswer with only the letter (A/B/C/D):"
-
-        # Tokenize
-        encoding = self.tokenizer(
-            prompt,
-            return_tensors='pt',
-            padding=False,
-            truncation=False
-        )
-
-        input_ids = encoding['input_ids'].squeeze(0)
-        attention_mask = encoding['attention_mask'].squeeze(0)
-
-        # Load features
-        features_path = self._get_features_path(slide_id)
-        patch_features = self._load_patch_features(features_path)
-
+        # Stack batch
         return {
-            'input_ids': input_ids,
-            'attention_mask': attention_mask,
-            'patch_features': patch_features,
-            'slide_id': slide_id,
-            'question': question,
-            'choices': choices,
-            'answer': answer,
-            'category': category
+            'input_ids': torch.stack([item['input_ids'] for item in batch]),
+            'attention_mask': torch.stack([item['attention_mask'] for item in batch]),
+            'labels': torch.stack([item['labels'] for item in batch]),
+            'patch_features': torch.stack(padded_features),
+            'slide_id': [item['slide_id'] for item in batch]
         }
-
-
-def collate_fn(batch):
-    """
-    Custom collate function for training.
-    """
-    max_patches = max([item['patch_features'].shape[0] for item in batch])
-
-    # Pad patch features
-    padded_features = []
-    for item in batch:
-        features = item['patch_features']
-        N = features.shape[0]
-
-        if N < max_patches:
-            padding = torch.zeros(max_patches - N, features.shape[1])
-            features = torch.cat([features, padding], dim=0)
-
-        padded_features.append(features)
-
-    # Stack batch
-    return {
-        'input_ids': torch.stack([item['input_ids'] for item in batch]),
-        'attention_mask': torch.stack([item['attention_mask'] for item in batch]),
-        'labels': torch.stack([item['labels'] for item in batch]),
-        'patch_features': torch.stack(padded_features),
-        'slide_id': [item['slide_id'] for item in batch]
-    }
 
 
 def benchmark_collate_fn(batch):

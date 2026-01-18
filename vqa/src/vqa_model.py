@@ -127,6 +127,10 @@ class MoE_Qwen_VQA(nn.Module):
             hidden_dim=2048
         )
 
+        # Enable gradient checkpointing to save memory
+        self.llm.gradient_checkpointing_enable()
+        print("Gradient checkpointing enabled for LLM.")
+
         # 4. Set pad token
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
@@ -269,6 +273,9 @@ class MoE_Qwen_VQA(nn.Module):
         inputs_embeds, new_attention_mask, new_labels = self.prepare_model_inputs(
             input_ids, patch_features, attention_mask, labels
         )
+
+        # Convert to LLM dtype (bfloat16)
+        inputs_embeds = inputs_embeds.to(dtype=self.llm.dtype)
 
         # Forward through LLM
         outputs = self.llm(
