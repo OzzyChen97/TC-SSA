@@ -1,0 +1,11 @@
+{
+  "TCGA-BLCA": 0,
+  "TCGA-BR": 1,
+  "TCGA-COAD": 2,
+  "TCGA-GBM": 3,
+  "TCGA-HNSC": 4,
+  "TCGA-LGG": 5,
+  "TCGA-LUNG": 6,
+  "TCGA-Rest": 7,
+  "TCGA-SKCM": 8
+}

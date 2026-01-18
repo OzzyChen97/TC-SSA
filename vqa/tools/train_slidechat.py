@@ -4,32 +4,21 @@ Training script for WSI-VQA with SlideChat data.
 Adapted specifically for SlideChat dataset format.
 
 Usage:
-    # Stage 1 (Caption Pretraining) - Multi-GPU
-    torchrun --nproc_per_node=4 vqa/tools/train_slidechat.py \
-        --stage 1 \
-        --moe_checkpoint vqa/outputs/best_model.pth \
-        --llm_path vqa/data/Qwen3-4B-Instruct-2507 \
-        --data_path vqa/data/SlideChat/SlideInstruct_train_stage1_caption.json \
-        --features_dir vqa/data/GTEx-TCGA-Embeddings \
-        --output_dir vqa/outputs/slidechat_stage1 \
-        --batch_size 4 \
-        --gradient_accumulation_steps 4 \
-        --num_epochs 5 \
-        --lr 1e-4
-
-    # Stage 2 (VQA Finetuning) - Multi-GPU
-    torchrun --nproc_per_node=2 vqa/tools/train_slidechat.py \
-        --stage 2 \
-        --moe_checkpoint /path/to/moe_best.pt \
-        --llm_path Qwen/Qwen3-4B-Instruct-2507 \
-        --load_projector outputs/slidechat_stage1/final/projector.pt \
-        --data_path vqa/data/SlideChat/SlideInstruct_train_stage2_vqa.json \
-        --features_dir vqa/data/SlideChat/Feat \
-        --output_dir outputs/slidechat_stage2 \
-        --batch_size 2 \
-        --gradient_accumulation_steps 8 \
-        --num_epochs 5 \
-        --lr 1e-5
+    /workspace/gaoyonghan/miniconda3/envs/etc/bin/torchrun \
+    --nproc_per_node=4 \
+    vqa/tools/train_slidechat.py \
+    --stage 1 \
+    --moe_checkpoint outputs/cptac_nsclc_uni_moe_experiment/best_model.pth \
+    --llm_path vqa/data/Qwen3-4B-Instruct-2507 \
+    --data_path vqa/data/SlideChat/SlideInstruct_train_stage1_caption.json \
+    --features_dir vqa/data/GTEx-TCGA-Embeddings \
+    --output_dir vqa/outputs/slidechat_stage1 \
+    --batch_size 32 \
+    --gradient_accumulation_steps 1 \
+    --num_epochs 5 \
+    --lr 1e-3 \
+    --visual_dim 1024 \
+    --moe_num_slots 32
 """
 
 import argparse
@@ -41,7 +30,7 @@ from torch.utils.data import DataLoader, DistributedSampler
 from torch.nn.parallel import DistributedDataParallel as DDP
 from transformers import get_cosine_schedule_with_warmup
 from tqdm import tqdm
-import wandb
+import swanlab
 
 # Add parent directory to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
@@ -104,13 +93,13 @@ def parse_args():
                        help='Number of MoE slots/visual tokens')
 
     # Training arguments
-    parser.add_argument('--batch_size', type=int, default=4,
+    parser.add_argument('--batch_size', type=int, default=32,
                        help='Batch size per GPU')
     parser.add_argument('--gradient_accumulation_steps', type=int, default=4,
                        help='Gradient accumulation steps')
     parser.add_argument('--num_epochs', type=int, default=3,
                        help='Number of training epochs')
-    parser.add_argument('--lr', type=float, default=1e-4,
+    parser.add_argument('--lr', type=float, default=1e-3,
                        help='Learning rate')
     parser.add_argument('--warmup_ratio', type=float, default=0.1,
                        help='Warmup ratio')
@@ -190,7 +179,7 @@ def train_epoch(model, dataloader, optimizer, scheduler, epoch, args, rank, worl
                     pbar.set_postfix({'loss': f'{avg_loss:.4f}', 'lr': f'{lr:.2e}'})
 
                 if not args.no_wandb:
-                    wandb.log({
+                    swanlab.log({
                         'train/loss': avg_loss,
                         'train/lr': lr,
                         'epoch': epoch,
@@ -216,10 +205,12 @@ def main():
     if rank == 0:
         os.makedirs(args.output_dir, exist_ok=True)
 
-    # Initialize wandb
+    # Initialize swanlab
     if rank == 0 and not args.no_wandb:
-        wandb.init(
-            project=args.wandb_project,
+        swanlab.login(api_key="0A0DTrg0HCj4yuKPe85VI")
+        swanlab.init(
+            project="Slidechat",
+            workspace="Ozzy",
             name=args.wandb_run_name or f'stage{args.stage}_slidechat',
             config=vars(args)
         )
@@ -326,7 +317,7 @@ def main():
         if rank == 0:
             print(f"\nEpoch {epoch} - Average Loss: {avg_loss:.4f}")
             if not args.no_wandb:
-                wandb.log({'epoch/loss': avg_loss, 'epoch': epoch})
+                swanlab.log({'epoch/loss': avg_loss, 'epoch': epoch})
 
     # Save final checkpoint
     if rank == 0:
@@ -338,7 +329,7 @@ def main():
             model.save_pretrained(final_path)
 
     if not args.no_wandb and rank == 0:
-        wandb.finish()
+        swanlab.finish()
 
     cleanup_ddp()
 
