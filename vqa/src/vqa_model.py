@@ -12,6 +12,7 @@ import torch.nn as nn
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import sys
 import os
+from peft import get_peft_model, LoraConfig, TaskType
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
@@ -55,7 +56,7 @@ class MoE_Qwen_VQA(nn.Module):
         llm_path="/workspace/ETC/vqa/data/Qwen3-4B-Instruct-2507",
         num_visual_tokens=16,
         moe_num_slots=32,
-        visual_dim=256,
+        visual_dim=1024,
         device='cuda'
     ):
         """
@@ -71,6 +72,7 @@ class MoE_Qwen_VQA(nn.Module):
 
         self.num_visual_tokens = num_visual_tokens
         self.device = device
+        self.llm_path = llm_path # Save for debugging
 
         # 1. Load Visual Encoder (Frozen)
         print(f"Loading MoE_Compressor from {moe_checkpoint}...")
@@ -135,12 +137,28 @@ class MoE_Qwen_VQA(nn.Module):
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
             self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
+            # Fix Qwen padding side if needed (usually left for generation, right for training)
+            self.tokenizer.padding_side = 'right'
 
     def freeze_llm(self):
         """Freeze LLM parameters (Stage 1)."""
         for param in self.llm.parameters():
             param.requires_grad = False
         print("LLM frozen.")
+
+    def enable_lora(self, r=16, lora_alpha=32, lora_dropout=0.05):
+        """Enable LoRA for Stage 2."""
+        peft_config = LoraConfig(
+            task_type=TaskType.CAUSAL_LM,
+            inference_mode=False,
+            r=r,
+            lora_alpha=lora_alpha,
+            lora_dropout=lora_dropout,
+            target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"] # Target all Linear layers in Qwen
+        )
+        self.llm = get_peft_model(self.llm, peft_config)
+        self.llm.print_trainable_parameters()
+        print("LoRA enabled.")
 
     def unfreeze_llm(self):
         """Unfreeze LLM parameters (Stage 2)."""

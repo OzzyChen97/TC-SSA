@@ -8,7 +8,7 @@ Production-ready PyTorch research codebase for **Whole Slide Image (WSI) Classif
 
 ## 🎯 Overview
 
-This project implements a deep learning pipeline for classifying Whole Slide Images using pre-extracted patch features from foundation models (UNI, CTransPath, etc.). The core innovation is the **MoE Token Compressor** that intelligently reduces thousands of variable-length patch embeddings into a fixed set of semantic tokens for classification.
+This project implements a deep learning pipeline for Whole Slide Image (WSI) analysis, featuring both **Classification** and **Visual Question Answering (SlideChat)**. The core innovation is the **MoE Token Compressor** that intelligently reduces thousands of variable-length patch embeddings into a fixed set of semantic tokens.
 
 ### Key Innovation
 
@@ -119,6 +119,63 @@ This indicates **Mode Collapse** where the model predicts the negative class (0)
     2. **Encoder Capacity**: ResNet-50 might be struggling to extract robust features for this specific task compared to UNI, leading to faster overfitting to the majority class priors.
     3. **Hyperparameters**: The learning rate might be too high, preventing the model from settling into a solution that distinguishes the minority class.
 **Recommendation**: Implement **Weighted Cross Entropy Loss** or perform **Oversampling** for the minority class to force the ResNet-50 model to learn features for Class 1.
+
+---
+
+## 💬 SlideChat: WSI Visual Question Answering
+
+We extend the MoE Token Compressor to serve as a visual encoder for a Multimodal Large Language Model (MLLM), enabling **SlideChat** - a Conversational Assistant for Whole Slide Images.
+
+### Architecture
+- **Visual Encoder**: Pre-trained MoE Token Compressor (frozen)
+- **Projector**: Linear projection to align MoE tokens with LLM embedding space
+- **LLM**: Qwen3-4B-Instruct
+- **Input**: WSI Patch Features + Text Question
+- **Output**: Text Answer
+
+### Training Pipeline
+The training consists of two stages:
+
+**Stage 1: Captioning Pre-training (Projector Alignment)**
+Trains only the projector to align visual tokens with text using captioning data.
+```bash
+torchrun --nproc_per_node=4 vqa/tools/train_slidechat.py \
+    --stage 1 \
+    --moe_checkpoint /path/to/moe_checkpoint.pth \
+    --llm_path vqa/data/Qwen3-4B-Instruct-2507 \
+    --data_path vqa/data/SlideChat/SlideInstruct_train_stage1_caption.json \
+    --features_dir vqa/data/GTEx-TCGA-Embeddings \
+    --output_dir vqa/outputs/slidechat_stage1 \
+    --moe_num_slots 32
+```
+
+**Stage 2: VQA Finetuning (LoRA)**
+Finetunes the LLM using LoRA adapters to learn complex reasoning on VQA pairs.
+```bash
+torchrun --nproc_per_node=4 vqa/tools/train_slidechat_stage2.py \
+    --moe_checkpoint /path/to/moe_checkpoint.pth \
+    --llm_path vqa/data/Qwen3-4B-Instruct-2507 \
+    --projector_checkpoint vqa/outputs/slidechat_stage1/final/projector.pt \
+    --data_path vqa/data/SlideChat/SlideInstruct_train_stage2_vqa_filtered.json \
+    --features_dir vqa/data/GTEx-TCGA-Embeddings \
+    --output_dir vqa/outputs/slidechat_stage2_lora \
+    --batch_size 4 \
+    --gradient_accumulation_steps 4 \
+    --num_epochs 3 \
+    --lr 2e-4 \
+    --lora_r 16 \
+    --moe_num_slots 32
+```
+
+### Evaluation (SlideBench)
+Evaluate the model on the SlideBench benchmark:
+```bash
+python vqa/tools/test_benchmark.py \
+    --model_path vqa/outputs/slidechat_stage2_lora/final \
+    --moe_checkpoint /path/to/moe_checkpoint.pth \
+    --benchmark_path vqa/data/SlideChat/SlideBench-VQA-TCGA-plus.json \
+    --output_path results/slidechat_results.json
+```
 
 ---
 
