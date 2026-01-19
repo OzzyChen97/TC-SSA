@@ -25,6 +25,7 @@ import pandas as pd
 
 # Add parent directory to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 from vqa.src.vqa_model import MoE_Qwen_VQA
 from vqa.src.vqa_dataset import BenchmarkDataset, benchmark_collate_fn
@@ -291,6 +292,8 @@ def parse_args():
                        help='Number of dataloader workers')
     parser.add_argument('--num_visual_tokens', type=int, default=16,
                        help='Number of visual tokens')
+    parser.add_argument('--visual_dim', type=int, default=512,
+                       help='Visual feature dimension (512 for ResNet-50, 1024 for UNI)')
 
     return parser.parse_args()
 
@@ -314,6 +317,7 @@ def main():
         moe_checkpoint=args.moe_checkpoint,
         llm_path=args.llm_path,
         num_visual_tokens=args.num_visual_tokens,
+        visual_dim=args.visual_dim,
         device='cuda'
     )
 
