@@ -176,12 +176,12 @@ class MoE_Qwen_VQA(nn.Module):
         Returns:
             visual_embeds: [B, num_visual_tokens, llm_hidden_size]
         """
-        with torch.no_grad():
-            # Get MoE compressed tokens
-            visual_tokens, _ = self.visual_encoder(patch_features)  # [B, 16, 1024]
+        # Note: Do NOT use torch.no_grad() here - MoE may be trainable in Stage 1 finetune mode
+        # When MoE is frozen, requires_grad=False handles gradient stopping
+        visual_tokens, _ = self.visual_encoder(patch_features)  # [B, num_slots, visual_dim]
 
         # Project to LLM space
-        visual_embeds = self.projector(visual_tokens)  # [B, 16, llm_hidden_size]
+        visual_embeds = self.projector(visual_tokens)  # [B, num_slots, llm_hidden_size]
         return visual_embeds
 
     def prepare_model_inputs(self, input_ids, patch_features, attention_mask, labels=None):
@@ -339,6 +339,9 @@ class MoE_Qwen_VQA(nn.Module):
             input_ids, patch_features, attention_mask, labels=None
         )
 
+        # Convert to LLM dtype (bfloat16)
+        inputs_embeds = inputs_embeds.to(dtype=torch.bfloat16)
+
         # Generate
         outputs = self.llm.generate(
             inputs_embeds=inputs_embeds,
@@ -356,6 +359,10 @@ class MoE_Qwen_VQA(nn.Module):
     def save_pretrained(self, save_dir):
         """Save model checkpoints."""
         os.makedirs(save_dir, exist_ok=True)
+
+        # Save MoE compressor (visual_encoder)
+        torch.save(self.visual_encoder.state_dict(),
+                  os.path.join(save_dir, "moe_compressor.pt"))
 
         # Save projector
         torch.save(self.projector.state_dict(),

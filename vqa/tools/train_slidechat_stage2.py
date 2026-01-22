@@ -1,18 +1,19 @@
 """
-/workspace/gaoyonghan/miniconda3/envs/etc/bin/torchrun \
-    --nproc_per_node=4 \
-    vqa/tools/train_slidechat_stage2.py \
-    --moe_checkpoint /workspace/ETC/outputs/moe_tcga_experiment/best_model.pth \
-    --llm_path vqa/data/Qwen3-4B-Instruct-2507 \
-    --projector_checkpoint /workspace/ETC/vqa/outputs/slidechat_stage1/final/projector.pt \
+cd /workspace/zhuo/ETC
+
+CUDA_VISIBLE_DEVICES=1,2,3 torchrun --nproc_per_node=3 vqa/tools/train_slidechat_stage2.py \
+    --moe_checkpoint /workspace/zhuo/ETC/outputs/moe_tcga_9class_experiment/best_model.pth \
+    --llm_path /workspace/jhsheng/huggingface/models/Qwen/Qwen2.5-7B-Instruct/ \
+    --projector_checkpoint /workspace/zhuo/ETC/vqa/outputs/slidechat_stage1_7B_moe_finetune1/final/projector.pt \
     --data_path vqa/data/SlideChat/SlideInstruct_train_stage2_vqa_filtered.json \
     --features_dir vqa/data/GTEx-TCGA-Embeddings \
-    --output_dir vqa/outputs/slidechat_stage2_lora \
-    --batch_size 10 \
+    --output_dir vqa/outputs/slidechat_stage2_7B_lora \
+    --batch_size 23 \
     --gradient_accumulation_steps 8 \
     --num_epochs 10 \
     --lr 2e-4 \
     --lora_r 16 \
+    --lora_alpha 32 \
     --visual_dim 512 \
     --moe_num_slots 32
 """
@@ -232,6 +233,15 @@ def main():
     
     projector_state_dict = torch.load(args.projector_checkpoint, map_location='cpu')
     model.projector.load_state_dict(projector_state_dict)
+
+    # Load Stage 1 finetuned MoE if available (from same directory as projector)
+    stage1_dir = os.path.dirname(args.projector_checkpoint)
+    moe_checkpoint_path = os.path.join(stage1_dir, 'moe_compressor.pt')
+    if os.path.exists(moe_checkpoint_path):
+        if rank == 0:
+            print(f"Loading Stage 1 finetuned MoE from {moe_checkpoint_path}...")
+        moe_state_dict = torch.load(moe_checkpoint_path, map_location='cpu')
+        model.visual_encoder.load_state_dict(moe_state_dict)
 
     # Enable LoRA
     if rank == 0:

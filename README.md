@@ -168,14 +168,46 @@ torchrun --nproc_per_node=4 vqa/tools/train_slidechat_stage2.py \
 ```
 
 ### Evaluation (SlideBench)
-Evaluate the model on the SlideBench benchmark:
+Evaluate the model on the SlideBench benchmark (CSV format):
 ```bash
-python vqa/tools/test_benchmark.py \
-    --model_path vqa/outputs/slidechat_stage2_lora/final \
-    --moe_checkpoint /path/to/moe_checkpoint.pth \
-    --benchmark_path vqa/data/SlideChat/SlideBench-VQA-TCGA-plus.json \
-    --output_path results/slidechat_results.json
+python vqa/tools/test_benchmark_csv.py \
+    --model_path vqa/outputs/slidechat_stage2_lora/epoch2_step500 \
+    --moe_checkpoint outputs/moe_tcga_experiment/best_model.pth \
+    --llm_path vqa/data/Qwen3-4B-Instruct-2507 \
+    --benchmark_path vqa/data/SlideChat/SlideBench-VQA-TCGA.csv \
+    --features_dir vqa/data/GTEx-TCGA-Embeddings \
+    --output_path vqa/results/benchmark_tcga_results_v3.json \
+    --batch_size 16 \
+    --visual_dim 512
 ```
+
+### SlideBench-VQA-TCGA Results
+
+Evaluation on 1473 samples from SlideBench-VQA-TCGA using 512-dim features (MoE-Qwen-VQA):
+
+| Model | Overall Accuracy |
+|-------|------------------|
+| **SlideChat (SOTA)** | 81.17% |
+| **MoE-Qwen-VQA (Ours)** | **54.65%** |
+| Random Baseline | 25.00% |
+
+**Performance by Category:**
+
+| Category | Accuracy | Correct/Total |
+|----------|----------|---------------|
+| **Microscopy (Overall)** | **65.4%** | 250/382 |
+| - Tissue Architecture | 66.90% | 97/145 |
+| - Cytomorphological | 66.67% | 26/39 |
+| - Tumor Characteristics | 64.20% | 52/81 |
+| - Histopathological Changes | 64.10% | 75/117 |
+| **Clinical (Overall)** | **58.2%** | 57/98 |
+| - Treatment Guidance | 66.67% | 30/45 |
+| **Diagnosis (Overall)** | **49.8%** | 498/993 |
+| - Disease Classification | 60.96% | 217/356 |
+
+**Note**: 
+- A critical padding bug was fixed in `test_benchmark_csv.py`, improving accuracy from 38.56% to 54.65%.
+- Current limitation: Using 512-dim features (vs projected 1024-dim in SOTA) and limited training epochs.
 
 ---
 

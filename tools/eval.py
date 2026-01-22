@@ -8,10 +8,10 @@ This script evaluates a trained model on a test dataset and generates:
 - ROC curve (optional)
 
 python tools/eval.py \
-    --test_csv /workspace/ETC/data/cptac_nsclc/test.csv \
-    --features_dir /workspace/ETC/CPathPatchFeature/cptac_nsclc/uni/pt_files \
-    --checkpoint /workspace/ETC/outputs/cptac_nsclc_uni_moe_experiment/checkpoint_epoch_30.pth \
-    --output_dir /workspace/ETC/outputs/cptac_nsclc_uni_moe_experiment/eval \
+    --test_csv /workspace/zhuo/ETC/data/cptac_nsclc/test.csv \
+    --features_dir /workspace/zhuo/ETC/data/CPathPatchFeature/cptac_nsclc/uni/pt_files \
+    --checkpoint /workspace/zhuo/ETC/outputs/outputs_topk=1_slots=64_dropout=/train_output/nsclc-uni/best_model.pth \
+    --output_dir /workspace/zhuo/ETC/outputs/cptac_nsclc_uni_moe_experiment/eval \
     --save_predictions 
 """
 

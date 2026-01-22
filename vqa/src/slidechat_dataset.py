@@ -36,8 +36,9 @@ class SlideChatDataset(Dataset):
         mode='caption',
         max_length=512,
         num_visual_tokens=16,
-        visual_dim=1024,
-        ignore_index=-100
+        visual_dim=512,
+        ignore_index=-100,
+        feature_suffix=1024
     ):
         """
         Args:
@@ -47,7 +48,9 @@ class SlideChatDataset(Dataset):
             mode: 'caption' or 'vqa'
             max_length: Maximum sequence length
             num_visual_tokens: Number of visual tokens from MoE
+            visual_dim: Visual feature dimension (512 for CONCH)
             ignore_index: Label index to ignore in loss
+            feature_suffix: Suffix in filename (1024 for more patches via _0_1024.npy)
         """
         self.features_dir = features_dir
         self.tokenizer = tokenizer
@@ -56,6 +59,7 @@ class SlideChatDataset(Dataset):
         self.num_visual_tokens = num_visual_tokens
         self.visual_dim = visual_dim
         self.ignore_index = ignore_index
+        self.feature_suffix = feature_suffix
 
         # Load data
         with open(data_path, 'r') as f:
@@ -63,6 +67,7 @@ class SlideChatDataset(Dataset):
 
         print(f"Loaded {len(self.data)} samples from {data_path}")
         print(f"Features directory: {features_dir}")
+        print(f"Using feature files with suffix: *_{feature_suffix}.npy (prefer _0_)")
 
         # Ensure <image> token exists
         self.image_token_id = tokenizer.convert_tokens_to_ids("<image>")
@@ -134,14 +139,28 @@ class SlideChatDataset(Dataset):
                 matching_files = [f for f in files if f.startswith(slide_id)]
 
                 if matching_files:
-                    # Prefer files with _1024.npy (higher dimension), then _512.npy
-                    # Prefer _0_ over _1_ (typically the primary feature set)
-                    for priority_pattern in ['_0_1024.npy', '_1_1024.npy', '_0_512.npy', '_1_512.npy', '.pt', '.pth']:
+                    # Priority order: prefer _0_ (more patches) and prefer feature_suffix
+                    # Full fallback chain: _0_{suffix} > _1_{suffix} > _0_other > _1_other > any
+                    priority_patterns = [
+                        f'_0_{self.feature_suffix}.npy',  # Best: _0_ with preferred suffix
+                        f'_1_{self.feature_suffix}.npy',  # Second: _1_ with preferred suffix
+                        '_0_1024.npy',  # Fallback: _0_ with 1024
+                        '_0_512.npy',   # Fallback: _0_ with 512
+                        '_1_1024.npy',  # Fallback: _1_ with 1024
+                        '_1_512.npy',   # Fallback: _1_ with 512
+                    ]
+                    
+                    for pattern in priority_patterns:
                         for fname in matching_files:
-                            if priority_pattern in fname:
+                            if pattern in fname:
                                 return os.path.join(search_dir, fname)
-
-                    # If no priority match, return first matching file
+                    
+                    # Last resort: return first matching .npy file
+                    for fname in matching_files:
+                        if fname.endswith('.npy'):
+                            return os.path.join(search_dir, fname)
+                    
+                    # Absolute last resort
                     return os.path.join(search_dir, matching_files[0])
             except (OSError, PermissionError):
                 continue

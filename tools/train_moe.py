@@ -1,6 +1,25 @@
 """
 Training script for WSI Classification with MoE Token Compression on GTEx-TCGA data.
 Mimics tools/train.py.
+
+cd /workspace/zhuo/ETC
+
+CUDA_VISIBLE_DEVICES=0,1 python tools/train_moe.py \
+    --train_csv /workspace/zhuo/ETC/vqa/data/TCGA_priority/train.csv \
+    --val_csv /workspace/zhuo/ETC/vqa/data/TCGA_priority/val.csv \
+    --feature_dim 512 \
+    --num_classes 9 \
+    --num_slots 64 \
+    --num_epochs 15 \
+    --lr 1e-4 \
+    --weight_decay 1e-5 \
+    --aux_loss_weight 0.1 \
+    --scheduler plateau \
+    --lr_patience 5 \
+    --early_stop_patience 3 \
+    --output_dir outputs/moe_tcga_priority_slots64 \
+    --save_freq 5 \
+    --use_amp
 """
 
 import sys
@@ -128,8 +147,8 @@ def parse_args():
     # System parameters
     parser.add_argument('--seed', type=int, default=42,
                         help='Random seed')
-    parser.add_argument('--num_workers', type=int, default=4,
-                        help='Number of data loading workers')
+    parser.add_argument('--num_workers', type=int, default=32,
+                        help='Number of data loading workers (increase for faster loading)')
     parser.add_argument('--use_amp', action='store_true',
                         help='Use Automatic Mixed Precision')
     parser.add_argument('--device', type=str, default='cuda',
@@ -142,6 +161,8 @@ def parse_args():
                         help='Log every N batches')
     parser.add_argument('--save_freq', type=int, default=5,
                         help='Save checkpoint every N epochs')
+    parser.add_argument('--early_stop_patience', type=int, default=5,
+                        help='Early stopping patience (stop if no improvement for N epochs)')
 
     return parser.parse_args()
 
@@ -359,7 +380,9 @@ def main():
         shuffle=True,
         num_workers=args.num_workers,
         collate_fn=collate_fn_variable_length,
-        pin_memory=True
+        pin_memory=True,
+        prefetch_factor=2 if args.num_workers > 0 else None,
+        persistent_workers=True if args.num_workers > 0 else False
     )
 
     val_loader = None
@@ -374,7 +397,9 @@ def main():
             shuffle=False,
             num_workers=args.num_workers,
             collate_fn=collate_fn_variable_length,
-            pin_memory=True
+            pin_memory=True,
+            prefetch_factor=2 if args.num_workers > 0 else None,
+            persistent_workers=True if args.num_workers > 0 else False
         )
 
     logger.info("Building model...")
@@ -414,6 +439,7 @@ def main():
 
     logger.info("Starting training...")
     best_val_auc = 0.0
+    epochs_without_improvement = 0
 
     for epoch in range(1, args.num_epochs + 1):
         train_metrics = train_epoch(
@@ -426,6 +452,7 @@ def main():
 
             if val_metrics['auc'] > best_val_auc:
                 best_val_auc = val_metrics['auc']
+                epochs_without_improvement = 0
                 save_checkpoint(
                     {
                         'epoch': epoch,
@@ -438,6 +465,15 @@ def main():
                     filename=os.path.join(args.output_dir, 'best_model.pth')
                 )
                 logger.info(f"Saved best model with AUC: {best_val_auc:.4f}")
+            else:
+                epochs_without_improvement += 1
+                logger.info(f"No improvement for {epochs_without_improvement} epoch(s)")
+
+            # Early stopping check
+            if epochs_without_improvement >= args.early_stop_patience:
+                logger.info(f"Early stopping triggered! No improvement for {args.early_stop_patience} epochs.")
+                logger.info(f"Best validation AUC: {best_val_auc:.4f}")
+                break
 
             # Update learning rate based on validation AUC for plateau
             if scheduler:

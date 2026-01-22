@@ -3,20 +3,20 @@ Training script for WSI-VQA with SlideChat data.
 
 Adapted specifically for SlideChat dataset format.
 
-Usage:
-/workspace/gaoyonghan/miniconda3/envs/etc/bin/torchrun \
-    --nproc_per_node=4 \
-    vqa/tools/train_slidechat.py \
+Usage (Stage 1 with MoE fine-tuning - RECOMMENDED):
+CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2 vqa/tools/train_slidechat.py \
     --stage 1 \
-    --moe_checkpoint /workspace/ETC/outputs/moe_tcga_experiment/best_model.pth \
-    --llm_path vqa/data/Qwen3-4B-Instruct-2507 \
+    --moe_checkpoint /workspace/zhuo/ETC/outputs/moe_tcga_9class_experiment/best_model.pth \
+    --llm_path /workspace/jhsheng/huggingface/models/Qwen/Qwen2.5-7B-Instruct/ \
     --data_path vqa/data/SlideChat/SlideInstruct_train_stage1_caption_filtered.json \
     --features_dir vqa/data/GTEx-TCGA-Embeddings \
-    --output_dir vqa/outputs/slidechat_stage1 \
-    --batch_size 10 \
+    --output_dir vqa/outputs/slidechat_stage1_7B_moe_finetune1 \
+    --batch_size 24 \
     --gradient_accumulation_steps 8 \
-    --num_epochs 15 \
+    --num_epochs 10 \
     --lr 1e-3 \
+    --moe_lr 1e-5 \
+    --finetune_moe \
     --visual_dim 512 \
     --moe_num_slots 32
 """
@@ -87,8 +87,10 @@ def parse_args():
                        help='Output directory for checkpoints')
     
     # Architecture arguments
-    parser.add_argument('--visual_dim', type=int, default=1024,
-                       help='Dimension of input visual features (512 for ConCH, 1024 for UNI)')
+    parser.add_argument('--visual_dim', type=int, default=512,
+                       help='Dimension of input visual features (512 for ConCH)')
+    parser.add_argument('--feature_suffix', type=int, default=1024,
+                       help='Suffix in feature filename (1024 for more patches via _0_1024.npy)')
     parser.add_argument('--moe_num_slots', type=int, default=32,
                        help='Number of MoE slots/visual tokens')
 
@@ -100,17 +102,21 @@ def parse_args():
     parser.add_argument('--num_epochs', type=int, default=3,
                        help='Number of training epochs')
     parser.add_argument('--lr', type=float, default=1e-3,
-                       help='Learning rate')
+                        help='Learning rate for Projector')
+    parser.add_argument('--moe_lr', type=float, default=1e-5,
+                        help='Learning rate for MoE (smaller than projector lr)')
+    parser.add_argument('--finetune_moe', action='store_true',
+                        help='Whether to fine-tune MoE in Stage 1 (recommended for better VQA performance)')
     parser.add_argument('--warmup_ratio', type=float, default=0.1,
-                       help='Warmup ratio')
+                        help='Warmup ratio')
     parser.add_argument('--weight_decay', type=float, default=0.01,
-                       help='Weight decay')
+                        help='Weight decay')
     parser.add_argument('--max_grad_norm', type=float, default=1.0,
-                       help='Max gradient norm')
+                        help='Max gradient norm')
     parser.add_argument('--save_steps', type=int, default=1000,
-                       help='Save every N steps')
+                        help='Save every N steps')
     parser.add_argument('--log_steps', type=int, default=1,
-                       help='Log every N steps')
+                        help='Log every N steps')
 
     # Dataset arguments
     parser.add_argument('--max_length', type=int, default=512,
@@ -250,8 +256,16 @@ def main():
     # Set training mode
     if args.stage == 1:
         model.freeze_llm()
-        if rank == 0:
-            print("Stage 1: Training Projector only")
+        if args.finetune_moe:
+            # Unfreeze MoE for joint training with Projector
+            model.visual_encoder.requires_grad_(True)
+            if rank == 0:
+                print("Stage 1: Training Projector + MoE (joint fine-tuning)")
+                print(f"  - Projector LR: {args.lr}")
+                print(f"  - MoE LR: {args.moe_lr}")
+        else:
+            if rank == 0:
+                print("Stage 1: Training Projector only (MoE frozen)")
     else:
         model.unfreeze_llm()
         if rank == 0:
@@ -271,7 +285,8 @@ def main():
         mode='caption' if args.stage == 1 else 'vqa',
         max_length=args.max_length,
         num_visual_tokens=args.moe_num_slots,
-        visual_dim=args.visual_dim
+        visual_dim=args.visual_dim,
+        feature_suffix=args.feature_suffix
     )
 
     # Create dataloader
@@ -286,9 +301,29 @@ def main():
         collate_fn=dataset.collate_fn
     )
 
-    # Setup optimizer
-    trainable_params = [p for p in model.parameters() if p.requires_grad]
-    optimizer = torch.optim.AdamW(trainable_params, lr=args.lr, weight_decay=args.weight_decay)
+    # Setup optimizer with parameter groups (different LRs for MoE and Projector)
+    base_model = model.module if world_size > 1 else model
+    
+    if args.stage == 1 and args.finetune_moe:
+        # Use parameter groups: MoE with smaller LR, Projector with larger LR
+        param_groups = [
+            {'params': base_model.visual_encoder.parameters(), 'lr': args.moe_lr, 'name': 'moe'},
+            {'params': base_model.projector.parameters(), 'lr': args.lr, 'name': 'projector'}
+        ]
+        optimizer = torch.optim.AdamW(param_groups, weight_decay=args.weight_decay)
+        total_trainable = sum(p.numel() for p in base_model.visual_encoder.parameters()) + \
+                          sum(p.numel() for p in base_model.projector.parameters())
+        if rank == 0:
+            moe_params = sum(p.numel() for p in base_model.visual_encoder.parameters())
+            proj_params = sum(p.numel() for p in base_model.projector.parameters())
+            print(f"\nParameter groups:")
+            print(f"  - MoE: {moe_params:,} params, lr={args.moe_lr}")
+            print(f"  - Projector: {proj_params:,} params, lr={args.lr}")
+    else:
+        # Standard single LR for all trainable params
+        trainable_params = [p for p in model.parameters() if p.requires_grad]
+        optimizer = torch.optim.AdamW(trainable_params, lr=args.lr, weight_decay=args.weight_decay)
+        total_trainable = sum(p.numel() for p in trainable_params)
 
     # Setup scheduler
     num_training_steps = len(dataloader) // args.gradient_accumulation_steps * args.num_epochs
@@ -303,7 +338,7 @@ def main():
     if rank == 0:
         print(f"\nTraining steps: {num_training_steps}")
         print(f"Warmup steps: {num_warmup_steps}")
-        print(f"Trainable parameters: {sum(p.numel() for p in trainable_params):,}")
+        print(f"Trainable parameters: {total_trainable:,}")
         print("\nStarting training...\n")
 
     # Training loop
