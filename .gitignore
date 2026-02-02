@@ -97,3 +97,23 @@ site/
 # Backup files
 *.bak
 *.backup
+
+# Large data files
+*.zip
+*.tar
+*.tar.gz
+*.tar.bz2
+*.rar
+*.7z
+
+# Model weights
+*.safetensors
+*.bin
+*.onnx
+
+# Data directories (large datasets)
+vqa/data/GTEx-TCGA-Embeddings/
+vqa/data/SlideChat/Feat/
+vqa/data/SlideChat/*vqa*.json
+vqa/data/Qwen3-4B-Instruct*/
+data/CPathPatchFeature/
