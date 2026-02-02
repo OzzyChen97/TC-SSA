@@ -178,7 +178,10 @@ def train_epoch(model, dataloader, criterion, optimizer, scaler, device, args, e
     all_labels = []
     all_preds = []
     all_probs = []
-
+    
+    # Initialize global stats for monitoring
+    global_slot_counts = None
+    
     optimizer.zero_grad()
     start_time = time.time()
 
@@ -229,11 +232,39 @@ def train_epoch(model, dataloader, criterion, optimizer, scaler, device, args, e
             optimizer.zero_grad()
 
         if (batch_idx + 1) % args.log_interval == 0:
-            logger.info(
-                f'Epoch [{epoch}] Batch [{batch_idx + 1}/{len(dataloader)}] '
-                f'Loss: {loss_meter.avg:.4f} CE: {ce_loss_meter.avg:.4f} '
-                f'Aux: {aux_loss_meter.avg:.4f}'
-            )
+            # Get detailed routing stats for monitoring (just for the last sample in batch)
+            with torch.no_grad():
+                try:
+                    # Run inference again on last features to get stats
+                    _, _, routing_stats = model(features, return_routing_stats=True)
+                    slot_counts = routing_stats['slot_counts']
+                    num_patches = routing_stats['num_patches']
+                    
+                    # Accumulate global stats (sampling based)
+                    if global_slot_counts is None:
+                        global_slot_counts = torch.zeros_like(slot_counts)
+                    global_slot_counts += slot_counts
+                    
+                    min_count = slot_counts.min().item()
+                    max_count = slot_counts.max().item()
+                    std_count = slot_counts.std().item()
+                    mean_count = slot_counts.mean().item()
+                    
+                    num_zero_slots = (slot_counts == 0).sum().item()
+                    
+                    logger.info(
+                        f'Epoch [{epoch}] Batch [{batch_idx + 1}/{len(dataloader)}] '
+                        f'Loss: {loss_meter.avg:.4f} CE: {ce_loss_meter.avg:.4f} '
+                        f'Aux: {aux_loss_meter.avg:.4f} | '
+                        f'Stats: mean={mean_count:.1f} std={std_count:.1f} min={min_count:.0f} max={max_count:.0f} idle={num_zero_slots}'
+                    )
+                except Exception as e:
+                    # Fallback if modification issues
+                    logger.info(
+                        f'Epoch [{epoch}] Batch [{batch_idx + 1}/{len(dataloader)}] '
+                        f'Loss: {loss_meter.avg:.4f} CE: {ce_loss_meter.avg:.4f} '
+                        f'Aux: {aux_loss_meter.avg:.4f}'
+                    )
 
     if len(dataloader) % args.grad_accum_steps != 0:
         if args.use_amp:
@@ -242,6 +273,19 @@ def train_epoch(model, dataloader, criterion, optimizer, scaler, device, args, e
         else:
             optimizer.step()
         optimizer.zero_grad()
+
+    # Print Global Routing Stats for the Epoch
+    if global_slot_counts is not None:
+        global_idle = (global_slot_counts == 0).sum().item()
+        global_min = global_slot_counts.min().item()
+        global_max = global_slot_counts.max().item()
+        global_mean = global_slot_counts.mean().item()
+        global_std = global_slot_counts.std().item()
+        logger.info(f"=== Epoch {epoch} Global Routing Stats (Sampled) ===")
+        logger.info(f"   Idle Experts (Globally): {global_idle}/{len(global_slot_counts)}")
+        logger.info(f"   Load Distribution: mean={global_mean:.1f}, std={global_std:.1f}, min={global_min:.0f}, max={global_max:.0f}")
+        logger.info(f"   Note: This is based on sampled batches ({args.log_interval} steps)")
+        logger.info("=================================================")
 
     all_labels = np.concatenate(all_labels)
     all_preds = np.concatenate(all_preds)

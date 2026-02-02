@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tar -tzf:*)",
+      "Bash(python3 -c:*)",
+      "Bash(tar -xzf:*)",
+      "Bash(ls -lh:*)",
+      "Bash(python:*)"
+    ]
+  }
+}

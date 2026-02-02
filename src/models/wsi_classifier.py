@@ -49,19 +49,24 @@ class WSI_Classifier(nn.Module):
             nn.Linear(512, num_classes)
         )
 
-    def forward(self, x):
+    def forward(self, x, return_routing_stats=False):
         """
         Forward pass.
 
         Args:
             x: Input features [1, N, 1024] where N varies per slide
+            return_routing_stats: If True, return routing statistics for monitoring
 
         Returns:
             logits: Classification logits [1, num_classes]
             aux_loss: Auxiliary load balancing loss (scalar)
+            routing_stats (optional): Dict with slot assignment statistics
         """
         # 1. Compression: [1, N, 1024] -> [1, num_slots, 1024]
-        compressed_x, aux_loss = self.compressor(x)
+        if return_routing_stats:
+            compressed_x, aux_loss, routing_stats = self.compressor(x, return_routing_stats=True)
+        else:
+            compressed_x, aux_loss = self.compressor(x)
 
         # 2. Aggregation: Pool across all expert slots
         # Mean pooling combines opinions from all experts
@@ -69,6 +74,9 @@ class WSI_Classifier(nn.Module):
 
         # 3. Classification
         logits = self.classifier(slide_repr)  # [1, num_classes]
+
+        if return_routing_stats:
+            return logits, aux_loss, routing_stats
 
         return logits, aux_loss
 

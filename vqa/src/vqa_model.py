@@ -166,23 +166,28 @@ class MoE_Qwen_VQA(nn.Module):
             param.requires_grad = True
         print("LLM unfrozen.")
 
-    def encode_images(self, patch_features):
+    def encode_images(self, patch_features, return_routing_stats=False):
         """
         Encode WSI patches into visual tokens.
 
         Args:
             patch_features: [B, N, 1024] - Patch features from UNI/ResNet
+            return_routing_stats: If True, also return routing statistics
 
         Returns:
             visual_embeds: [B, num_visual_tokens, llm_hidden_size]
+            routing_stats (optional): Dict with slot assignment statistics
         """
         # Note: Do NOT use torch.no_grad() here - MoE may be trainable in Stage 1 finetune mode
         # When MoE is frozen, requires_grad=False handles gradient stopping
-        visual_tokens, _ = self.visual_encoder(patch_features)  # [B, num_slots, visual_dim]
-
-        # Project to LLM space
-        visual_embeds = self.projector(visual_tokens)  # [B, num_slots, llm_hidden_size]
-        return visual_embeds
+        if return_routing_stats:
+            visual_tokens, aux_loss, routing_stats = self.visual_encoder(patch_features, return_routing_stats=True)
+            visual_embeds = self.projector(visual_tokens)
+            return visual_embeds, routing_stats
+        else:
+            visual_tokens, _ = self.visual_encoder(patch_features)  # [B, num_slots, visual_dim]
+            visual_embeds = self.projector(visual_tokens)  # [B, num_slots, llm_hidden_size]
+            return visual_embeds
 
     def prepare_model_inputs(self, input_ids, patch_features, attention_mask, labels=None):
         """
@@ -202,8 +207,10 @@ class MoE_Qwen_VQA(nn.Module):
         # Get text embeddings
         text_embeds = self.llm.get_input_embeddings()(input_ids)  # [B, L, hidden_size]
         
-        # Get visual embeddings
-        visual_embeds = self.encode_images(patch_features)  # [B, num_visual_tokens, hidden_size]
+        # Get visual embeddings and aux_loss
+        # We need to manually call visual_encoder to get aux_loss properly
+        visual_tokens, aux_loss = self.visual_encoder(patch_features)
+        visual_embeds = self.projector(visual_tokens)
         
         B, L, D = text_embeds.shape
         num_visual_tokens = visual_embeds.shape[1]
@@ -272,9 +279,11 @@ class MoE_Qwen_VQA(nn.Module):
         if labels is not None:
             new_labels = torch.stack(new_labels_list)
             
-        return new_inputs_embeds, new_attention_mask, new_labels
+        return new_inputs_embeds, new_attention_mask, new_labels, aux_loss
+            
+        return new_inputs_embeds, new_attention_mask, new_labels, aux_loss
 
-    def forward(self, input_ids, attention_mask, labels, patch_features):
+    def forward(self, input_ids, attention_mask, labels, patch_features, aux_loss_weight=0.1):
         """
         Forward pass for training.
 
@@ -283,12 +292,13 @@ class MoE_Qwen_VQA(nn.Module):
             attention_mask: [B, L] - Attention mask
             labels: [B, L] - Labels for language modeling (-100 for ignored tokens)
             patch_features: [B, N, 1024] - WSI patch features
+            aux_loss_weight: Weight for MoE load balancing loss
 
         Returns:
-            loss: Scalar loss
+            loss: Scalar loss (CE + aux_loss)
         """
         # Prepare inputs with visual token insertion and alignment
-        inputs_embeds, new_attention_mask, new_labels = self.prepare_model_inputs(
+        inputs_embeds, new_attention_mask, new_labels, aux_loss = self.prepare_model_inputs(
             input_ids, patch_features, attention_mask, labels
         )
 
@@ -302,8 +312,11 @@ class MoE_Qwen_VQA(nn.Module):
             labels=new_labels,
             return_dict=True
         )
+        
+        # Combine losses
+        total_loss = outputs.loss + aux_loss_weight * aux_loss
 
-        return outputs.loss
+        return total_loss
 
     @torch.no_grad()
     def generate(
@@ -335,7 +348,7 @@ class MoE_Qwen_VQA(nn.Module):
 
         # Get combined embeddings and expanded mask
         # Note: labels is None for generation
-        inputs_embeds, new_attention_mask, _ = self.prepare_model_inputs(
+        inputs_embeds, new_attention_mask, _, _ = self.prepare_model_inputs(
             input_ids, patch_features, attention_mask, labels=None
         )
 

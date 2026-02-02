@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git init:*)",
+      "Bash(git branch:*)",
+      "Bash(git config:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(while read f)",
+      "Bash(do echo:*)",
+      "Bash(done)",
+      "Bash(conda run -n etc python -c:*)",
+      "Bash(conda run -n etc python:*)",
+      "Bash(ls -lh:*)",
+      "Bash(chmod:*)",
+      "Bash(find:*)",
+      "Bash(source:*)",
+      "Bash(conda activate:*)",
+      "Bash(python:*)",
+      "Bash(conda info:*)"
+    ]
+  }
+}

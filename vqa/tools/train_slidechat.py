@@ -3,22 +3,24 @@ Training script for WSI-VQA with SlideChat data.
 
 Adapted specifically for SlideChat dataset format.
 
-Usage (Stage 1 with MoE fine-tuning - RECOMMENDED):
+cd /workspace/zhuo/ETC
 CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2 vqa/tools/train_slidechat.py \
     --stage 1 \
-    --moe_checkpoint /workspace/zhuo/ETC/outputs/moe_tcga_9class_experiment/best_model.pth \
+    --moe_checkpoint /workspace/zhuo/ETC/outputs/moe_tcga_priority_slots64/best_model.pth \
     --llm_path /workspace/jhsheng/huggingface/models/Qwen/Qwen2.5-7B-Instruct/ \
     --data_path vqa/data/SlideChat/SlideInstruct_train_stage1_caption_filtered.json \
     --features_dir vqa/data/GTEx-TCGA-Embeddings \
-    --output_dir vqa/outputs/slidechat_stage1_7B_moe_finetune1 \
-    --batch_size 24 \
-    --gradient_accumulation_steps 8 \
-    --num_epochs 10 \
+    --output_dir vqa/outputs/slidechat_stage1_slots64_fixed \
+    --batch_size 12 \
+    --gradient_accumulation_steps 12 \
+    --num_epochs 5 \
     --lr 1e-3 \
-    --moe_lr 1e-5 \
+    --moe_lr 1e-4 \
     --finetune_moe \
     --visual_dim 512 \
-    --moe_num_slots 32
+    --moe_num_slots 64 \
+    --feature_suffix 1024 \
+    --aux_loss_weight 0.2
 """
 
 import argparse
@@ -30,6 +32,7 @@ from torch.utils.data import DataLoader, DistributedSampler
 from torch.nn.parallel import DistributedDataParallel as DDP
 from transformers import get_cosine_schedule_with_warmup
 from tqdm import tqdm
+from datetime import datetime
 import swanlab
 
 # Add parent directory to path
@@ -111,6 +114,8 @@ def parse_args():
                         help='Warmup ratio')
     parser.add_argument('--weight_decay', type=float, default=0.01,
                         help='Weight decay')
+    parser.add_argument('--aux_loss_weight', type=float, default=0.1,
+                        help='Auxiliary loss weight for MoE load balancing')
     parser.add_argument('--max_grad_norm', type=float, default=1.0,
                         help='Max gradient norm')
     parser.add_argument('--save_steps', type=int, default=1000,
@@ -139,6 +144,10 @@ def train_epoch(model, dataloader, optimizer, scheduler, epoch, args, rank, worl
 
     total_loss = 0
     num_batches = 0
+    
+    # For routing stats monitoring
+    routing_stats_log_interval = 10  # Log every 10 steps
+    global_slot_counts = None
 
     if rank == 0:
         pbar = tqdm(dataloader, desc=f"Epoch {epoch}")
@@ -159,7 +168,8 @@ def train_epoch(model, dataloader, optimizer, scheduler, epoch, args, rank, worl
             input_ids=input_ids,
             attention_mask=attention_mask,
             labels=labels,
-            patch_features=patch_features
+            patch_features=patch_features,
+            aux_loss_weight=args.aux_loss_weight
         )
 
         # Scale loss
@@ -168,6 +178,42 @@ def train_epoch(model, dataloader, optimizer, scheduler, epoch, args, rank, worl
 
         total_loss += loss.item() * args.gradient_accumulation_steps
         num_batches += 1
+        
+        # Monitor routing stats every N steps (only on rank 0)
+        if rank == 0 and (step + 1) % routing_stats_log_interval == 0:
+            base_model = model.module if world_size > 1 else model
+            with torch.no_grad():
+                try:
+                    _, routing_stats = base_model.encode_images(patch_features, return_routing_stats=True)
+                    slot_counts = routing_stats['slot_counts']
+                    num_patches = routing_stats['num_patches']
+                    aux_loss = routing_stats['aux_loss']
+                    
+                    # Accumulate global stats
+                    if global_slot_counts is None:
+                        global_slot_counts = torch.zeros_like(slot_counts)
+                    global_slot_counts += slot_counts
+                    
+                    # Calculate balance metrics
+                    min_count = slot_counts.min().item()
+                    max_count = slot_counts.max().item()
+                    std_count = slot_counts.std().item()
+                    mean_count = slot_counts.mean().item()
+                    
+                    # Detailed stats
+                    num_zero_slots = (slot_counts == 0).sum().item()
+                    top5_sum = slot_counts.topk(min(5, len(slot_counts))).values.sum().item()
+                    top5_ratio = top5_sum / (slot_counts.sum().item() + 1e-9)
+                    
+                    # Print routing statistics
+                    print(f"\n[Step {step+1}] Routing Stats: patches={num_patches}, "
+                          f"mean={mean_count:.1f}, std={std_count:.2f}, "
+                          f"min={min_count:.1f}, max={max_count:.1f}, "
+                          f"idle_slots={num_zero_slots}/{len(slot_counts)}, "
+                          f"top5_load={top5_ratio:.1%}, "
+                          f"aux_loss={aux_loss:.4f}")
+                except Exception as e:
+                    pass  # Silently skip if routing stats not available
 
         # Update weights
         if (step + 1) % args.gradient_accumulation_steps == 0:
@@ -196,7 +242,21 @@ def train_epoch(model, dataloader, optimizer, scheduler, epoch, args, rank, worl
         if rank == 0 and (step + 1) % args.save_steps == 0:
             save_path = os.path.join(args.output_dir, f'epoch{epoch}_step{step+1}')
             print(f"\nSaving checkpoint to {save_path}")
+            print(f"\nSaving checkpoint to {save_path}")
             model.module.save_pretrained(save_path) if world_size > 1 else model.save_pretrained(save_path)
+
+    # Print Global Routing Stats for the Epoch (only on rank 0)
+    if rank == 0 and global_slot_counts is not None:
+        global_idle = (global_slot_counts == 0).sum().item()
+        global_min = global_slot_counts.min().item()
+        global_max = global_slot_counts.max().item()
+        global_mean = global_slot_counts.mean().item()
+        global_std = global_slot_counts.std().item()
+        print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] === Epoch {epoch} Global Routing Stats (Sampled) ===")
+        print(f"   Idle Experts (Globally): {global_idle}/{len(global_slot_counts)}")
+        print(f"   Load Distribution: mean={global_mean:.1f}, std={global_std:.1f}, min={global_min:.0f}, max={global_max:.0f}")
+        print(f"   Note: This is based on sampled batches ({routing_stats_log_interval} steps)")
+        print("=================================================")
 
     return total_loss / max(num_batches, 1)
 

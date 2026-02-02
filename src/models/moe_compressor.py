@@ -76,34 +76,58 @@ class MoE_Compressor(nn.Module):
             Expert(dim=input_dim) for _ in range(num_slots)
         ])
 
-    def forward(self, x):
+    def forward(self, x, return_routing_stats=False):
         """
         Forward pass: Compress N patches to num_slots tokens.
 
         Args:
             x: Input features [B, N, D] (typically B=1 for WSI)
+            return_routing_stats: If True, return routing statistics for monitoring
 
         Returns:
             final_tokens: Compressed features [B, num_slots, D]
             aux_loss: Load balancing loss (scalar)
+            routing_stats (optional): Dict with slot assignment statistics
         """
         B, N, D = x.shape
 
         # 1. Compute routing scores
         logits = self.gate(x)  # [B, N, num_slots]
+
+        # Add noise during training to encourage exploration (prevent collapse)
+        if self.training:
+            # Standard Normal Noise from GShard/Switch Transformer
+            noise = torch.randn_like(logits) * (1.0 / self.num_slots)
+            logits = logits + noise
+
         probs = F.softmax(logits, dim=-1)
 
         # 2. Select Top-K experts per patch
         topk_probs, topk_indices = torch.topk(probs, self.top_k, dim=-1)
 
         # 3. Compute auxiliary load balancing loss
-        # Critical for MoE: prevents all patches from routing to the same expert
+        # Switch Transformer style loss: mean(probs) * mean(fractions) * num_slots
         aux_loss = torch.tensor(0.0, device=x.device)
         if self.training:
-            # Importance: Total probability assigned to each expert
-            importance = probs.sum(dim=1).mean(dim=0)  # [num_slots]
-            # Coefficient of Variation squared for load balancing
-            aux_loss = (torch.std(importance) / (importance.mean() + 1e-10)) ** 2
+            # P_i: Fraction of probability assigned to expert i
+            # f_i: Fraction of patches routed to expert i
+            
+            # 1. P_i (average probability per expert)
+            # [B, N, num_slots] -> [num_slots]
+            prob_per_expert = probs.mean(dim=(0, 1))
+            
+            # 2. f_i (fraction of samples routed to expert i)
+            # Create hardness mask for top-k selection
+            # [B, N, top_k] -> scatter -> [B, N, num_slots]
+            zeros = torch.zeros_like(probs)
+            mask_hard = zeros.scatter(-1, topk_indices, 1.0)
+            frac_per_expert = mask_hard.mean(dim=(0, 1))
+            
+            # 3. Switch Transformer Loss: N * sum(P_i * f_i)
+            # We want both P and f to be uniform (1/N)
+            # If uniform: sum(1/N * 1/N) = N * (1/N^2) = 1/N
+            # Scaled by N, it becomes 1. Minimal value is 1.
+            aux_loss = self.num_slots * torch.sum(prob_per_expert * frac_per_expert)
 
         # 4. Aggregation / Compression
         # Create mask for top-k routing
@@ -130,5 +154,17 @@ class MoE_Compressor(nn.Module):
             final_tokens.append(processed_feat.unsqueeze(1))
 
         final_tokens = torch.cat(final_tokens, dim=1)  # [B, num_slots, D]
+
+        if return_routing_stats:
+            # Compute routing statistics
+            # slot_counts: How many patches are assigned to each slot (based on top-k)
+            slot_counts = mask.sum(dim=1).mean(dim=0)  # [num_slots], averaged over batch
+            routing_stats = {
+                'slot_counts': slot_counts.detach().cpu(),  # [num_slots]
+                'importance': probs.sum(dim=1).mean(dim=0).detach().cpu(),  # [num_slots]
+                'aux_loss': aux_loss.item() if aux_loss.numel() == 1 else aux_loss.detach().cpu(),
+                'num_patches': N,
+            }
+            return final_tokens, aux_loss, routing_stats
 
         return final_tokens, aux_loss

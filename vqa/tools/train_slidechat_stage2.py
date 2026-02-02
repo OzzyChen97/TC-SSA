@@ -1,21 +1,22 @@
 """
 cd /workspace/zhuo/ETC
 
-CUDA_VISIBLE_DEVICES=1,2,3 torchrun --nproc_per_node=3 vqa/tools/train_slidechat_stage2.py \
-    --moe_checkpoint /workspace/zhuo/ETC/outputs/moe_tcga_9class_experiment/best_model.pth \
+CUDA_VISIBLE_DEVICES=0,1 torchrun --nproc_per_node=2 vqa/tools/train_slidechat_stage2.py \
+    --moe_checkpoint /workspace/zhuo/ETC/outputs/moe_tcga_32slots_top2_robust/best_model.pth \
     --llm_path /workspace/jhsheng/huggingface/models/Qwen/Qwen2.5-7B-Instruct/ \
-    --projector_checkpoint /workspace/zhuo/ETC/vqa/outputs/slidechat_stage1_7B_moe_finetune1/final/projector.pt \
+    --projector_checkpoint /workspace/zhuo/ETC/vqa/outputs/slidechat_stage1_32slots_robust/final/projector.pt \
     --data_path vqa/data/SlideChat/SlideInstruct_train_stage2_vqa_filtered.json \
     --features_dir vqa/data/GTEx-TCGA-Embeddings \
-    --output_dir vqa/outputs/slidechat_stage2_7B_lora \
-    --batch_size 23 \
+    --output_dir vqa/outputs/slidechat_stage2_lora \
+    --batch_size 8 \
     --gradient_accumulation_steps 8 \
-    --num_epochs 10 \
+    --num_epochs 3 \
     --lr 2e-4 \
-    --lora_r 16 \
-    --lora_alpha 32 \
+    --lora_r 64 \
+    --lora_alpha 128 \
     --visual_dim 512 \
-    --moe_num_slots 32
+    --moe_num_slots 32 \
+    --feature_suffix 1024
 """
 
 import argparse
@@ -76,6 +77,8 @@ def parse_args():
                        help='Dimension of visual features (1024 for UNI, 512 for ConCH)')
     parser.add_argument('--moe_num_slots', type=int, default=32,
                        help='Number of MoE slots')
+    parser.add_argument('--feature_suffix', type=str, default='1024',
+                       help='Suffix for feature files (e.g. 1024)')
     
     # LoRA arguments
     parser.add_argument('--lora_r', type=int, default=16, help='LoRA r')
@@ -247,6 +250,14 @@ def main():
     if rank == 0:
         print(f"Enabling LoRA (r={args.lora_r}, alpha={args.lora_alpha})...")
     model.enable_lora(r=args.lora_r, lora_alpha=args.lora_alpha, lora_dropout=args.lora_dropout)
+    
+    # Freeze Visual Encoder and Projector
+    if rank == 0:
+        print("Freezing Visual Encoder and Projector...")
+    for param in model.visual_encoder.parameters():
+        param.requires_grad = False
+    for param in model.projector.parameters():
+        param.requires_grad = False
 
     # Move to GPU
     model = model.to(f'cuda:{local_rank}')
@@ -266,8 +277,9 @@ def main():
         features_dir=args.features_dir,
         tokenizer=model.module.tokenizer if world_size > 1 else model.tokenizer,
         mode='vqa', # Stage 2 usually implies VQA task format
-        max_length=args.max_length,
-        visual_dim=args.visual_dim
+        max_length=1024, # Hardcoded max_length like in stage1
+        visual_dim=args.visual_dim,
+        feature_suffix=args.feature_suffix
     )
 
     sampler = DistributedSampler(dataset, num_replicas=world_size, rank=rank, shuffle=True) if world_size > 1 else None
@@ -278,7 +290,7 @@ def main():
         sampler=sampler,
         shuffle=(sampler is None),
         collate_fn=SlideChatDataset.collate_fn,
-        num_workers=0, # Avoid shm issues
+        num_workers=0,  # Must be 0 in Docker due to shm limits
         pin_memory=True
     )
 

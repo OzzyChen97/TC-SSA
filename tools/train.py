@@ -9,17 +9,18 @@ Supports:
 - Checkpointing and logging
 
 python tools/train.py \
-    --train_csv /workspace/ETC/data/cptac_nsclc/train.csv \
-    --val_csv /workspace/ETC/data/cptac_nsclc/val.csv \
-    --features_dir /workspace/ETC/CPathPatchFeature/cptac_nsclc/uni/pt_files \
+    --train_csv data/brca/train_histology.csv \
+    --val_csv data/brca/val_histology.csv \
+    --features_dir data/CPathPatchFeature/brca/uni/pt_files \
+    --feature_dim 1024 \
     --model_type moe \
-    --num_slots 16 \
+    --num_slots 32 \
     --num_classes 2 \
     --num_epochs 100 \
     --lr 1e-4 \
     --aux_loss_weight 0.1 \
     --use_amp \
-    --output_dir outputs/cptac_nsclc_uni_moe_experiment
+    --output_dir outputs/brca_uni_moe_experiment
 """
 
 import sys
@@ -46,6 +47,44 @@ from src.utils import (
     AverageMeter,
     save_checkpoint
 )
+
+
+class EarlyStopping:
+    """Early stopping to stop training when validation metric doesn't improve."""
+    
+    def __init__(self, patience=10, min_delta=0.0, mode='max'):
+        """
+        Args:
+            patience: Number of epochs to wait before stopping
+            min_delta: Minimum change to qualify as improvement
+            mode: 'min' or 'max' (whether lower or higher is better)
+        """
+        self.patience = patience
+        self.min_delta = min_delta
+        self.mode = mode
+        self.counter = 0
+        self.best_score = None
+        self.early_stop = False
+        
+    def __call__(self, score):
+        if self.best_score is None:
+            self.best_score = score
+            return False
+        
+        if self.mode == 'max':
+            improved = score > self.best_score + self.min_delta
+        else:
+            improved = score < self.best_score - self.min_delta
+            
+        if improved:
+            self.best_score = score
+            self.counter = 0
+        else:
+            self.counter += 1
+            if self.counter >= self.patience:
+                self.early_stop = True
+                return True
+        return False
 
 
 def parse_args():
@@ -84,6 +123,10 @@ def parse_args():
                         help='Weight for auxiliary load-balancing loss (default: 0.01)')
     parser.add_argument('--grad_accum_steps', type=int, default=8,
                         help='Gradient accumulation steps (default: 8)')
+    parser.add_argument('--early_stopping_patience', type=int, default=15,
+                        help='Early stopping patience (epochs without improvement, default: 15)')
+    parser.add_argument('--early_stopping_min_delta', type=float, default=0.0,
+                        help='Minimum improvement to reset patience (default: 0.0)')
 
     # Optimization
     parser.add_argument('--optimizer', type=str, default='adamw',
@@ -214,6 +257,114 @@ def train_epoch(model, dataloader, criterion, optimizer, scaler, device, args, e
         'accuracy': metrics['accuracy'],
         'auc': metrics['auc']
     }
+
+
+def collect_expert_usage(model, dataloader, device, args, logger):
+    """
+    Collect expert usage statistics across the dataset.
+    
+    Args:
+        model: The MoE model
+        dataloader: Data loader
+        device: Device to use
+        args: Training arguments
+        logger: Logger instance
+    
+    Returns:
+        Dict with expert usage statistics
+    """
+    model.eval()
+    
+    # Check if model is MoE type
+    if args.model_type != 'moe':
+        logger.info("Expert usage stats only available for MoE model")
+        return None
+    
+    total_slot_counts = None
+    total_importance = None
+    total_patches = 0
+    num_samples = 0
+    
+    with torch.no_grad():
+        for features_list, labels, slide_ids in dataloader:
+            for features in features_list:
+                features = features.unsqueeze(0).to(device)
+                
+                # Get routing statistics
+                _, _, routing_stats = model(features, return_routing_stats=True)
+                
+                if total_slot_counts is None:
+                    total_slot_counts = routing_stats['slot_counts'].clone()
+                    total_importance = routing_stats['importance'].clone()
+                else:
+                    total_slot_counts += routing_stats['slot_counts']
+                    total_importance += routing_stats['importance']
+                
+                total_patches += routing_stats['num_patches']
+                num_samples += 1
+    
+    # Compute averages
+    avg_slot_counts = total_slot_counts / num_samples
+    avg_importance = total_importance / num_samples
+    avg_patches_per_sample = total_patches / num_samples
+    
+    return {
+        'avg_slot_counts': avg_slot_counts,
+        'avg_importance': avg_importance,
+        'avg_patches_per_sample': avg_patches_per_sample,
+        'num_samples': num_samples
+    }
+
+
+def print_expert_usage(expert_stats, num_slots, logger):
+    """
+    Print expert usage statistics in a formatted way.
+    
+    Args:
+        expert_stats: Dict with expert usage statistics
+        num_slots: Number of expert slots
+        logger: Logger instance
+    """
+    if expert_stats is None:
+        return
+    
+    avg_counts = expert_stats['avg_slot_counts'].numpy()
+    avg_importance = expert_stats['avg_importance'].numpy()
+    
+    logger.info("=" * 60)
+    logger.info("Expert Usage Statistics")
+    logger.info("=" * 60)
+    logger.info(f"Average patches per sample: {expert_stats['avg_patches_per_sample']:.1f}")
+    logger.info(f"Number of samples: {expert_stats['num_samples']}")
+    logger.info("-" * 60)
+    
+    # Sort by usage count
+    sorted_indices = np.argsort(avg_counts)[::-1]
+    
+    # Print top 10 most used experts
+    logger.info("Top 10 Most Used Experts:")
+    for i, idx in enumerate(sorted_indices[:10]):
+        bar_len = int(avg_counts[idx] / avg_counts.max() * 20)
+        bar = '█' * bar_len + '░' * (20 - bar_len)
+        logger.info(f"  Expert {idx:3d}: {bar} {avg_counts[idx]:6.1f} patches (importance: {avg_importance[idx]:.3f})")
+    
+    # Print bottom 10 least used experts
+    logger.info("Bottom 10 Least Used Experts:")
+    for i, idx in enumerate(sorted_indices[-10:]):
+        bar_len = int(avg_counts[idx] / avg_counts.max() * 20) if avg_counts.max() > 0 else 0
+        bar = '█' * bar_len + '░' * (20 - bar_len)
+        logger.info(f"  Expert {idx:3d}: {bar} {avg_counts[idx]:6.1f} patches (importance: {avg_importance[idx]:.3f})")
+    
+    # Usage statistics summary
+    active_experts = np.sum(avg_counts > 0.1)
+    usage_std = np.std(avg_counts)
+    usage_cv = usage_std / np.mean(avg_counts) if np.mean(avg_counts) > 0 else 0
+    
+    logger.info("-" * 60)
+    logger.info(f"Active Experts (>0.1 patches): {active_experts}/{num_slots}")
+    logger.info(f"Usage Std Dev: {usage_std:.2f}")
+    logger.info(f"Usage Coefficient of Variation: {usage_cv:.2f}")
+    logger.info("=" * 60)
 
 
 @torch.no_grad()
@@ -363,6 +514,14 @@ def main():
 
     logger.info("Starting training...")
     best_val_auc = 0.0
+    
+    # Initialize early stopping
+    early_stopper = EarlyStopping(
+        patience=args.early_stopping_patience,
+        min_delta=args.early_stopping_min_delta,
+        mode='max'  # We want to maximize AUC
+    )
+    logger.info(f"Early stopping enabled: patience={args.early_stopping_patience}, min_delta={args.early_stopping_min_delta}")
 
     for epoch in range(1, args.num_epochs + 1):
         train_metrics = train_epoch(
@@ -396,10 +555,26 @@ def main():
                     logger.info(f"Current learning rate: {current_lr:.6f}")
                 else:
                     scheduler.step()
+            
+            # Check early stopping
+            if early_stopper(val_metrics['auc']):
+                logger.info(f"Early stopping triggered! No improvement for {args.early_stopping_patience} epochs.")
+                logger.info(f"Best validation AUC: {best_val_auc:.4f}")
+                break
+            else:
+                logger.info(f"Early stopping counter: {early_stopper.counter}/{args.early_stopping_patience}")
         else:
             # No validation set, use cosine/step scheduler normally
             if scheduler and args.scheduler != 'plateau':
                 scheduler.step()
+        
+        # Collect and print expert usage statistics
+        if args.model_type == 'moe':
+            expert_stats = collect_expert_usage(
+                model, val_loader if val_loader else train_loader,
+                device, args, logger
+            )
+            print_expert_usage(expert_stats, args.num_slots, logger)
 
         if epoch % args.save_freq == 0:
             save_checkpoint(

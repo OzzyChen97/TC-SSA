@@ -1,0 +1,6013 @@
+[
+    {
+        "Answer": "invasive lobular carcinoma",
+        "Choice": [
+            "ductal carcinoma in situ",
+            "invasive ductal carcinoma",
+            "invasive lobular carcinoma",
+            "metastatic carcinoma"
+        ],
+        "Id": "TCGA-LD-A74U",
+        "Question": "what is the patient's diagnosis?"
+    },
+    {
+        "Answer": "70mm",
+        "Choice": [
+            "50mm",
+            "60mm",
+            "70mm",
+            "80mm"
+        ],
+        "Id": "TCGA-LD-A74U",
+        "Question": "what is the tumor size approximately?"
+    },
+    {
+        "Answer": "not mentioned",
+        "Choice": [
+            "low",
+            "intermediate",
+            "high",
+            "not mentioned"
+        ],
+        "Id": "TCGA-LD-A74U",
+        "Question": "what is the nuclear grade of the tumor?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "yes",
+            "no",
+            "not mentioned",
+            "cannot be determined"
+        ],
+        "Id": "TCGA-LD-A74U",
+        "Question": "is there any in-situ component in the tumor?"
+    },
+    {
+        "Answer": "medullary carcinoma",
+        "Choice": [
+            "medullary carcinoma",
+            "invasive ductal carcinoma",
+            "lobular carcinoma",
+            "inflammatory breast cancer."
+        ],
+        "Id": "TCGA-AR-A1AI",
+        "Question": "what type of breast cancer does jeb have?"
+    },
+    {
+        "Answer": "4.5 x 3.0 x 2.0 cm",
+        "Choice": [
+            "3.5 x 2.0 x 2.0 cm",
+            "4.5 x 3.0 x 2.0 cm",
+            "4.0 x 2.5 x 2.0 cm",
+            "5.0 x 2.5 x 2.5 cm."
+        ],
+        "Id": "TCGA-AR-A1AI",
+        "Question": "what was the size of the mass in jeb's breast?"
+    },
+    {
+        "Answer": "negative, indicating removal of all cancer.",
+        "Choice": [
+            "positive, indicating residual cancer.",
+            "negative, indicating removal of all cancer.",
+            "unclear, further testing is neede",
+            "d: positive, indicating the presence of cancer in the margins."
+        ],
+        "Id": "TCGA-AR-A1AI",
+        "Question": "what was the status of the surgical margins in jeb's case?"
+    },
+    {
+        "Answer": "Medullary Carcinoma",
+        "Id": "TCGA-AR-A1AI",
+        "Question": "From the slide, can you infer the histological_type?"
+    },
+    {
+        "Answer": "Negative",
+        "Id": "TCGA-AR-A1AI",
+        "Question": "what is the result of progesterone_receptor in the slide?"
+    },
+    {
+        "Answer": "2+",
+        "Id": "TCGA-AR-A1AI",
+        "Question": "what is her2 according to the slide?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-AR-A1AI",
+        "Question": "what is the result of vital_status in the slide?"
+    },
+    {
+        "Answer": "1881",
+        "Id": "TCGA-AR-A1AI",
+        "Question": "From the slide, can you infer the survival time?"
+    },
+    {
+        "Answer": "3 cm",
+        "Choice": [
+            "1.4 cm",
+            "2.8 cm",
+            "3 cm",
+            "3.2 cm"
+        ],
+        "Id": "TCGA-B6-A0WZ",
+        "Question": "what is the size of the tumor?"
+    },
+    {
+        "Answer": "tubulolobular subtype",
+        "Choice": [
+            "lobular cacinoma",
+            "tubulolobular subtype",
+            "mucinous carcinoma",
+            "papillary carcinoma"
+        ],
+        "Id": "TCGA-B6-A0WZ",
+        "Question": "what subtype of infiltrating ductal carcinoma is present?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "yes",
+            "no",
+            "cannot determine",
+            "not mentioned in the slide"
+        ],
+        "Id": "TCGA-B6-A0WZ",
+        "Question": "is there evidence of multifocal tumor?"
+    },
+    {
+        "Answer": "positive for estrogen receptors",
+        "Choice": [
+            "positive for estrogen receptors",
+            "negative for estrogen receptors",
+            "positive for progesterone receptors",
+            "negative for progesterone receptors"
+        ],
+        "Id": "TCGA-B6-A0WZ",
+        "Question": "what are the preliminary results of the hormone receptor analysis?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-B6-A0WZ",
+        "Question": "Can you help the pathologist to predict histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-B6-A0WZ",
+        "Question": "please predict progesterone_receptor?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-B6-A0WZ",
+        "Question": "Can you help the pathologist to predict vital_status?"
+    },
+    {
+        "Answer": "3941",
+        "Id": "TCGA-B6-A0WZ",
+        "Question": "what is the result of survival time in the slide?"
+    },
+    {
+        "Answer": "negative for invasive carcinoma",
+        "Choice": [
+            "22 cm",
+            "9/9",
+            "grade 3",
+            "negative for invasive carcinoma"
+        ],
+        "Id": "TCGA-BH-A5IZ",
+        "Question": "what is the size of the tumor?"
+    },
+    {
+        "Answer": "focal atypical ductal hyperplasia",
+        "Choice": [
+            "less than 5%",
+            "22 cm",
+            "grade 3",
+            "focal atypical ductal hyperplasia"
+        ],
+        "Id": "TCGA-BH-A5IZ",
+        "Question": "what percentage of the tumor volume constitutes ductal carcinoma in situ (dcis)?"
+    },
+    {
+        "Answer": "negative for invasive carcinoma",
+        "Choice": [
+            "9/9",
+            "22 cm",
+            "positive for estrogen receptors",
+            "negative for invasive carcinoma"
+        ],
+        "Id": "TCGA-BH-A5IZ",
+        "Question": "what is the nottingham score for the tumor?"
+    },
+    {
+        "Answer": "positive for estrogen and progesterone receptors",
+        "Choice": [
+            "positive for estrogen receptors",
+            "negative for progesterone receptors",
+            "negative for her-2",
+            "positive for estrogen and progesterone receptors"
+        ],
+        "Id": "TCGA-BH-A5IZ",
+        "Question": "what are the hormone receptor status of the tumor?"
+    },
+    {
+        "Answer": "focal atypical ductal hyperplasia",
+        "Choice": [
+            "atypical ductal hyperplasia",
+            "fibrocystic changes",
+            "dermal lymphatic invasion",
+            "focal atypical ductal hyperplasia"
+        ],
+        "Id": "TCGA-BH-A5IZ",
+        "Question": "what type of non-neoplastic breast tissue changes were observed?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-BH-A5IZ",
+        "Question": "Can you help the pathologist to predict histological_type?"
+    },
+    {
+        "Answer": "Negative",
+        "Id": "TCGA-BH-A5IZ",
+        "Question": "what is the result of progesterone_receptor in the slide?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-BH-A5IZ",
+        "Question": "Could you predict vital_status?"
+    },
+    {
+        "Answer": "567",
+        "Id": "TCGA-BH-A5IZ",
+        "Question": "From the slide, can you infer the survival time?"
+    },
+    {
+        "Answer": "0.6 cm to 21 cm",
+        "Choice": [
+            "0.6 cm to 21 cm",
+            "0.6 cm to 9 cm",
+            "0.6 cm to 15 cm",
+            "0.8 cm to 21 cm"
+        ],
+        "Id": "TCGA-BH-A0AZ",
+        "Question": "what is the tumor size range?"
+    },
+    {
+        "Answer": "6 out of 9",
+        "Choice": [
+            "6 out of 9",
+            "9 out of 6",
+            "3 out of 5",
+            "5 out of 10"
+        ],
+        "Id": "TCGA-BH-A0AZ",
+        "Question": "what is the nottingham score?"
+    },
+    {
+        "Answer": "less than 1%",
+        "Choice": [
+            "less than 1%",
+            "approximately 2%",
+            "around 10%",
+            "more than 5%"
+        ],
+        "Id": "TCGA-BH-A0AZ",
+        "Question": "what percentage of tumor volume does ductal carcinoma in situ (dcis) represent?"
+    },
+    {
+        "Answer": "equivocal estrogen and progesterone receptors",
+        "Choice": [
+            "positive estrogen and negative progesterone receptors",
+            "negative estrogen and positive progesterone receptors",
+            "equivocal estrogen and progesterone receptors",
+            "negative estrogen and negative progesterone receptors"
+        ],
+        "Id": "TCGA-BH-A0AZ",
+        "Question": "what were the results of the immunohistochemical staining?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-BH-A0AZ",
+        "Question": "Can you help the pathologist to predict histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-BH-A0AZ",
+        "Question": "Could you predict progesterone_receptor?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-BH-A0AZ",
+        "Question": "please predict vital_status?"
+    },
+    {
+        "Answer": "1919",
+        "Id": "TCGA-BH-A0AZ",
+        "Question": "please predict survival time?"
+    },
+    {
+        "Answer": "2.0 cm",
+        "Choice": [
+            "1.0 cm",
+            "2.0 cm",
+            "3.0 cm",
+            "4.0 cm"
+        ],
+        "Id": "TCGA-EW-A1PF",
+        "Question": "what is the total size of the tumor?"
+    },
+    {
+        "Answer": "grade 2",
+        "Choice": [
+            "grade 1",
+            "grade 2",
+            "grade 3",
+            "grade 4"
+        ],
+        "Id": "TCGA-EW-A1PF",
+        "Question": "what is the grade of the invasive ductal carcinoma?"
+    },
+    {
+        "Answer": "less than 5%",
+        "Choice": [
+            "less than 1%",
+            "less than 3%",
+            "less than 5%",
+            "less than 7%"
+        ],
+        "Id": "TCGA-EW-A1PF",
+        "Question": "what is the size of the comedo necrosis in the ductal carcinoma in situ?"
+    },
+    {
+        "Answer": "keratin",
+        "Choice": [
+            "keratin",
+            "estrogen receptor",
+            "progesterone receptor",
+            "her2/neu"
+        ],
+        "Id": "TCGA-EW-A1PF",
+        "Question": "what is the pending immunohistochemistry for?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-EW-A1PF",
+        "Question": "please predict histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-EW-A1PF",
+        "Question": "Could you predict progesterone_receptor?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-EW-A1PF",
+        "Question": "Can you help the pathologist to predict vital_status?"
+    },
+    {
+        "Answer": "439",
+        "Id": "TCGA-EW-A1PF",
+        "Question": "what is the result of survival time in the slide?"
+    },
+    {
+        "Answer": "3.0 cm",
+        "Choice": [
+            "2.0 cm",
+            "3.0 cm",
+            "2 mm",
+            "1.5 cm"
+        ],
+        "Id": "TCGA-BH-A0BV",
+        "Question": "what is the size of the infiltrating ductal carcinoma in the breast?"
+    },
+    {
+        "Answer": "7/9",
+        "Choice": [
+            "7/9",
+            "5/9",
+            "9/9",
+            "6/9"
+        ],
+        "Id": "TCGA-BH-A0BV",
+        "Question": "what is the nottingham score of the infiltrating ductal carcinoma?"
+    },
+    {
+        "Answer": "2.0 cm",
+        "Choice": [
+            "2.0 cm",
+            "1.5 cm",
+            "3.0 cm",
+            "0.5 cm"
+        ],
+        "Id": "TCGA-BH-A0BV",
+        "Question": "what is the closest margin of resection for the infiltrating ductal carcinoma?"
+    },
+    {
+        "Answer": "solid and cribriform",
+        "Choice": [
+            "solid and cribriform",
+            "papillary and atypical",
+            "infiltrating and lobular",
+            "metastatic and invasive"
+        ],
+        "Id": "TCGA-BH-A0BV",
+        "Question": "what is the tumor type of the ductal carcinoma in situ?"
+    },
+    {
+        "Answer": "t2 n1 mx",
+        "Choice": [
+            "t1 n0 m0",
+            "t2 n1 mx",
+            "t3 n2 m1",
+            "t4 n3 m2"
+        ],
+        "Id": "TCGA-BH-A0BV",
+        "Question": "what is the pathological stage of the breast cancer?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-BH-A0BV",
+        "Question": "please predict histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-BH-A0BV",
+        "Question": "what is progesterone_receptor according to the slide?"
+    },
+    {
+        "Answer": "0",
+        "Id": "TCGA-BH-A0BV",
+        "Question": "what is her2 according to the slide?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-BH-A0BV",
+        "Question": "what is vital_status according to the slide?"
+    },
+    {
+        "Answer": "1519",
+        "Id": "TCGA-BH-A0BV",
+        "Question": "please predict survival time?"
+    },
+    {
+        "Answer": "2.8 cm",
+        "Choice": [
+            "2.8 cm",
+            "4 mm",
+            "0.4 cm",
+            "3 mm"
+        ],
+        "Id": "TCGA-BH-A202",
+        "Question": "what was the size of the primary invasive carcinoma?"
+    },
+    {
+        "Answer": "250",
+        "Choice": [
+            "250",
+            "78",
+            "positive",
+            "negative"
+        ],
+        "Id": "TCGA-BH-A202",
+        "Question": "what was the score for estrogen receptors?"
+    },
+    {
+        "Answer": "invasive ductal carcinoma",
+        "Choice": [
+            "invasive ductal carcinoma",
+            "papilloma",
+            "no special type",
+            "fibroadenomatous changes"
+        ],
+        "Id": "TCGA-BH-A202",
+        "Question": "what type of carcinoma was found in the breast segmental mastectomy?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "yes",
+            "no",
+            "not mentioned",
+            "negative"
+        ],
+        "Id": "TCGA-BH-A202",
+        "Question": "was lymphovascular invasion identified?"
+    },
+    {
+        "Answer": "pt4an0mx",
+        "Choice": [
+            "pt4an0mx",
+            "negative",
+            "positive",
+            "in situ component"
+        ],
+        "Id": "TCGA-BH-A202",
+        "Question": "what was the pathologic stage?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "no",
+            "yes",
+            "negative",
+            "positive"
+        ],
+        "Id": "TCGA-BH-A202",
+        "Question": "was there amplification of the her2/neu gene?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-BH-A202",
+        "Question": "what is histological_type according to the slide?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-BH-A202",
+        "Question": "Could you predict progesterone_receptor?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-BH-A202",
+        "Question": "From the slide, can you infer the vital_status?"
+    },
+    {
+        "Answer": "795",
+        "Id": "TCGA-BH-A202",
+        "Question": "what is the result of survival time in the slide?"
+    },
+    {
+        "Answer": "invasive ductal adenocarcinoma",
+        "Choice": [
+            "invasive ductal adenocarcinoma",
+            "nottingham grade iii",
+            "ductal carcinoma in-situ",
+            "invasive lobular carcinoma"
+        ],
+        "Id": "TCGA-AR-A0U3",
+        "Question": "what type of cancer was found in the breast?"
+    },
+    {
+        "Answer": "2.3 x 2.0 cm",
+        "Choice": [
+            "2.3 x 2.0 cm",
+            "3.5 x 2.0 cm",
+            "2.0 x 2.0 cm",
+            "2.5 x 3.0 cm"
+        ],
+        "Id": "TCGA-AR-A0U3",
+        "Question": "what was the size of the tumor?"
+    },
+    {
+        "Answer": "t2",
+        "Choice": [
+            "t0",
+            "t1",
+            "t2",
+            "t3"
+        ],
+        "Id": "TCGA-AR-A0U3",
+        "Question": "what was the stage classification of the tumor?"
+    },
+    {
+        "Answer": "10%",
+        "Choice": [
+            "5%",
+            "15%",
+            "10%",
+            "20%"
+        ],
+        "Id": "TCGA-AR-A0U3",
+        "Question": "how much of the tumor was accounted for by ductal carcinoma in-situ?"
+    },
+    {
+        "Answer": "positive with more than 10% nuclear staining",
+        "Choice": [
+            "negative",
+            "positive with less than 10% nuclear staining",
+            "positive with more than 10% nuclear staining",
+            "variable staining"
+        ],
+        "Id": "TCGA-AR-A0U3",
+        "Question": "what was the result of the estrogen receptor (er) staining?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-AR-A0U3",
+        "Question": "what is histological_type according to the slide?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-AR-A0U3",
+        "Question": "please predict progesterone_receptor?"
+    },
+    {
+        "Answer": "1+",
+        "Id": "TCGA-AR-A0U3",
+        "Question": "please predict her2?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-AR-A0U3",
+        "Question": "please predict vital_status?"
+    },
+    {
+        "Answer": "2317",
+        "Id": "TCGA-AR-A0U3",
+        "Question": "what is the result of survival time in the slide?"
+    },
+    {
+        "Answer": "high grade",
+        "Choice": [
+            "low grade",
+            "intermediate grade",
+            "high grade",
+            "not mentioned"
+        ],
+        "Id": "TCGA-AO-A0JE",
+        "Question": "what is the grade of the invasive ductal carcinoma?"
+    },
+    {
+        "Answer": "calcifications and microvascular invasion",
+        "Choice": [
+            "no additional findings",
+            "calcifications and microvascular invasion",
+            "focal atypical ductal hyperplasia",
+            "benign changes in the surrounding breast tissue"
+        ],
+        "Id": "TCGA-AO-A0JE",
+        "Question": "what additional findings are present in the tumor?"
+    },
+    {
+        "Answer": "benign changes",
+        "Choice": [
+            "benign changes",
+            "high-grade ductal carcinoma",
+            "ductal carcinoma in situ",
+            "extranodal extension"
+        ],
+        "Id": "TCGA-AO-A0JE",
+        "Question": "what is found in the surrounding breast tissue?"
+    },
+    {
+        "Answer": "on the right breast mass",
+        "Choice": [
+            "on the sentinel lymph nodes",
+            "on the right breast mass",
+            "on the surrounding breast tissue",
+            "on the axillary lymph nodes"
+        ],
+        "Id": "TCGA-AO-A0JE",
+        "Question": "where were receptor studies performed?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-AO-A0JE",
+        "Question": "From the slide, can you infer the histological_type?"
+    },
+    {
+        "Answer": "Negative",
+        "Id": "TCGA-AO-A0JE",
+        "Question": "what is the result of progesterone_receptor in the slide?"
+    },
+    {
+        "Answer": "3+",
+        "Id": "TCGA-AO-A0JE",
+        "Question": "Could you predict her2?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-AO-A0JE",
+        "Question": "what is the result of vital_status in the slide?"
+    },
+    {
+        "Answer": "1966",
+        "Id": "TCGA-AO-A0JE",
+        "Question": "Could you predict survival time?"
+    },
+    {
+        "Answer": "2.4 cm",
+        "Choice": [
+            "1.4 cm",
+            "2.4 cm",
+            "3.4 cm",
+            "4.4 cm"
+        ],
+        "Id": "TCGA-A1-A0SF",
+        "Question": "what is the size of the infiltrating ductal carcinoma in the breast?"
+    },
+    {
+        "Answer": "grade 2",
+        "Choice": [
+            "grade 1",
+            "grade 2",
+            "grade 3",
+            "grade 4"
+        ],
+        "Id": "TCGA-A1-A0SF",
+        "Question": "what is the grade of the invasive tumor in the breast?"
+    },
+    {
+        "Answer": "not provided",
+        "Choice": [
+            "positive",
+            "negative",
+            "inconclusive",
+            "not provided"
+        ],
+        "Id": "TCGA-A1-A0SF",
+        "Question": "what is the result of her2/neu testing?"
+    },
+    {
+        "Answer": "benign breast tissue",
+        "Choice": [
+            "infiltrating ductal carcinoma",
+            "benign breast tissue",
+            "microcalcifications associated with benign ducts and stroma",
+            "non-proliferative fibrocystic change"
+        ],
+        "Id": "TCGA-A1-A0SF",
+        "Question": "what is the pathological finding in the soft tissue in the breast?"
+    },
+    {
+        "Answer": "benign paratubal cyst",
+        "Choice": [
+            "benign paratubal cyst",
+            "malignant tumor",
+            "endometriosis",
+            "ovarian cyst"
+        ],
+        "Id": "TCGA-A1-A0SF",
+        "Question": "what is the pathological finding in the ovary?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-A1-A0SF",
+        "Question": "please predict histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-A1-A0SF",
+        "Question": "Can you help the pathologist to predict progesterone_receptor?"
+    },
+    {
+        "Answer": "grade 2",
+        "Choice": [
+            "grade 1",
+            "grade 2",
+            "grade 3",
+            "grade 4"
+        ],
+        "Id": "TCGA-EW-A1P7",
+        "Question": "what was the grade assigned to the breast cancer according to the nottingham score?"
+    },
+    {
+        "Answer": "high",
+        "Choice": [
+            "low",
+            "moderate",
+            "high",
+            "very high"
+        ],
+        "Id": "TCGA-EW-A1P7",
+        "Question": "what was the nuclear grade of the ductal adenocarcinoma found in the breast mass?"
+    },
+    {
+        "Answer": "negative",
+        "Choice": [
+            "positive",
+            "negative",
+            "inconclusive",
+            "not mentioned"
+        ],
+        "Id": "TCGA-EW-A1P7",
+        "Question": "what were the results of the tumor margin assessment?"
+    },
+    {
+        "Answer": "negative",
+        "Choice": [
+            "positive",
+            "negative",
+            "inconclusive",
+            "not mentioned"
+        ],
+        "Id": "TCGA-EW-A1P7",
+        "Question": "what was the receptor status for estrogen receptor (er) and progesterone receptor (pr)?"
+    },
+    {
+        "Answer": "equivocal",
+        "Choice": [
+            "positive",
+            "negative",
+            "equivocal",
+            "not mentioned"
+        ],
+        "Id": "TCGA-EW-A1P7",
+        "Question": "what was the receptor status for her 2-neu?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-EW-A1P7",
+        "Question": "From the slide, can you infer the histological_type?"
+    },
+    {
+        "Answer": "Negative",
+        "Id": "TCGA-EW-A1P7",
+        "Question": "please predict progesterone_receptor?"
+    },
+    {
+        "Answer": "2+",
+        "Id": "TCGA-EW-A1P7",
+        "Question": "please predict her2?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-EW-A1P7",
+        "Question": "Could you predict vital_status?"
+    },
+    {
+        "Answer": "915",
+        "Id": "TCGA-EW-A1P7",
+        "Question": "From the slide, can you infer the survival time?"
+    },
+    {
+        "Answer": "pt2n0",
+        "Choice": [
+            "pt0n0",
+            "pt2n0",
+            "pt1n1",
+            "pt3n2"
+        ],
+        "Id": "TCGA-BH-A0DG",
+        "Question": "what is the pathological stage of the tumor?"
+    },
+    {
+        "Answer": "approximately 20%",
+        "Choice": [
+            "approximately 30%",
+            "approximately 15%",
+            "approximately 5%",
+            "approximately 20%"
+        ],
+        "Id": "TCGA-BH-A0DG",
+        "Question": "what percentage of the tumor volume comprises the in situ component?"
+    },
+    {
+        "Answer": "grade 2",
+        "Choice": [
+            "grade 1",
+            "grade 2",
+            "grade 3",
+            "grade 4"
+        ],
+        "Id": "TCGA-BH-A0DG",
+        "Question": "what is the grade of the tumor according to the nottingham score?"
+    },
+    {
+        "Answer": "er-positive, pr-positive, her-2-negative",
+        "Choice": [
+            "er-negative, pr-negative, her-2-positive",
+            "er-positive, pr-positive, her-2-negative",
+            "er-negative, pr-positive, her-2-negative",
+            "er-positive, pr-negative, her-2-negative"
+        ],
+        "Id": "TCGA-BH-A0DG",
+        "Question": "what is the hormonal receptor status of the tumor?"
+    },
+    {
+        "Answer": "both fibrocystic change and fibroadenoma",
+        "Choice": [
+            "fibroadenoma only",
+            "fibrocystic change only",
+            "both fibrocystic change and fibroadenoma",
+            "non-neoplastic breast tissue"
+        ],
+        "Id": "TCGA-BH-A0DG",
+        "Question": "what type of breast tissue is present besides the tumor?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-BH-A0DG",
+        "Question": "Can you help the pathologist to predict histological_type?"
+    },
+    {
+        "Answer": "Negative",
+        "Id": "TCGA-BH-A0DG",
+        "Question": "please predict progesterone_receptor?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-BH-A0DG",
+        "Question": "Could you predict vital_status?"
+    },
+    {
+        "Answer": "2041",
+        "Id": "TCGA-BH-A0DG",
+        "Question": "Can you help the pathologist to predict survival time?"
+    },
+    {
+        "Answer": "adipose breast tissue,",
+        "Choice": [
+            "ductal carcinoma in situ,",
+            "adipose breast tissue,",
+            "nuclear pleomorphism and mitotic activity,",
+            "lymphoplasmacytic infiltrate and necrosis"
+        ],
+        "Id": "TCGA-BH-A0DD",
+        "Question": "what is the histological finding of the breast simple mastectomy?"
+    },
+    {
+        "Answer": "lymphoplasmacytic infiltrate and necrosis,",
+        "Choice": [
+            "ductal carcinoma in situ,",
+            "ductal epithelial hyperplasia,",
+            "lymphoplasmacytic infiltrate and necrosis,",
+            "skin and nipple are histologically unremarkable"
+        ],
+        "Id": "TCGA-BH-A0DD",
+        "Question": "what is the histological finding of the modified radical mastectomy?"
+    },
+    {
+        "Answer": "ductal adenocarcinoma, nuclear grade 2,",
+        "Choice": [
+            "ductal adenocarcinoma, nuclear grade 2,",
+            "ductal carcinoma in situ,",
+            "tubule maton score of 3,",
+            "nottingham score of 8"
+        ],
+        "Id": "TCGA-BH-A0DD",
+        "Question": "what is the classification of the invasive component of the tumor?"
+    },
+    {
+        "Answer": "estrogen receptors are positive,",
+        "Choice": [
+            "estrogen receptors are positive,",
+            "progesterone receptors are positive,",
+            "both estrogen and progesterone receptors are positive,",
+            "receptor status is not mentioned"
+        ],
+        "Id": "TCGA-BH-A0DD",
+        "Question": "what is the receptor status mentioned in the slide?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-BH-A0DD",
+        "Question": "please predict histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-BH-A0DD",
+        "Question": "Can you help the pathologist to predict progesterone_receptor?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-BH-A0DD",
+        "Question": "what is the result of vital_status in the slide?"
+    },
+    {
+        "Answer": "2486",
+        "Id": "TCGA-BH-A0DD",
+        "Question": "Can you help the pathologist to predict survival time?"
+    },
+    {
+        "Answer": "infiltrating carcinoma",
+        "Choice": [
+            "infiltrating carcinoma",
+            "hyperplasia",
+            "fibrosis",
+            "metaplasia"
+        ],
+        "Id": "TCGA-B6-A0IA",
+        "Question": "what type of carcinoma was found in the patient's breast biopsy?"
+    },
+    {
+        "Answer": "2.0 cm",
+        "Choice": [
+            "2.0 cm",
+            "1.5 cm",
+            "2.5 cm",
+            "3.0 cm"
+        ],
+        "Id": "TCGA-B6-A0IA",
+        "Question": "what is the size of the tumor found in the patient's breast?"
+    },
+    {
+        "Answer": "hyperplasia",
+        "Choice": [
+            "hyperplasia",
+            "fibrosis",
+            "metaplasia",
+            "dilated ducts"
+        ],
+        "Id": "TCGA-B6-A0IA",
+        "Question": "what other changes were found in the patient's breast?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "no",
+            "yes",
+            "not mentioned",
+            "none of the above"
+        ],
+        "Id": "TCGA-B6-A0IA",
+        "Question": "was there any residual carcinoma in the previous biopsy site?"
+    },
+    {
+        "Answer": "Other, specify",
+        "Id": "TCGA-B6-A0IA",
+        "Question": "what is histological_type according to the slide?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-B6-A0IA",
+        "Question": "From the slide, can you infer the progesterone_receptor?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-B6-A0IA",
+        "Question": "Can you help the pathologist to predict vital_status?"
+    },
+    {
+        "Answer": "6719",
+        "Id": "TCGA-B6-A0IA",
+        "Question": "please predict survival time?"
+    },
+    {
+        "Answer": "lobular carcinoma",
+        "Choice": [
+            "ductal carcinoma",
+            "invasive carcinoma",
+            "lobular carcinoma",
+            "metastatic carcinoma"
+        ],
+        "Id": "TCGA-AC-A2FF",
+        "Question": "what type of carcinoma did the patient have?"
+    },
+    {
+        "Answer": "lymph nodes",
+        "Choice": [
+            "breast tissue",
+            "lymph nodes",
+            "chest cavity",
+            "abdominal organs"
+        ],
+        "Id": "TCGA-AC-A2FF",
+        "Question": "where was the metastatic involvement found?"
+    },
+    {
+        "Answer": "lumpectomy",
+        "Choice": [
+            "mastectomy",
+            "lumpectomy",
+            "biopsy",
+            "lymph node dissection"
+        ],
+        "Id": "TCGA-AC-A2FF",
+        "Question": "what type of procedure did the patient undergo?"
+    },
+    {
+        "Answer": "immunostains",
+        "Choice": [
+            "magnetic resonance imaging",
+            "computed tomography scan",
+            "positron emission tomography scan",
+            "immunostains"
+        ],
+        "Id": "TCGA-AC-A2FF",
+        "Question": "what additional tests were performed?"
+    },
+    {
+        "Answer": "tumor size and characteristics",
+        "Choice": [
+            "patient demographics",
+            "treatment plan",
+            "tumor size and characteristics",
+            "prognosis"
+        ],
+        "Id": "TCGA-AC-A2FF",
+        "Question": "what does the surgical slide provide information on?"
+    },
+    {
+        "Answer": "sentinel lymph node",
+        "Choice": [
+            "sentinel lymph node",
+            "axillary lymph node",
+            "inguinal lymph node",
+            "paraaortic lymph node"
+        ],
+        "Id": "TCGA-AC-A2FF",
+        "Question": "what type of node was involved in the metastatic carcinoma?"
+    },
+    {
+        "Answer": "Infiltrating Lobular Carcinoma",
+        "Id": "TCGA-AC-A2FF",
+        "Question": "what is histological_type according to the slide?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-AC-A2FF",
+        "Question": "what is the result of progesterone_receptor in the slide?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-AC-A2FF",
+        "Question": "please predict vital_status?"
+    },
+    {
+        "Answer": "2420",
+        "Id": "TCGA-AC-A2FF",
+        "Question": "please predict survival time?"
+    },
+    {
+        "Answer": "invasive lobular carcinoma",
+        "Choice": [
+            "invasive ductal carcinoma",
+            "invasive lobular carcinoma",
+            "benign tumor",
+            "metastatic carcinoma"
+        ],
+        "Id": "TCGA-AC-A2FG",
+        "Question": "what is the histological type of the breast tumor?"
+    },
+    {
+        "Answer": "2.1 cm",
+        "Choice": [
+            "0.8 cm",
+            "1.5 cm",
+            "2.1 cm",
+            "2.8 cm"
+        ],
+        "Id": "TCGA-AC-A2FG",
+        "Question": "what is the size of the tumor?"
+    },
+    {
+        "Answer": "grade 2/3",
+        "Choice": [
+            "grade 1/3",
+            "grade 2/3",
+            "grade 3/3",
+            "not specified"
+        ],
+        "Id": "TCGA-AC-A2FG",
+        "Question": "what is the elston modification of bloom-richardson grade?"
+    },
+    {
+        "Answer": "negative",
+        "Choice": [
+            "negative",
+            "positive",
+            "uncertain",
+            "tumor not transected"
+        ],
+        "Id": "TCGA-AC-A2FG",
+        "Question": "what is the status of the surgical margins?"
+    },
+    {
+        "Answer": "fibroids and hemorrhage",
+        "Choice": [
+            "no other findings",
+            "fibroids and hemorrhage",
+            "ductal carcinoma in situ",
+            "axillary node involvement"
+        ],
+        "Id": "TCGA-AC-A2FG",
+        "Question": "what other findings were observed in the pathological slide?"
+    },
+    {
+        "Answer": "Infiltrating Lobular Carcinoma",
+        "Id": "TCGA-AC-A2FG",
+        "Question": "what is the result of histological_type in the slide?"
+    },
+    {
+        "Answer": "Negative",
+        "Id": "TCGA-AC-A2FG",
+        "Question": "please predict progesterone_receptor?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-AC-A2FG",
+        "Question": "what is vital_status according to the slide?"
+    },
+    {
+        "Answer": "1853",
+        "Id": "TCGA-AC-A2FG",
+        "Question": "From the slide, can you infer the survival time?"
+    },
+    {
+        "Answer": "grade 2",
+        "Choice": [
+            "grade 1",
+            "grade 2",
+            "grade 3",
+            "grade 4"
+        ],
+        "Id": "TCGA-A2-A259",
+        "Question": "what was the grade of the invasive ductal carcinoma present in the patient's breast?"
+    },
+    {
+        "Answer": "her2 neu was negative",
+        "Choice": [
+            "her2 neu was positive",
+            "her2 neu was negative",
+            "there were no findings related to her2 neu",
+            "poorly differentiated her2 neu found"
+        ],
+        "Id": "TCGA-A2-A259",
+        "Question": "what were the findings related to her2 neu in the patient's breast tissue?"
+    },
+    {
+        "Answer": "1.5 cm",
+        "Choice": [
+            "1.0 cm",
+            "1.5 cm",
+            "2.0 cm",
+            "2.5 cm"
+        ],
+        "Id": "TCGA-A2-A259",
+        "Question": "what was the size of the patient's tumor?"
+    },
+    {
+        "Answer": "both estrogen and progesterone receptors",
+        "Choice": [
+            "estrogen receptors only",
+            "progesterone receptors only",
+            "both estrogen and progesterone receptors",
+            "no hormone receptors were present"
+        ],
+        "Id": "TCGA-A2-A259",
+        "Question": "which hormone receptors were positive in the patient's breast tissue?"
+    },
+    {
+        "Answer": "invasive lobular carcinoma",
+        "Choice": [
+            "invasive lobular carcinoma",
+            "adrenocarcinoma",
+            "squamous cell carcinoma",
+            "carcinoid tumor"
+        ],
+        "Id": "TCGA-A2-A259",
+        "Question": "what type of carcinoma was present along with invasive ductal carcinoma?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-A2-A259",
+        "Question": "what is histological_type according to the slide?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-A2-A259",
+        "Question": "Can you help the pathologist to predict progesterone_receptor?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-A2-A259",
+        "Question": "Can you help the pathologist to predict vital_status?"
+    },
+    {
+        "Answer": "1596",
+        "Id": "TCGA-A2-A259",
+        "Question": "From the slide, can you infer the survival time?"
+    },
+    {
+        "Answer": "invasive ductal carcinoma with dcis and microcalcifications",
+        "Choice": [
+            "invasive ductal carcinoma with dcis and microcalcifications",
+            "invasive lobular carcinoma with dcis",
+            "invasive ductal carcinoma with invasive lobular carcinoma",
+            "dcis only"
+        ],
+        "Id": "TCGA-A1-A0SJ",
+        "Question": "what is the pathological finding of the breast?"
+    },
+    {
+        "Answer": "renal tumor",
+        "Choice": [
+            "renal cell carcinoma",
+            "renal tumor",
+            "angiomyolipoma",
+            "oncocytoma"
+        ],
+        "Id": "TCGA-A1-A0SJ",
+        "Question": "what is the immunohistochemical finding of the tumor?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-A1-A0SJ",
+        "Question": "From the slide, can you infer the histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-A1-A0SJ",
+        "Question": "what is progesterone_receptor according to the slide?"
+    },
+    {
+        "Answer": "2+",
+        "Id": "TCGA-A1-A0SJ",
+        "Question": "Can you help the pathologist to predict her2?"
+    },
+    {
+        "Answer": "2.3 x 2.3 x 2 mm",
+        "Choice": [
+            "2.3 x 2.3 x 2 cm",
+            "2.3 x 2.3 x 2 mm",
+            "2.3 x 2.3 x 2 um",
+            "2.3 x 2.3 x 2 nm"
+        ],
+        "Id": "TCGA-E9-A1N6",
+        "Question": "what was the size of the breast tumor?"
+    },
+    {
+        "Answer": "poorly differentiated",
+        "Choice": [
+            "well-differentiated",
+            "poorly differentiated",
+            "moderately differentiated",
+            "undifferentiated"
+        ],
+        "Id": "TCGA-E9-A1N6",
+        "Question": "was the tumor well-differentiated or poorly differentiated?"
+    },
+    {
+        "Answer": "infiltrating ductal carcinoma",
+        "Choice": [
+            "infiltrating lobular carcinoma",
+            "infiltrating ductal carcinoma",
+            "inflammatory carcinoma",
+            "medullary carcinoma"
+        ],
+        "Id": "TCGA-E9-A1N6",
+        "Question": "what type of carcinoma was identified in the tumor?"
+    },
+    {
+        "Answer": "tubule formation, nuclear pleomorphism, and mitotic count",
+        "Choice": [
+            "tubule formation, nuclear pleomorphism, and mitotic count",
+            "tubule formation, nuclear pleomorphism, and lymph node invasion",
+            "tubule formation, nuclear pleomorphism, and tumor extent",
+            "tubule formation, nuclear pleomorphism, and margin status"
+        ],
+        "Id": "TCGA-E9-A1N6",
+        "Question": "what was the missing data preventing the determination of the nottingham histologic score?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "yes",
+            "no",
+            "unclear",
+            "insufficient"
+        ],
+        "Id": "TCGA-E9-A1N6",
+        "Question": "was any information provided on neo-adjuvant treatment?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-E9-A1N6",
+        "Question": "please predict histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-E9-A1N6",
+        "Question": "please predict progesterone_receptor?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-E9-A1N6",
+        "Question": "what is the result of vital_status in the slide?"
+    },
+    {
+        "Answer": "410",
+        "Id": "TCGA-E9-A1N6",
+        "Question": "Could you predict survival time?"
+    },
+    {
+        "Answer": "1.8 cm",
+        "Choice": [
+            "1.8 cm",
+            "2.5 cm",
+            "3.2 cm",
+            "4.5 cm"
+        ],
+        "Id": "TCGA-LL-A5YP",
+        "Question": "what was the size of the high-grade ductal carcinoma in situ (dcis) in the breast?"
+    },
+    {
+        "Answer": "grade 3",
+        "Choice": [
+            "grade 1",
+            "grade 2",
+            "grade 3",
+            "grade 4"
+        ],
+        "Id": "TCGA-LL-A5YP",
+        "Question": "what was the grade of the invasive ductal carcinoma in the breast?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "yes",
+            "no",
+            "cannot determine",
+            "not mentioned"
+        ],
+        "Id": "TCGA-LL-A5YP",
+        "Question": "were the margins involved with tumor?"
+    },
+    {
+        "Answer": "proliferative fibrocystic changes and neurofibromatosis",
+        "Choice": [
+            "proliferative fibrocystic changes and neurofibromatosis",
+            "invasive lobular carcinoma and fibroadenoma",
+            "ductal carcinoma in situ (dcis) and mastitis",
+            "metastatic carcinoma and ductal hyperplasia"
+        ],
+        "Id": "TCGA-LL-A5YP",
+        "Question": "what additional findings were noted apart from the carcinomas?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-LL-A5YP",
+        "Question": "please predict histological_type?"
+    },
+    {
+        "Answer": "Negative",
+        "Id": "TCGA-LL-A5YP",
+        "Question": "From the slide, can you infer the progesterone_receptor?"
+    },
+    {
+        "Answer": "1+",
+        "Id": "TCGA-LL-A5YP",
+        "Question": "Could you predict her2?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-LL-A5YP",
+        "Question": "From the slide, can you infer the vital_status?"
+    },
+    {
+        "Answer": "450",
+        "Id": "TCGA-LL-A5YP",
+        "Question": "Could you predict survival time?"
+    },
+    {
+        "Answer": "invasive ductal carcinoma",
+        "Choice": [
+            "invasive ductal carcinoma",
+            "benign lymph nodes",
+            "non-neoplastic breast tissue changes",
+            "estrogen and progesterone receptor positivity"
+        ],
+        "Id": "TCGA-AO-A03T",
+        "Question": "what type of cancer is mentioned in the slide?"
+    },
+    {
+        "Answer": "left axilla",
+        "Choice": [
+            "skin",
+            "right axilla",
+            "non-neoplastic breast tissue changes",
+            "left axilla"
+        ],
+        "Id": "TCGA-AO-A03T",
+        "Question": "where has the tumor spread to?"
+    },
+    {
+        "Answer": "non-neoplastic breast tissue changes",
+        "Choice": [
+            "invasive ductal carcinoma",
+            "left axilla",
+            "non-neoplastic breast tissue changes",
+            "estrogen and progesterone receptor positivity"
+        ],
+        "Id": "TCGA-AO-A03T",
+        "Question": "what type of tissue changes are mentioned in the slide?"
+    },
+    {
+        "Answer": "estrogen receptor positivity",
+        "Choice": [
+            "progesterone receptor positivity",
+            "skin",
+            "estrogen receptor positivity",
+            "benign lymph nodes"
+        ],
+        "Id": "TCGA-AO-A03T",
+        "Question": "which hormone receptors show positivity in the tissue?"
+    },
+    {
+        "Answer": "involvement of the skin by the carcinoma",
+        "Choice": [
+            "size and location of the tumor within the breast",
+            "involvement of the skin by the carcinoma",
+            "non-neoplastic breast tissue changes",
+            "presence of benign lymph nodes"
+        ],
+        "Id": "TCGA-AO-A03T",
+        "Question": "what does the slide confirm about the diagnosis?"
+    },
+    {
+        "Answer": "special stains",
+        "Choice": [
+            "estrogen and progesterone receptor positivity",
+            "skin",
+            "non-neoplastic breast tissue changes",
+            "special stains"
+        ],
+        "Id": "TCGA-AO-A03T",
+        "Question": "what stains were performed on the tissue?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-AO-A03T",
+        "Question": "From the slide, can you infer the histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-AO-A03T",
+        "Question": "Can you help the pathologist to predict progesterone_receptor?"
+    },
+    {
+        "Answer": "0",
+        "Id": "TCGA-AO-A03T",
+        "Question": "please predict her2?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-AO-A03T",
+        "Question": "From the slide, can you infer the vital_status?"
+    },
+    {
+        "Answer": "1187",
+        "Id": "TCGA-AO-A03T",
+        "Question": "please predict survival time?"
+    },
+    {
+        "Answer": "grade 3",
+        "Choice": [
+            "grade 1",
+            "grade 2",
+            "grade 3",
+            "grade 4"
+        ],
+        "Id": "TCGA-C8-A3M7",
+        "Question": "what is the histological grade of the primary tumor?"
+    },
+    {
+        "Answer": "asymptomatic",
+        "Choice": [
+            "severely symptomatic",
+            "moderately symptomatic",
+            "mildly symptomatic",
+            "asymptomatic"
+        ],
+        "Id": "TCGA-C8-A3M7",
+        "Question": "what is the patient's karnofsky performance scale score indicating?"
+    },
+    {
+        "Answer": "lobular carcinoma",
+        "Choice": [
+            "ductal carcinoma",
+            "infiltrating carcinoma",
+            "lobular carcinoma",
+            "metastatic carcinoma"
+        ],
+        "Id": "TCGA-C8-A3M7",
+        "Question": "what type of carcinoma is the primary tumor?"
+    },
+    {
+        "Answer": "not specified",
+        "Choice": [
+            "yes",
+            "no",
+            "not specified",
+            "none of the above"
+        ],
+        "Id": "TCGA-C8-A3M7",
+        "Question": "is the patient currently on any medications?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "yes",
+            "no",
+            "partially mentioned",
+            "not specified"
+        ],
+        "Id": "TCGA-C8-A3M7",
+        "Question": "is there any information about the presence of distant metastasis?"
+    },
+    {
+        "Answer": "Infiltrating Lobular Carcinoma",
+        "Id": "TCGA-C8-A3M7",
+        "Question": "what is the result of histological_type in the slide?"
+    },
+    {
+        "Answer": "Negative",
+        "Id": "TCGA-C8-A3M7",
+        "Question": "Could you predict progesterone_receptor?"
+    },
+    {
+        "Answer": "Dead",
+        "Id": "TCGA-C8-A3M7",
+        "Question": "what is vital_status according to the slide?"
+    },
+    {
+        "Answer": "1034",
+        "Id": "TCGA-C8-A3M7",
+        "Question": "Can you help the pathologist to predict survival time?"
+    },
+    {
+        "Answer": "2.1 x 1.8 x 1.4 cm",
+        "Choice": [
+            "2.1 x 1.8 x 1.4 cm",
+            "1.8 x 1.4 x 2.1 cm",
+            "1.4 x 2.1 x 1.8 cm",
+            "1.4 x 1.8 x 2.1 cm"
+        ],
+        "Id": "TCGA-E9-A227",
+        "Question": "what was the size of the tumor?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-E9-A227",
+        "Question": "what is histological_type according to the slide?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-E9-A227",
+        "Question": "From the slide, can you infer the progesterone_receptor?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-E9-A227",
+        "Question": "what is vital_status according to the slide?"
+    },
+    {
+        "Answer": "975",
+        "Id": "TCGA-E9-A227",
+        "Question": "what is the result of survival time in the slide?"
+    },
+    {
+        "Answer": "additional testing is in progress.",
+        "Choice": [
+            "no malignancy was seen.",
+            "malignancy was seen.",
+            "additional testing is in progress.",
+            "immunostains are negative."
+        ],
+        "Id": "TCGA-EW-A1IY",
+        "Question": "what were the findings of the examination of the sentinel node #3?"
+    },
+    {
+        "Answer": "2.0 cm in greatest dimension.",
+        "Choice": [
+            "2.0 cm in greatest dimension.",
+            "1.5 cm in greatest dimension.",
+            "2.5 cm in greatest dimension.",
+            "1.0 cm in greatest dimension."
+        ],
+        "Id": "TCGA-EW-A1IY",
+        "Question": "what is the size of the infiltrating ductal carcinoma in the breast?"
+    },
+    {
+        "Answer": "intermediate nuclear grade.",
+        "Choice": [
+            "low nuclear grade.",
+            "high nuclear grade.",
+            "intermediate nuclear grade.",
+            "nuclear grade not specified."
+        ],
+        "Id": "TCGA-EW-A1IY",
+        "Question": "what is the nuclear grade of the infiltrating ductal carcinoma?"
+    },
+    {
+        "Answer": "no, lymphovascular invasion was observed.",
+        "Choice": [
+            "yes, lymphovascular invasion was observed.",
+            "no, lymphovascular invasion was observed.",
+            "lymphovascular invasion not specifie",
+            "b: no, lymphovascular invasion was observed. c: lymphovascular invasion not specified. d: immunostains are negative."
+        ],
+        "Id": "TCGA-EW-A1IY",
+        "Question": "were there any lymphovascular invasions observed?"
+    },
+    {
+        "Answer": "estrogen receptors.",
+        "Choice": [
+            "keratin.",
+            "estrogen receptors.",
+            "progesterone receptors.",
+            "her2-neu."
+        ],
+        "Id": "TCGA-EW-A1IY",
+        "Question": "which immunostain was positive in the tumor cells?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-EW-A1IY",
+        "Question": "please predict histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-EW-A1IY",
+        "Question": "please predict progesterone_receptor?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-EW-A1IY",
+        "Question": "what is the result of vital_status in the slide?"
+    },
+    {
+        "Answer": "258",
+        "Id": "TCGA-EW-A1IY",
+        "Question": "Could you predict survival time?"
+    },
+    {
+        "Answer": "grade 2",
+        "Choice": [
+            "grade 1",
+            "grade 2",
+            "grade 3",
+            "grade 4"
+        ],
+        "Id": "TCGA-LL-A442",
+        "Question": "what is the histologic grade of the infiltrating ductal carcinoma?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "yes",
+            "no",
+            "can't tell",
+            "none of the above"
+        ],
+        "Id": "TCGA-LL-A442",
+        "Question": "is there any invasive tumor seen at the surgical margins?"
+    },
+    {
+        "Answer": "2.7 cm",
+        "Choice": [
+            "2.5 cm",
+            "2.7 cm",
+            "3.0 cm",
+            "3.2 cm"
+        ],
+        "Id": "TCGA-LL-A442",
+        "Question": "what is the size of the breast tumor?"
+    },
+    {
+        "Answer": "infiltrating ductal carcinoma",
+        "Choice": [
+            "infiltrating ductal carcinoma",
+            "infiltrating lobular carcinoma",
+            "mucinous carcinoma",
+            "medullary carcinoma"
+        ],
+        "Id": "TCGA-LL-A442",
+        "Question": "what is the histologic type of the breast tumor?"
+    },
+    {
+        "Answer": "yes",
+        "Choice": [
+            "yes",
+            "no",
+            "can't tell",
+            "none of the above"
+        ],
+        "Id": "TCGA-LL-A442",
+        "Question": "does the slide provide information about the hormonal receptor status of the breast cancer?"
+    },
+    {
+        "Answer": "2.8 cm",
+        "Choice": [
+            "1.5 cm",
+            "3.8 cm",
+            "2.8 cm",
+            "4.2 cm"
+        ],
+        "Id": "TCGA-EW-A2FW",
+        "Question": "what is the size of the tumor?"
+    },
+    {
+        "Answer": "grade 3",
+        "Choice": [
+            "grade 1",
+            "grade 2",
+            "grade 3",
+            "grade 4"
+        ],
+        "Id": "TCGA-EW-A2FW",
+        "Question": "what is the histological grade of the invasive carcinoma?"
+    },
+    {
+        "Answer": "21%",
+        "Choice": [
+            "50%",
+            "21%",
+            "5%",
+            "0%"
+        ],
+        "Id": "TCGA-EW-A2FW",
+        "Question": "what is the presence of estrogen and progesterone receptors in tumor cells?"
+    },
+    {
+        "Answer": "pt2 n0 mx",
+        "Choice": [
+            "pt1 n0 mx",
+            "pt2 n0 mx",
+            "pt1 n1 mx",
+            "pt2 n1 mx"
+        ],
+        "Id": "TCGA-EW-A2FW",
+        "Question": "what is the final pathologic stage of the tumor?"
+    },
+    {
+        "Answer": "negative",
+        "Choice": [
+            "positive",
+            "negative",
+            "not performed",
+            "unknown"
+        ],
+        "Id": "TCGA-EW-A2FW",
+        "Question": "what is the status of her2?"
+    },
+    {
+        "Answer": "Other, specify",
+        "Id": "TCGA-EW-A2FW",
+        "Question": "what is the result of histological_type in the slide?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-EW-A2FW",
+        "Question": "please predict progesterone_receptor?"
+    },
+    {
+        "Answer": "1+",
+        "Id": "TCGA-EW-A2FW",
+        "Question": "please predict her2?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-EW-A2FW",
+        "Question": "what is the result of vital_status in the slide?"
+    },
+    {
+        "Answer": "412",
+        "Id": "TCGA-EW-A2FW",
+        "Question": "what is the result of survival time in the slide?"
+    },
+    {
+        "Answer": "1.1 cm",
+        "Choice": [
+            "1.0 cm",
+            "1.1 cm",
+            "1.5 cm",
+            "2.0 cm"
+        ],
+        "Id": "TCGA-E2-A105",
+        "Question": "what size was the stellate mass found in the breast?"
+    },
+    {
+        "Answer": "invasive mammary carcinoma, tubulolobular type",
+        "Choice": [
+            "invasive mammary carcinoma, ductal type",
+            "invasive mammary carcinoma, tubulolobular type",
+            "ductal carcinoma in situ",
+            "benign tumor"
+        ],
+        "Id": "TCGA-E2-A105",
+        "Question": "what is the final diagnosis?"
+    },
+    {
+        "Answer": "yes",
+        "Choice": [
+            "yes",
+            "no",
+            "not mentioned",
+            "only the left breast"
+        ],
+        "Id": "TCGA-E2-A105",
+        "Question": "are the surgical margins free of tumor?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-E2-A105",
+        "Question": "please predict histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-E2-A105",
+        "Question": "please predict progesterone_receptor?"
+    },
+    {
+        "Answer": "2+",
+        "Id": "TCGA-E2-A105",
+        "Question": "From the slide, can you infer the her2?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-E2-A105",
+        "Question": "From the slide, can you infer the vital_status?"
+    },
+    {
+        "Answer": "1308",
+        "Id": "TCGA-E2-A105",
+        "Question": "what is the result of survival time in the slide?"
+    },
+    {
+        "Answer": "1.3 x 1.3 x 1.2 cm",
+        "Choice": [
+            "1.2 x 1.3 x 1.3 cm",
+            "1.2 x 1.3 x 1.2 cm",
+            "1.3 x 1.3 x 1.2 cm",
+            "1.3 x 1.3 x 1.1 cm"
+        ],
+        "Id": "TCGA-AR-A255",
+        "Question": "what was the size of the mass that was excised?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-AR-A255",
+        "Question": "what is histological_type according to the slide?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-AR-A255",
+        "Question": "please predict progesterone_receptor?"
+    },
+    {
+        "Answer": "3+",
+        "Id": "TCGA-AR-A255",
+        "Question": "what is her2 according to the slide?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-AR-A255",
+        "Question": "From the slide, can you infer the vital_status?"
+    },
+    {
+        "Answer": "1059",
+        "Id": "TCGA-AR-A255",
+        "Question": "what is survival time according to the slide?"
+    },
+    {
+        "Answer": "pt1c n2 mx",
+        "Choice": [
+            "pt1c n2 mx",
+            "pt1 n0 m0",
+            "pt2 n1 m0",
+            "pt3 n2 m1"
+        ],
+        "Id": "TCGA-A2-A0EW",
+        "Question": "what was the final pathological stage of the patient's cancer?"
+    },
+    {
+        "Answer": "lower outer quadrant and upper middle quadrant",
+        "Choice": [
+            "lower inner quadrant and upper outer quadrant",
+            "lower outer quadrant and upper middle quadrant",
+            "upper inner quadrant and lower middle quadrant",
+            "upper outer quadrant and lower inner quadrant"
+        ],
+        "Id": "TCGA-A2-A0EW",
+        "Question": "where in the patient's breast were the two tumors found?"
+    },
+    {
+        "Answer": "positive for her2, estrogen, and progesterone receptors",
+        "Choice": [
+            "positive for her2 and negative for estrogen and progesterone receptors",
+            "negative for her2, estrogen, and progesterone receptors",
+            "positive for her2, estrogen, and progesterone receptors",
+            "negative for her2, positive for estrogen and progesterone receptors"
+        ],
+        "Id": "TCGA-A2-A0EW",
+        "Question": "what were the tumors positive for and negative for?"
+    },
+    {
+        "Answer": "Infiltrating Lobular Carcinoma",
+        "Id": "TCGA-A2-A0EW",
+        "Question": "Can you help the pathologist to predict histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-A2-A0EW",
+        "Question": "From the slide, can you infer the progesterone_receptor?"
+    },
+    {
+        "Answer": "0",
+        "Id": "TCGA-A2-A0EW",
+        "Question": "please predict her2?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-A2-A0EW",
+        "Question": "From the slide, can you infer the vital_status?"
+    },
+    {
+        "Answer": "905",
+        "Id": "TCGA-A2-A0EW",
+        "Question": "Could you predict survival time?"
+    },
+    {
+        "Answer": "nos (not otherwise specified), g3 (grade 3), pt2n1a, lovoro",
+        "Choice": [
+            "nos (not otherwise specified), g3 (grade 3), pt2n1a, lovoro",
+            "nos (not otherwise specified), g2 (grade 2), pt1n0, nolo",
+            "nos (not otherwise specified), g3 (grade 3), pt3n1a, nolo",
+            ", g3 (grade 3), pt2n1a, lovoro        b: nos (not otherwise specified), g2 (grade 2), pt1n0, nolo        c: nos (not otherwise specified), g3 (grade 3), pt3n1a, nolo        d: nod (not otherwise determined), g3 (grade 3), pt2n0, lovoro"
+        ],
+        "Id": "TCGA-A8-A08R",
+        "Question": "what is the final tumor classification for the breast?"
+    },
+    {
+        "Answer": "4 cm",
+        "Choice": [
+            "2 cm",
+            "3 cm",
+            "4 cm",
+            "5 cm"
+        ],
+        "Id": "TCGA-A8-A08R",
+        "Question": "what is the tumor diameter in the breast?"
+    },
+    {
+        "Answer": "invasive ductal carcinoma",
+        "Choice": [
+            "invasive lobular carcinoma",
+            "invasive ductal carcinoma",
+            "ductal carcinoma in situ",
+            "metaplastic carcinoma"
+        ],
+        "Id": "TCGA-A8-A08R",
+        "Question": "what is the type of carcinoma found in the breast?"
+    },
+    {
+        "Answer": "yes, perineural invasion present",
+        "Choice": [
+            "yes, lymphatic invasion present",
+            "no",
+            "yes, vascular invasion present",
+            "yes, perineural invasion present"
+        ],
+        "Id": "TCGA-A8-A08R",
+        "Question": "is there any lymphatic, vascular, or perineural invasion present?"
+    },
+    {
+        "Answer": "grade 3",
+        "Choice": [
+            "grade 1",
+            "grade 2",
+            "grade 3",
+            "grade 4"
+        ],
+        "Id": "TCGA-A8-A08R",
+        "Question": "what is the grade of the tumor in the breast?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-A8-A08R",
+        "Question": "what is the result of histological_type in the slide?"
+    },
+    {
+        "Answer": "Negative",
+        "Id": "TCGA-A8-A08R",
+        "Question": "what is the result of progesterone_receptor in the slide?"
+    },
+    {
+        "Answer": "1+",
+        "Id": "TCGA-A8-A08R",
+        "Question": "what is the result of her2 in the slide?"
+    },
+    {
+        "Answer": "3x2.5x2.4 cm",
+        "Choice": [
+            "3x2.5x2.4 cm",
+            "3x3x3 cm",
+            "2.5x2.5x2 cm",
+            "2x1.5x1.5 cm"
+        ],
+        "Id": "TCGA-BH-A0HL",
+        "Question": "what is the size of the tumor?"
+    },
+    {
+        "Answer": "intracystic papillary carcinoma",
+        "Choice": [
+            "invasive lobular carcinoma",
+            "intracystic papillary carcinoma",
+            "fibroadenoma",
+            "fibrocystic changes"
+        ],
+        "Id": "TCGA-BH-A0HL",
+        "Question": "what was found in the breast tissue besides invasive ductal carcinoma?"
+    },
+    {
+        "Answer": "5%",
+        "Choice": [
+            "2%",
+            "5%",
+            "10%",
+            "15%"
+        ],
+        "Id": "TCGA-BH-A0HL",
+        "Question": "what percentage of the tumor mass accounts for ductal carcinoma in situ?"
+    },
+    {
+        "Answer": "1.2 cm",
+        "Choice": [
+            "0.5 cm",
+            "1.2 cm",
+            "2 cm",
+            "3 cm"
+        ],
+        "Id": "TCGA-BH-A0HL",
+        "Question": "what is the closest margin to the tumor?"
+    },
+    {
+        "Answer": "pr2",
+        "Choice": [
+            "pr1",
+            "pr2",
+            "pr3",
+            "pr4"
+        ],
+        "Id": "TCGA-BH-A0HL",
+        "Question": "what is the t stage of the tumor?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-BH-A0HL",
+        "Question": "From the slide, can you infer the histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-BH-A0HL",
+        "Question": "From the slide, can you infer the progesterone_receptor?"
+    },
+    {
+        "Answer": "2+",
+        "Id": "TCGA-BH-A0HL",
+        "Question": "Could you predict her2?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-BH-A0HL",
+        "Question": "Can you help the pathologist to predict vital_status?"
+    },
+    {
+        "Answer": "72",
+        "Id": "TCGA-BH-A0HL",
+        "Question": "Could you predict survival time?"
+    },
+    {
+        "Answer": "1.1 cm",
+        "Choice": [
+            "1.1 cm",
+            "0.3 cm",
+            "3.2 cm",
+            "0.1 cm"
+        ],
+        "Id": "TCGA-E2-A15E",
+        "Question": "what is the size of the invasive ductal carcinoma in the breast?"
+    },
+    {
+        "Answer": "grade 3",
+        "Choice": [
+            "grade 3",
+            "grade 2",
+            "grade 1",
+            "grade 4"
+        ],
+        "Id": "TCGA-E2-A15E",
+        "Question": "what is the grade of the invasive ductal carcinoma in the breast?"
+    },
+    {
+        "Answer": "ductal carcinoma in situ",
+        "Choice": [
+            "ductal carcinoma in situ",
+            "invasive ductal carcinoma",
+            "lobular carcinoma in situ",
+            "none of the above"
+        ],
+        "Id": "TCGA-E2-A15E",
+        "Question": "which type of carcinoma shows necrosis?"
+    },
+    {
+        "Answer": "all positive",
+        "Choice": [
+            "all positive",
+            "all negative",
+            "er and pr positive, her2 negative",
+            "er and her2 positive, pr negative"
+        ],
+        "Id": "TCGA-E2-A15E",
+        "Question": "what are the results for er, pr, and her2?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-E2-A15E",
+        "Question": "Can you help the pathologist to predict histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-E2-A15E",
+        "Question": "what is the result of progesterone_receptor in the slide?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-E2-A15E",
+        "Question": "From the slide, can you infer the vital_status?"
+    },
+    {
+        "Answer": "630",
+        "Id": "TCGA-E2-A15E",
+        "Question": "Could you predict survival time?"
+    },
+    {
+        "Answer": "3.5 cm",
+        "Choice": [
+            "1.5 cm",
+            "2 cm",
+            "2.1 cm",
+            "3.5 cm"
+        ],
+        "Id": "TCGA-B6-A0WV",
+        "Question": "what is the size of the infiltrating tumor in the breast?"
+    },
+    {
+        "Answer": "grade 2",
+        "Choice": [
+            "grade 1",
+            "grade 2",
+            "grade 3",
+            "undifferentiated"
+        ],
+        "Id": "TCGA-B6-A0WV",
+        "Question": "what is the histologic grade of the infiltrating ductal carcinoma?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "yes",
+            "no",
+            "not mentioned",
+            "not applicable"
+        ],
+        "Id": "TCGA-B6-A0WV",
+        "Question": "is there any residual carcinoma in the mastectomy specimen?"
+    },
+    {
+        "Answer": "epithelial hyperplasia",
+        "Choice": [
+            "ductal carcinoma in situ",
+            "epithelial hyperplasia",
+            "invasive carcinoma",
+            "no proliferative changes"
+        ],
+        "Id": "TCGA-B6-A0WV",
+        "Question": "what type of proliferative changes were observed in the breast?"
+    },
+    {
+        "Answer": "yes",
+        "Choice": [
+            "yes",
+            "no",
+            "not mentioned",
+            "not applicable"
+        ],
+        "Id": "TCGA-B6-A0WV",
+        "Question": "is there any vascular invasion identified in the biopsied sample?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-B6-A0WV",
+        "Question": "From the slide, can you infer the histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-B6-A0WV",
+        "Question": "Can you help the pathologist to predict progesterone_receptor?"
+    },
+    {
+        "Answer": "Dead",
+        "Id": "TCGA-B6-A0WV",
+        "Question": "Could you predict vital_status?"
+    },
+    {
+        "Answer": "2417",
+        "Id": "TCGA-B6-A0WV",
+        "Question": "Could you predict survival time?"
+    },
+    {
+        "Answer": "invasive ductal carcinoma",
+        "Choice": [
+            "invasive lobular carcinoma",
+            "inflammatory carcinoma",
+            "invasive ductal carcinoma",
+            "metaplastic carcinoma"
+        ],
+        "Id": "TCGA-E9-A1RA",
+        "Question": "what type of carcinoma was observed?"
+    },
+    {
+        "Answer": "1.2 x 1.3 cm",
+        "Choice": [
+            "0.8 x 1.2 cm",
+            "1.2 x 1.3 cm",
+            "1.5 x 1.7 cm",
+            "2.0 x 2.2 cm"
+        ],
+        "Id": "TCGA-E9-A1RA",
+        "Question": "what was the size of the lump in the breast?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "yes",
+            "no",
+            "not specified",
+            "insufficient information"
+        ],
+        "Id": "TCGA-E9-A1RA",
+        "Question": "were there any specific histological details provided?"
+    },
+    {
+        "Answer": "unknown",
+        "Choice": [
+            "unknown",
+            "localized",
+            "invasive",
+            "metastatic"
+        ],
+        "Id": "TCGA-E9-A1RA",
+        "Question": "what is the extent of the tumor?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-E9-A1RA",
+        "Question": "Can you help the pathologist to predict histological_type?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-E9-A1RA",
+        "Question": "please predict vital_status?"
+    },
+    {
+        "Answer": "608",
+        "Id": "TCGA-E9-A1RA",
+        "Question": "what is the result of survival time in the slide?"
+    },
+    {
+        "Answer": "all of the above.",
+        "Choice": [
+            "tumor measuring 2.0 cm.",
+            "ductal carcinoma with comedo necrosis.",
+            "presence of cribriform type.",
+            "all of the above."
+        ],
+        "Id": "TCGA-BH-A0BT",
+        "Question": "what were the characteristics of the invasive ductal carcinoma in the breast segmental mastectomy?"
+    },
+    {
+        "Answer": "negative for tumor.",
+        "Choice": [
+            "positive for tumor.",
+            "negative for tumor.",
+            "tumor size not mentione",
+            "d: not applicable."
+        ],
+        "Id": "TCGA-BH-A0BT",
+        "Question": "what is the result in the medial new margin?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-BH-A0BT",
+        "Question": "From the slide, can you infer the histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-BH-A0BT",
+        "Question": "please predict progesterone_receptor?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-BH-A0BT",
+        "Question": "please predict vital_status?"
+    },
+    {
+        "Answer": "2365",
+        "Id": "TCGA-BH-A0BT",
+        "Question": "what is the result of survival time in the slide?"
+    },
+    {
+        "Answer": "grade 3",
+        "Choice": [
+            "grade 1",
+            "grade 2",
+            "grade 3",
+            "grade 4"
+        ],
+        "Id": "TCGA-BH-A0HX",
+        "Question": "what is the nottingham grade for the ductal carcinoma in the breast?"
+    },
+    {
+        "Answer": "estrogen receptor positive and progesterone receptor negative",
+        "Choice": [
+            "estrogen receptor positive and progesterone receptor negative",
+            "estrogen receptor negative and progesterone receptor positive",
+            "estrogen receptor positive and progesterone receptor positive",
+            "estrogen receptor negative and progesterone receptor negative"
+        ],
+        "Id": "TCGA-BH-A0HX",
+        "Question": "what is the hormone receptor status of the tumor in the breast?"
+    },
+    {
+        "Answer": "grade 2",
+        "Choice": [
+            "grade 1",
+            "grade 2",
+            "grade 3",
+            "grade 4"
+        ],
+        "Id": "TCGA-BH-A0HX",
+        "Question": "what is the grade of lobular carcinoma in the breast?"
+    },
+    {
+        "Answer": "columnar cell change and sclerosing adenosis",
+        "Choice": [
+            "skin involvement and paget's disease",
+            "columnar cell change and sclerosing adenosis",
+            "fibroglandular changes and associated microcalcifications",
+            "focal atypical ductal hyperplasia and atypical lobular hyperplasia"
+        ],
+        "Id": "TCGA-BH-A0HX",
+        "Question": "what findings are mentioned in the breast?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-BH-A0HX",
+        "Question": "Could you predict histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-BH-A0HX",
+        "Question": "please predict progesterone_receptor?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-BH-A0HX",
+        "Question": "Could you predict vital_status?"
+    },
+    {
+        "Answer": "829",
+        "Id": "TCGA-BH-A0HX",
+        "Question": "From the slide, can you infer the survival time?"
+    },
+    {
+        "Answer": "5.0 cm",
+        "Choice": [
+            "2.0 cm",
+            "10.0 cm",
+            "5.0 cm",
+            "3.5 cm"
+        ],
+        "Id": "TCGA-A8-A08Z",
+        "Question": "what is the diameter of the tumor?"
+    },
+    {
+        "Answer": "nos, g ii, pt4bn3al1voro",
+        "Choice": [
+            "nos, g ii, pt4bn3al1voro",
+            "nos, g i, pt2n0m0",
+            "nos, g iii, pt3an1m0",
+            "nos, g iv, pt4an2m0"
+        ],
+        "Id": "TCGA-A8-A08Z",
+        "Question": "what is the classification of the tumor?"
+    },
+    {
+        "Answer": "tumor-free",
+        "Choice": [
+            "tumor-free",
+            "invaded by tumor",
+            "unidentified",
+            "not mentioned"
+        ],
+        "Id": "TCGA-A8-A08Z",
+        "Question": "what is the status of the dorsal resection margin?"
+    },
+    {
+        "Answer": "focal",
+        "Choice": [
+            "focal",
+            "extensive",
+            "no angioinvasion",
+            "not mentioned"
+        ],
+        "Id": "TCGA-A8-A08Z",
+        "Question": "what is the level of angioinvasion in the tumor?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-A8-A08Z",
+        "Question": "Can you help the pathologist to predict histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-A8-A08Z",
+        "Question": "what is the result of progesterone_receptor in the slide?"
+    },
+    {
+        "Answer": "1+",
+        "Id": "TCGA-A8-A08Z",
+        "Question": "please predict her2?"
+    },
+    {
+        "Answer": "invasive ductal carcinoma of the right breast.",
+        "Choice": [
+            "mastopathy fibrosa et cystica and hyperplasia ductalis simplex.",
+            "sinus histiocytosis lymphonodorum and mastopathy fibrosa et cystica.",
+            "invasive ductal carcinoma of the right breast.",
+            "adenocarcinoma of the left breast."
+        ],
+        "Id": "TCGA-D8-A1JL",
+        "Question": "what is the final diagnosis of the patient's breast condition?"
+    },
+    {
+        "Answer": "2.1 x 2.2 x 0.8 cm.",
+        "Choice": [
+            "2.1 x 2.2 x 0.8 cm.",
+            "not mentioned in the slide.",
+            "3.5 x 3.5 x 1.2 cm.",
+            "1.5 x 1.5 x 0.5 cm."
+        ],
+        "Id": "TCGA-D8-A1JL",
+        "Question": "what was the size of the tumor found in the patient's breast?"
+    },
+    {
+        "Answer": "both estrogen and progesterone receptors.",
+        "Choice": [
+            "estrogen receptors.",
+            "progesterone receptors.",
+            "both estrogen and progesterone receptors.",
+            "both estrogen and her2 receptors."
+        ],
+        "Id": "TCGA-D8-A1JL",
+        "Question": "which hormone receptors were found to be absent in the neoplastic cell nuclei?"
+    },
+    {
+        "Answer": "invasive ductal carcinoma.",
+        "Choice": [
+            "invasive lobular carcinoma.",
+            "ductal carcinoma in situ.",
+            "invasive ductal carcinoma.",
+            "metastatic carcinoma."
+        ],
+        "Id": "TCGA-D8-A1JL",
+        "Question": "what is the type of breast cancer indicated by the examination?"
+    },
+    {
+        "Answer": "mastopathy fibrosa et cystica.",
+        "Choice": [
+            "fibroadenoma.",
+            "mastitis.",
+            "mastopathy fibrosa et cystica.",
+            "ductal hyperplasia."
+        ],
+        "Id": "TCGA-D8-A1JL",
+        "Question": "what type of lesion was found in the glandular tissue surrounding the tumor?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-D8-A1JL",
+        "Question": "please predict histological_type?"
+    },
+    {
+        "Answer": "Negative",
+        "Id": "TCGA-D8-A1JL",
+        "Question": "Can you help the pathologist to predict progesterone_receptor?"
+    },
+    {
+        "Answer": "1+",
+        "Id": "TCGA-D8-A1JL",
+        "Question": "From the slide, can you infer the her2?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-D8-A1JL",
+        "Question": "From the slide, can you infer the vital_status?"
+    },
+    {
+        "Answer": "611",
+        "Id": "TCGA-D8-A1JL",
+        "Question": "From the slide, can you infer the survival time?"
+    },
+    {
+        "Answer": "3.5 cm",
+        "Choice": [
+            "1.5 cm",
+            "2.5 cm",
+            "3.5 cm",
+            "4.5 cm"
+        ],
+        "Id": "TCGA-B6-A0RO",
+        "Question": "what was the size of the mass in the medial portion of the specimen?"
+    },
+    {
+        "Answer": "infiltrating ductal carcinoma",
+        "Choice": [
+            "adenocarcinoma",
+            "infiltrating ductal carcinoma",
+            "intraductal carcinoma",
+            "squamous cell carcinoma"
+        ],
+        "Id": "TCGA-B6-A0RO",
+        "Question": "what is the histological type of the carcinoma?"
+    },
+    {
+        "Answer": "less than 5%",
+        "Choice": [
+            "less than 5%",
+            "between 10-20%",
+            "around 50%",
+            "more than 90%"
+        ],
+        "Id": "TCGA-B6-A0RO",
+        "Question": "what percentage of the carcinoma is comprised of intraductal carcinoma?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "yes",
+            "no"
+        ],
+        "Id": "TCGA-B6-A0RO",
+        "Question": "was there any tumor seen in the deep surgical margin?"
+    },
+    {
+        "Answer": "apocrine metaplasia",
+        "Choice": [
+            "fibrosis",
+            "hyperplasia",
+            "apocrine metaplasia",
+            "adenosis"
+        ],
+        "Id": "TCGA-B6-A0RO",
+        "Question": "what non-neoplastic changes were observed in the breast tissue?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-B6-A0RO",
+        "Question": "what is histological_type according to the slide?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-B6-A0RO",
+        "Question": "what is progesterone_receptor according to the slide?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-B6-A0RO",
+        "Question": "Can you help the pathologist to predict vital_status?"
+    },
+    {
+        "Answer": "4929",
+        "Id": "TCGA-B6-A0RO",
+        "Question": "what is the result of survival time in the slide?"
+    },
+    {
+        "Answer": "1.6 x 1.6 x 1.2 cm",
+        "Choice": [
+            "2.8 x 2.8 x 2.0 cm",
+            "1.2 x 1.0 x 0.8 cm",
+            "1.6 x 1.6 x 1.2 cm",
+            "3.5 x 3.5 x 3.5 cm"
+        ],
+        "Id": "TCGA-GM-A2D9",
+        "Question": "what is the size of the tumor?"
+    },
+    {
+        "Answer": "modified black's nuclear grade 1",
+        "Choice": [
+            "modified black's nuclear grade 2",
+            "modified black's nuclear grade 1",
+            "modified black's nuclear grade 3",
+            "modified black's nuclear grade 4"
+        ],
+        "Id": "TCGA-GM-A2D9",
+        "Question": "what is the nuclear grade of the invasive ductal carcinoma?"
+    },
+    {
+        "Answer": "less than 5%",
+        "Choice": [
+            "less than 5%",
+            "20%",
+            "50%",
+            "more than 5%"
+        ],
+        "Id": "TCGA-GM-A2D9",
+        "Question": "what percentage of the total tumor comprises focal intraductal carcinoma?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "yes",
+            "no",
+            "not mentioned",
+            "insufficient information"
+        ],
+        "Id": "TCGA-GM-A2D9",
+        "Question": "are there any lymphatic/vascular invasions found in the slide?"
+    },
+    {
+        "Answer": "10%",
+        "Choice": [
+            "5%",
+            "10%",
+            "15%",
+            "20%"
+        ],
+        "Id": "TCGA-GM-A2D9",
+        "Question": "what is the ki-67 proliferation index of the invasive carcinoma?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-GM-A2D9",
+        "Question": "From the slide, can you infer the histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-GM-A2D9",
+        "Question": "what is progesterone_receptor according to the slide?"
+    },
+    {
+        "Answer": "Dead",
+        "Id": "TCGA-GM-A2D9",
+        "Question": "please predict vital_status?"
+    },
+    {
+        "Answer": "1812",
+        "Id": "TCGA-GM-A2D9",
+        "Question": "what is survival time according to the slide?"
+    },
+    {
+        "Answer": "bilateral simple mastectomy with sentinel node biopsy.",
+        "Choice": [
+            "bilateral simple mastectomy with sentinel node biopsy.",
+            "bilateral reconstruction surgery.",
+            "lumpectomy with radiation therapy.",
+            "none of the above."
+        ],
+        "Id": "TCGA-A2-A0T6",
+        "Question": "what type of procedure did the patient have?"
+    },
+    {
+        "Answer": "left",
+        "Choice": [
+            "right",
+            "left",
+            "both",
+            "neither"
+        ],
+        "Id": "TCGA-A2-A0T6",
+        "Question": "in which breast did the slide find a benign sentinel node?"
+    },
+    {
+        "Answer": "2.5 x 1.0 x 1.0 cm",
+        "Choice": [
+            "7.0 cm",
+            "2.5 x 1.0 x 1.0 cm",
+            "irregular fibrous nodule",
+            "smaller palpable nodules"
+        ],
+        "Id": "TCGA-A2-A0T6",
+        "Question": "what size was the benign sentinel node?"
+    },
+    {
+        "Answer": "invasive breast cancer",
+        "Choice": [
+            "benign sentinel node",
+            "invasive breast cancer",
+            "both a and b",
+            "neither a nor b"
+        ],
+        "Id": "TCGA-A2-A0T6",
+        "Question": "what was found in the breast?"
+    },
+    {
+        "Answer": "7.0 cm",
+        "Choice": [
+            "7.0 cm",
+            "2.5 x 1.0 x 1.0 cm",
+            "benign sentinel node",
+            "smaller palpable nodules"
+        ],
+        "Id": "TCGA-A2-A0T6",
+        "Question": "what was the size of the irregular fibrous nodule found in the slide?"
+    },
+    {
+        "Answer": "there is the presence of invasive breast cancer in both breasts.",
+        "Choice": [
+            "there is no presence of breast cancer.",
+            "there is only the presence of breast cancer in the left breast.",
+            "there is only the presence of breast cancer in the right breast.",
+            "there is the presence of invasive breast cancer in both breasts."
+        ],
+        "Id": "TCGA-A2-A0T6",
+        "Question": "what does the slide suggest about the presence of breast cancer?"
+    },
+    {
+        "Answer": "Infiltrating Lobular Carcinoma",
+        "Id": "TCGA-A2-A0T6",
+        "Question": "Could you predict histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-A2-A0T6",
+        "Question": "what is the result of progesterone_receptor in the slide?"
+    },
+    {
+        "Answer": "1+",
+        "Id": "TCGA-A2-A0T6",
+        "Question": "Can you help the pathologist to predict her2?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-A2-A0T6",
+        "Question": "what is the result of vital_status in the slide?"
+    },
+    {
+        "Answer": "575",
+        "Id": "TCGA-A2-A0T6",
+        "Question": "From the slide, can you infer the survival time?"
+    },
+    {
+        "Answer": "invasive lobular carcinoma",
+        "Choice": [
+            "invasive lobular carcinoma",
+            "ductal carcinoma",
+            "fibroadenoma",
+            "adenoid cystic carcinoma'"
+        ],
+        "Id": "TCGA-AQ-A7U7",
+        "Question": "what is the classification of the tumor?"
+    },
+    {
+        "Answer": "grade 2",
+        "Choice": [
+            "grade 1",
+            "grade 2",
+            "grade 3",
+            "grade 4'"
+        ],
+        "Id": "TCGA-AQ-A7U7",
+        "Question": "what is the histologic grade of the tumor?"
+    },
+    {
+        "Answer": "4.1 cm",
+        "Choice": [
+            "2.1 cm",
+            "3.1 cm",
+            "4.1 cm",
+            "5.1 cm'"
+        ],
+        "Id": "TCGA-AQ-A7U7",
+        "Question": "what is the size of the tumor?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "yes",
+            "no",
+            "not mentioned",
+            "unclear'"
+        ],
+        "Id": "TCGA-AQ-A7U7",
+        "Question": "is lymphovascular invasion present?"
+    },
+    {
+        "Answer": "lobular carcinoma in situ'",
+        "Choice": [
+            "ductal carcinoma in situ",
+            "inflammatory breast cancer",
+            "paget's disease of the nipple",
+            "lobular carcinoma in situ'"
+        ],
+        "Id": "TCGA-AQ-A7U7",
+        "Question": "what additional condition is present along with invasive lobular carcinoma?"
+    },
+    {
+        "Answer": "stage iib'",
+        "Choice": [
+            "stage i a",
+            "stage i b",
+            "stage iia",
+            "stage iib'"
+        ],
+        "Id": "TCGA-AQ-A7U7",
+        "Question": "what is the stage of breast cancer for the patient?"
+    },
+    {
+        "Answer": "breast cancer",
+        "Choice": [
+            "melanoma",
+            "leukemia",
+            "breast cancer",
+            "lung cancer"
+        ],
+        "Id": "TCGA-AN-A0XS",
+        "Question": "what type of cancer does the patient have?"
+    },
+    {
+        "Answer": "grade 2",
+        "Choice": [
+            "grade 1",
+            "grade 2",
+            "grade 3",
+            "grade 4"
+        ],
+        "Id": "TCGA-AN-A0XS",
+        "Question": "what is the grade of the tumor?"
+    },
+    {
+        "Answer": "t1n0m0",
+        "Choice": [
+            "t1n0m0",
+            "t2n1m0",
+            "t3n1m1",
+            "t4n2m1"
+        ],
+        "Id": "TCGA-AN-A0XS",
+        "Question": "what is the stage of the tumor?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "yes",
+            "no"
+        ],
+        "Id": "TCGA-AN-A0XS",
+        "Question": "has any treatment been administered yet?"
+    },
+    {
+        "Answer": "infiltrative ductal carcinoma",
+        "Choice": [
+            "infiltrative ductal carcinoma",
+            "squamous cell carcinoma",
+            "adenocarcinoma",
+            "neuroendocrine carcinoma"
+        ],
+        "Id": "TCGA-AN-A0XS",
+        "Question": "what type of carcinoma is the tumor?"
+    },
+    {
+        "Answer": "normal blood sample",
+        "Choice": [
+            "abnormal blood sample",
+            "normal blood sample",
+            "bone marrow sample",
+            "lymph node sample"
+        ],
+        "Id": "TCGA-AN-A0XS",
+        "Question": "what was obtained in addition to the tumor sample?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-AN-A0XS",
+        "Question": "please predict histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-AN-A0XS",
+        "Question": "From the slide, can you infer the progesterone_receptor?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-AN-A0XS",
+        "Question": "From the slide, can you infer the vital_status?"
+    },
+    {
+        "Answer": "10",
+        "Id": "TCGA-AN-A0XS",
+        "Question": "From the slide, can you infer the survival time?"
+    },
+    {
+        "Answer": "lobular carcinoma",
+        "Choice": [
+            "lobular carcinoma",
+            "invasive ductal carcinoma",
+            "fibroadenoma",
+            "benign cyst"
+        ],
+        "Id": "TCGA-E9-A2JS",
+        "Question": "what type of tumor was identified in the breast specimen?"
+    },
+    {
+        "Answer": "2.4x0x2.8cm",
+        "Choice": [
+            "2.4x0x2.8cm",
+            "1.5x1.5cm",
+            "3.2x2.6cm",
+            "0.9x0.9cm"
+        ],
+        "Id": "TCGA-E9-A2JS",
+        "Question": "what is the size of the tumor in the breast?"
+    },
+    {
+        "Answer": "nottingham histologic score is not determined",
+        "Choice": [
+            "nottingham histologic score is not determined",
+            "low histologic score",
+            "high histologic score",
+            "moderate histologic score"
+        ],
+        "Id": "TCGA-E9-A2JS",
+        "Question": "what is the histologic score for the tumor?"
+    },
+    {
+        "Answer": "no evidence of neo-adjuvant treatment",
+        "Choice": [
+            "no evidence of neo-adjuvant treatment",
+            "evidence of neo-adjuvant treatment",
+            "uncertain",
+            "not mentioned"
+        ],
+        "Id": "TCGA-E9-A2JS",
+        "Question": "was there any evidence of neo-adjuvant treatment?"
+    },
+    {
+        "Answer": "Infiltrating Lobular Carcinoma",
+        "Id": "TCGA-E9-A2JS",
+        "Question": "what is the result of histological_type in the slide?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-E9-A2JS",
+        "Question": "what is vital_status according to the slide?"
+    },
+    {
+        "Answer": "540",
+        "Id": "TCGA-E9-A2JS",
+        "Question": "what is the result of survival time in the slide?"
+    },
+    {
+        "Answer": "nottingham grade 2",
+        "Choice": [
+            "nottingham grade 2",
+            "nottingham grade 1",
+            "nottingham grade 3",
+            "nottingham grade 0"
+        ],
+        "Id": "TCGA-BH-A0DK",
+        "Question": "what is the grade of the invasive ductal carcinoma in the patient's breast tissue?"
+    },
+    {
+        "Answer": "2.5 cm",
+        "Choice": [
+            "1.5 cm",
+            "3 cm",
+            "2.5 cm",
+            "4 cm"
+        ],
+        "Id": "TCGA-BH-A0DK",
+        "Question": "what is the size of the invasive tumor in the patient's breast tissue?"
+    },
+    {
+        "Answer": "fibrocystic changes and invasive ductal carcinoma",
+        "Choice": [
+            "fibrocystic changes only",
+            "invasive ductal carcinoma only",
+            "fibrocystic changes and invasive ductal carcinoma",
+            "no changes observed"
+        ],
+        "Id": "TCGA-BH-A0DK",
+        "Question": "what type of changes are observed in the patient's breast tissue?"
+    },
+    {
+        "Answer": "yes",
+        "Choice": [
+            "yes",
+            "no",
+            "unknown",
+            "not mentioned"
+        ],
+        "Id": "TCGA-BH-A0DK",
+        "Question": "is there evidence of lymphovascular invasion in the patient's breast tissue?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-BH-A0DK",
+        "Question": "Could you predict histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-BH-A0DK",
+        "Question": "Can you help the pathologist to predict progesterone_receptor?"
+    },
+    {
+        "Answer": "0",
+        "Id": "TCGA-BH-A0DK",
+        "Question": "From the slide, can you infer the her2?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-BH-A0DK",
+        "Question": "From the slide, can you infer the vital_status?"
+    },
+    {
+        "Answer": "423",
+        "Id": "TCGA-BH-A0DK",
+        "Question": "Can you help the pathologist to predict survival time?"
+    },
+    {
+        "Answer": "46",
+        "Choice": [
+            "46",
+            "37",
+            "52",
+            "64"
+        ],
+        "Id": "TCGA-C8-A8HR",
+        "Question": "what is the patient's age?"
+    },
+    {
+        "Answer": "written consent",
+        "Choice": [
+            "informed consent",
+            "implied consent",
+            "verbal consent",
+            "written consent"
+        ],
+        "Id": "TCGA-C8-A8HR",
+        "Question": "what type of consent did the patient provide?"
+    },
+    {
+        "Answer": "pt2 n2 mo stage a",
+        "Choice": [
+            "pt2 n2 mo stage a",
+            "pt1 n0 mo stage b",
+            "pt3 n1 mo stage b",
+            "pt2 n2 mo stage b"
+        ],
+        "Id": "TCGA-C8-A8HR",
+        "Question": "what is the staging of the tumor?"
+    },
+    {
+        "Answer": "presence of a primary tumor with an extension",
+        "Choice": [
+            "presence of a primary tumor with an extension",
+            "presence of multiple tumors",
+            "presence of a benign tumor",
+            "absence of any tumor"
+        ],
+        "Id": "TCGA-C8-A8HR",
+        "Question": "what does the pathological description indicate about the tumor?"
+    },
+    {
+        "Answer": "director of research pathology",
+        "Choice": [
+            "director of research pathology",
+            "patient's primary care physician",
+            "surgeon",
+            "patient"
+        ],
+        "Id": "TCGA-C8-A8HR",
+        "Question": "who signed the slide?"
+    },
+    {
+        "Answer": "Infiltrating Lobular Carcinoma",
+        "Id": "TCGA-C8-A8HR",
+        "Question": "please predict histological_type?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-C8-A8HR",
+        "Question": "what is the result of vital_status in the slide?"
+    },
+    {
+        "Answer": "408",
+        "Id": "TCGA-C8-A8HR",
+        "Question": "Can you help the pathologist to predict survival time?"
+    },
+    {
+        "Answer": "2.7 x 2.7 x 2.5 cm",
+        "Choice": [
+            "2.7 x 2.7 x 2.5 cm",
+            "3.0 x 3.0 x 3.0 cm",
+            "2.0 x 2.0 x 2.0 cm",
+            "2.5 x 2.5 x 2.5 cm"
+        ],
+        "Id": "TCGA-E9-A22H",
+        "Question": "what was the size of the tumor in the patient's breast?"
+    },
+    {
+        "Answer": "infiltrating ductal carcinoma",
+        "Choice": [
+            "infiltrating ductal carcinoma",
+            "lobular carcinoma",
+            "medullary carcinoma",
+            "ductal carcinoma in situ"
+        ],
+        "Id": "TCGA-E9-A22H",
+        "Question": "what type of breast cancer was identified in the patient?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "no",
+            "yes",
+            "not mentioned",
+            "insufficient information"
+        ],
+        "Id": "TCGA-E9-A22H",
+        "Question": "was the nottingham histologic score determined for the patient?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "no",
+            "yes",
+            "not mentioned",
+            "insufficient information"
+        ],
+        "Id": "TCGA-E9-A22H",
+        "Question": "did the patient receive neo-adjuvant treatment?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "no",
+            "yes",
+            "not mentioned",
+            "insufficient information"
+        ],
+        "Id": "TCGA-E9-A22H",
+        "Question": "were there any additional pathologic findings slideed apart from breast cancer?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-E9-A22H",
+        "Question": "please predict histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-E9-A22H",
+        "Question": "what is the result of progesterone_receptor in the slide?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-E9-A22H",
+        "Question": "From the slide, can you infer the vital_status?"
+    },
+    {
+        "Answer": "330",
+        "Id": "TCGA-E9-A22H",
+        "Question": "what is survival time according to the slide?"
+    },
+    {
+        "Answer": "2.8 cm",
+        "Choice": [
+            "2 cm",
+            "2.8 cm",
+            "3 cm",
+            "2.2 cm"
+        ],
+        "Id": "TCGA-LL-A7T0",
+        "Question": "what was the size of the largest invasive carcinoma?"
+    },
+    {
+        "Answer": "4 mm deep",
+        "Choice": [
+            "1 mm deep",
+            "2 mm deep",
+            "3 mm deep",
+            "4 mm deep"
+        ],
+        "Id": "TCGA-LL-A7T0",
+        "Question": "what was the depth of the closest margin for the invasive carcinoma?"
+    },
+    {
+        "Answer": "grade 3",
+        "Choice": [
+            "grade 1",
+            "grade 2",
+            "grade 3",
+            "grade 4"
+        ],
+        "Id": "TCGA-LL-A7T0",
+        "Question": "what was the tumor grade based on the nottingham histologic score?"
+    },
+    {
+        "Answer": "positive",
+        "Choice": [
+            "negative",
+            "positive",
+            "unclear",
+            "not tested"
+        ],
+        "Id": "TCGA-LL-A7T0",
+        "Question": "what were the results of the estrogen receptor and progesterone receptor tests?"
+    },
+    {
+        "Answer": "positive",
+        "Choice": [
+            "negative",
+            "positive",
+            "unclear",
+            "not tested"
+        ],
+        "Id": "TCGA-LL-A7T0",
+        "Question": "what were the results of the her2 test?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-LL-A7T0",
+        "Question": "what is the result of histological_type in the slide?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-LL-A7T0",
+        "Question": "what is progesterone_receptor according to the slide?"
+    },
+    {
+        "Answer": "3+",
+        "Id": "TCGA-LL-A7T0",
+        "Question": "From the slide, can you infer the her2?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-LL-A7T0",
+        "Question": "Could you predict vital_status?"
+    },
+    {
+        "Answer": "376",
+        "Id": "TCGA-LL-A7T0",
+        "Question": "what is the result of survival time in the slide?"
+    },
+    {
+        "Answer": "er, pr, and her-2/neu",
+        "Choice": [
+            "ca-125",
+            "afp",
+            "er, pr, and her-2/neu",
+            "cea"
+        ],
+        "Id": "TCGA-C8-A135",
+        "Question": "what additional markers are mentioned in the slide?"
+    },
+    {
+        "Answer": "the tumor's cellular differentiation",
+        "Choice": [
+            "the tumor size",
+            "the tumor's shape",
+            "the tumor's cellular differentiation",
+            "the tumor's location"
+        ],
+        "Id": "TCGA-C8-A135",
+        "Question": "what does the slide describe about the microscopic appearance of the tumor?"
+    },
+    {
+        "Answer": "the primary tumor, lymph nodes, and pathological staging",
+        "Choice": [
+            "the patient's age",
+            "the patient's gender",
+            "the primary tumor, lymph nodes, and pathological staging",
+            "the patient's symptom description"
+        ],
+        "Id": "TCGA-C8-A135",
+        "Question": "what does the slide include information on?"
+    },
+    {
+        "Answer": "nuclear atypia",
+        "Choice": [
+            "telangiectasis",
+            "nuclear atypia",
+            "adenocarcinoma",
+            "inflammation"
+        ],
+        "Id": "TCGA-C8-A135",
+        "Question": "what are some features observed in the tumor?"
+    },
+    {
+        "Answer": "no remarks were made",
+        "Choice": [
+            "no remarks were made",
+            "the tumor is highly malignant",
+            "recommendation for surgery",
+            "the need for further tests"
+        ],
+        "Id": "TCGA-C8-A135",
+        "Question": "what are the comments or notes from the pathologist in the slide?"
+    },
+    {
+        "Answer": "microscopic examination",
+        "Choice": [
+            "radiographic imaging",
+            "physical examination",
+            "microscopic examination",
+            "genetic testing"
+        ],
+        "Id": "TCGA-C8-A135",
+        "Question": "what is the histological diagnosis based on?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-C8-A135",
+        "Question": "what is histological_type according to the slide?"
+    },
+    {
+        "Answer": "Negative",
+        "Id": "TCGA-C8-A135",
+        "Question": "please predict progesterone_receptor?"
+    },
+    {
+        "Answer": "3+",
+        "Id": "TCGA-C8-A135",
+        "Question": "Can you help the pathologist to predict her2?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-C8-A135",
+        "Question": "what is the result of vital_status in the slide?"
+    },
+    {
+        "Answer": "32",
+        "Id": "TCGA-C8-A135",
+        "Question": "Can you help the pathologist to predict survival time?"
+    },
+    {
+        "Answer": "invasive ductal carcinoma",
+        "Choice": [
+            "ductal carcinoma in situ",
+            "lobular carcinoma in situ",
+            "invasive ductal carcinoma",
+            "invasive lobular carcinoma"
+        ],
+        "Id": "TCGA-A8-A08L",
+        "Question": "what type of breast cancer does the patient have?"
+    },
+    {
+        "Answer": "6 cm",
+        "Choice": [
+            "2 cm",
+            "4 cm",
+            "6 cm",
+            "8 cm"
+        ],
+        "Id": "TCGA-A8-A08L",
+        "Question": "what is the size of the tumor?"
+    },
+    {
+        "Answer": "lymph vessels, up to the base of the nipple, and pectoral muscle",
+        "Choice": [
+            "lymph vessels only",
+            "up to the base of the nipple",
+            "pectoral muscle only",
+            "lymph vessels, up to the base of the nipple, and pectoral muscle"
+        ],
+        "Id": "TCGA-A8-A08L",
+        "Question": "how far has the tumor invaded?"
+    },
+    {
+        "Answer": "grade 3",
+        "Choice": [
+            "grade 1",
+            "grade 2",
+            "grade 3",
+            "grade 4"
+        ],
+        "Id": "TCGA-A8-A08L",
+        "Question": "what is the tumor grade?"
+    },
+    {
+        "Answer": "stage iii a",
+        "Choice": [
+            "stage i",
+            "stage ii",
+            "stage iii a",
+            "stage iii b"
+        ],
+        "Id": "TCGA-A8-A08L",
+        "Question": "what is the cancer stage?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-A8-A08L",
+        "Question": "From the slide, can you infer the histological_type?"
+    },
+    {
+        "Answer": "Negative",
+        "Id": "TCGA-A8-A08L",
+        "Question": "what is progesterone_receptor according to the slide?"
+    },
+    {
+        "Answer": "1+",
+        "Id": "TCGA-A8-A08L",
+        "Question": "Could you predict her2?"
+    },
+    {
+        "Answer": "Dead",
+        "Id": "TCGA-A8-A08L",
+        "Question": "what is vital_status according to the slide?"
+    },
+    {
+        "Answer": "30",
+        "Id": "TCGA-A8-A08L",
+        "Question": "please predict survival time?"
+    },
+    {
+        "Answer": "30.5 x 8 cm",
+        "Choice": [
+            "30.5 x 8 cm",
+            "3.2 x 2.2 x 1 cm",
+            "5 x 3 cm",
+            "6.5 x 3.5 cm"
+        ],
+        "Id": "TCGA-AO-A0J9",
+        "Question": "what is the size of the labeled \"right breast\" specimen received?"
+    },
+    {
+        "Answer": "4 x 4 cm",
+        "Choice": [
+            "4 x 4 cm",
+            "3.2 x 2.2 x 1 cm",
+            "5 x 3 cm",
+            "6.5 x 3.5 cm"
+        ],
+        "Id": "TCGA-AO-A0J9",
+        "Question": "what is the measurement of the biopsy cavity?"
+    },
+    {
+        "Answer": "nipple base, skin defect, and upper inner quadrant",
+        "Choice": [
+            "nipple, nipple base, and skin defect",
+            "nipple base, skin defect, and upper inner quadrant",
+            "deep margin, lesion under the skin defect, and upper outer quadrant",
+            "posterior fibrotic area, deep margin, and intramammary lymph nodes"
+        ],
+        "Id": "TCGA-AO-A0J9",
+        "Question": "which sections are included in the pathological slide?"
+    },
+    {
+        "Answer": "invasive lobular carcinoma",
+        "Choice": [
+            "benign breast parenchymal changes",
+            "invasive lobular carcinoma",
+            "vascular invasion",
+            "her2 testing"
+        ],
+        "Id": "TCGA-AO-A0J9",
+        "Question": "what does the pathology slide confirm the presence of in the breast?"
+    },
+    {
+        "Answer": "perform hormone receptor and her2 testing",
+        "Choice": [
+            "perform hormone receptor and her2 testing",
+            "perform additional tests for vascular invasion",
+            "perform additional tests for benign breast parenchymal changes",
+            "perform additional tests for scar measurement"
+        ],
+        "Id": "TCGA-AO-A0J9",
+        "Question": "what are the recommendations for further evaluation and staging?"
+    },
+    {
+        "Answer": "Infiltrating Lobular Carcinoma",
+        "Id": "TCGA-AO-A0J9",
+        "Question": "what is the result of histological_type in the slide?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-AO-A0J9",
+        "Question": "From the slide, can you infer the progesterone_receptor?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-AO-A0J9",
+        "Question": "Can you help the pathologist to predict vital_status?"
+    },
+    {
+        "Answer": "1256",
+        "Id": "TCGA-AO-A0J9",
+        "Question": "what is the result of survival time in the slide?"
+    },
+    {
+        "Answer": "invasive ductal carcinoma",
+        "Choice": [
+            "invasive lobular carcinoma",
+            "non-invasive ductal carcinoma",
+            "ductal carcinoma in situ",
+            "invasive ductal carcinoma"
+        ],
+        "Id": "TCGA-D8-A1JK",
+        "Question": "what is the histopathological diagnosis of the breast?"
+    },
+    {
+        "Answer": "neither estrogen nor progesterone receptors",
+        "Choice": [
+            "estrogen receptors only",
+            "progesterone receptors only",
+            "both estrogen and progesterone receptors",
+            "neither estrogen nor progesterone receptors"
+        ],
+        "Id": "TCGA-D8-A1JK",
+        "Question": "which hormone receptors were found in the neoplastic cell nuclei?"
+    },
+    {
+        "Answer": "negative reaction",
+        "Choice": [
+            "positive reaction",
+            "negative reaction",
+            "inconclusive result",
+            "no her2 protein detected"
+        ],
+        "Id": "TCGA-D8-A1JK",
+        "Question": "what was the reaction of the her2 protein test in the invasive cancerous cells?"
+    },
+    {
+        "Answer": "nhg3",
+        "Choice": [
+            "nhg1",
+            "nhg2",
+            "nhg3",
+            "nhg4"
+        ],
+        "Id": "TCGA-D8-A1JK",
+        "Question": "what is the tumor grade of the breast?"
+    },
+    {
+        "Answer": "pt2",
+        "Choice": [
+            "pt1",
+            "pt2",
+            "pt3",
+            "pt4"
+        ],
+        "Id": "TCGA-D8-A1JK",
+        "Question": "what is the pathological tumor size of the breast?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-D8-A1JK",
+        "Question": "From the slide, can you infer the histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-D8-A1JK",
+        "Question": "please predict progesterone_receptor?"
+    },
+    {
+        "Answer": "1+",
+        "Id": "TCGA-D8-A1JK",
+        "Question": "From the slide, can you infer the her2?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-D8-A1JK",
+        "Question": "what is the result of vital_status in the slide?"
+    },
+    {
+        "Answer": "0",
+        "Id": "TCGA-D8-A1JK",
+        "Question": "please predict survival time?"
+    },
+    {
+        "Answer": "0.5 cm",
+        "Choice": [
+            "0.5 cm",
+            "0.5 mm",
+            "1.5 cm",
+            "2.5 cm"
+        ],
+        "Id": "TCGA-A2-A0CK",
+        "Question": "what was the size of the tumor?"
+    },
+    {
+        "Answer": "fibrous tissue",
+        "Choice": [
+            "malignancy",
+            "fibrous tissue",
+            "saa",
+            "lobular carcinoma in situ"
+        ],
+        "Id": "TCGA-A2-A0CK",
+        "Question": "what was the pre-operative diagnosis?"
+    },
+    {
+        "Answer": "stage i",
+        "Choice": [
+            "stage 0",
+            "stage i",
+            "stage ii",
+            "stage iii"
+        ],
+        "Id": "TCGA-A2-A0CK",
+        "Question": "what was the ajcc staging determined for this case?"
+    },
+    {
+        "Answer": "negative (1+)",
+        "Choice": [
+            "positive (3+)",
+            "negative (1+)",
+            "inconclusive",
+            "not tested"
+        ],
+        "Id": "TCGA-A2-A0CK",
+        "Question": "what was the result of the evaluation for her2-neu overexpression?"
+    },
+    {
+        "Answer": "gene amplification not detected",
+        "Choice": [
+            "gene amplification detected",
+            "gene amplification not detected",
+            "inconclusive",
+            "not tested"
+        ],
+        "Id": "TCGA-A2-A0CK",
+        "Question": "what was the result of the her2/neu fish analysis?"
+    },
+    {
+        "Answer": "negative",
+        "Choice": [
+            "positive",
+            "negative",
+            "inconclusive",
+            "not tested"
+        ],
+        "Id": "TCGA-A2-A0CK",
+        "Question": "what was the result of the er/pr immunostains?"
+    },
+    {
+        "Answer": "Infiltrating Lobular Carcinoma",
+        "Id": "TCGA-A2-A0CK",
+        "Question": "what is histological_type according to the slide?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-A2-A0CK",
+        "Question": "From the slide, can you infer the progesterone_receptor?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-A2-A0CK",
+        "Question": "please predict vital_status?"
+    },
+    {
+        "Answer": "4159",
+        "Id": "TCGA-A2-A0CK",
+        "Question": "what is the result of survival time in the slide?"
+    },
+    {
+        "Answer": "grade 1",
+        "Choice": [
+            "grade 1",
+            "grade 2",
+            "grade 3",
+            "grade 4"
+        ],
+        "Id": "TCGA-OL-A5RX",
+        "Question": "what was the grade of the invasive ductal carcinoma found in the patient?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "yes",
+            "no",
+            "not mentioned",
+            "inconclusive"
+        ],
+        "Id": "TCGA-OL-A5RX",
+        "Question": "was there any blood vessel or lymphatic invasion identified in the mastectomy specimen?"
+    },
+    {
+        "Answer": "pt1c(m), no, mx",
+        "Choice": [
+            "pt1c(m), no, mx",
+            "ptx, no, m0",
+            "pt1c(m), n1, m0",
+            "pt1c(m), no, m1"
+        ],
+        "Id": "TCGA-OL-A5RX",
+        "Question": "what is the ptnm staging of the tumor in the patient?"
+    },
+    {
+        "Answer": "all of the above",
+        "Choice": [
+            "columnar cell changes, duct ectasia, and fibroadenoma",
+            "apocrine metaplasia, intraductal papilloma, and fragments of implant capsule",
+            "focal lactational changes and intraductal hyperplasia",
+            "all of the above"
+        ],
+        "Id": "TCGA-OL-A5RX",
+        "Question": "what type of changes were found in the breast tissue of the patient?"
+    },
+    {
+        "Answer": "yes",
+        "Choice": [
+            "yes",
+            "no",
+            "not mentioned",
+            "inconclusive"
+        ],
+        "Id": "TCGA-OL-A5RX",
+        "Question": "were the excisional biopsy margins free of tumor?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-OL-A5RX",
+        "Question": "please predict histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-OL-A5RX",
+        "Question": "Could you predict progesterone_receptor?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-OL-A5RX",
+        "Question": "please predict vital_status?"
+    },
+    {
+        "Answer": "878",
+        "Id": "TCGA-OL-A5RX",
+        "Question": "Could you predict survival time?"
+    },
+    {
+        "Answer": "invasive ductal carcinoma (no special type) in right breast",
+        "Choice": [
+            "invasive ductal carcinoma (no special type) in right breast",
+            "ductal carcinoma in situ in the left breast",
+            "fibrocystic changes",
+            "usual ductal hyperplasia"
+        ],
+        "Id": "TCGA-A2-A3XY",
+        "Question": "what is the final diagnosis of the patient?"
+    },
+    {
+        "Answer": "grade 3",
+        "Choice": [
+            "grade 1",
+            "grade 2",
+            "grade 3",
+            "not provided in the information."
+        ],
+        "Id": "TCGA-A2-A3XY",
+        "Question": "what is the nuclear grade of the ductal carcinoma in situ?"
+    },
+    {
+        "Answer": "both estrogen and progesterone receptor negative",
+        "Choice": [
+            "estrogen receptors positive, progesterone receptors negative",
+            "estrogen receptors negative, progesterone receptors positive",
+            "both estrogen and progesterone receptors positive",
+            "both estrogen and progesterone receptor negative"
+        ],
+        "Id": "TCGA-A2-A3XY",
+        "Question": "what are the hormone receptors of the patient?"
+    },
+    {
+        "Answer": "yes, necrosis is present in both invasive and ductal carcinoma in situ.",
+        "Choice": [
+            "yes, necrosis is present in invasive carcinoma but not in ductal carcinoma in situ",
+            "yes, necrosis is present in ductal carcinoma in situ but not in invasive carcinoma",
+            "no, there is no necrosis in either invasive or ductal carcinoma in situ",
+            "yes, necrosis is present in both invasive and ductal carcinoma in situ."
+        ],
+        "Id": "TCGA-A2-A3XY",
+        "Question": "is there any necrosis present in the tumor?"
+    },
+    {
+        "Answer": "2.5 cm in greatest dimension",
+        "Choice": [
+            "1.5 cm in greatest dimension",
+            "2.0 cm in greatest dimension",
+            "2.5 cm in greatest dimension",
+            "3.0 cm in greatest dimension"
+        ],
+        "Id": "TCGA-A2-A3XY",
+        "Question": "how big is the unifocal tumor?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-A2-A3XY",
+        "Question": "please predict histological_type?"
+    },
+    {
+        "Answer": "Negative",
+        "Id": "TCGA-A2-A3XY",
+        "Question": "please predict progesterone_receptor?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-A2-A3XY",
+        "Question": "From the slide, can you infer the vital_status?"
+    },
+    {
+        "Answer": "1064",
+        "Id": "TCGA-A2-A3XY",
+        "Question": "Could you predict survival time?"
+    },
+    {
+        "Answer": "breast cancer",
+        "Choice": [
+            "lung cancer",
+            "breast cancer",
+            "skin cancer",
+            "colon cancer"
+        ],
+        "Id": "TCGA-D8-A27M",
+        "Question": "what type of cancer has the patient been diagnosed with?"
+    },
+    {
+        "Answer": "2.6 x 1.2 x 1.8 cm",
+        "Choice": [
+            "1.5 x 0.8 x 1.2 cm",
+            "3.2 x 1.6 x 2.4 cm",
+            "2.6 x 1.2 x 1.8 cm",
+            "2.0 x 1.0 x 1.5 cm"
+        ],
+        "Id": "TCGA-D8-A27M",
+        "Question": "what is the size of the tumor?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "yes",
+            "no",
+            "the slide doesn't mention it",
+            "insufficient information"
+        ],
+        "Id": "TCGA-D8-A27M",
+        "Question": "does the cancer have estrogen and progesterone receptors?"
+    },
+    {
+        "Answer": "negative",
+        "Choice": [
+            "positive",
+            "negative",
+            "the slide doesn't mention it",
+            "insufficient information"
+        ],
+        "Id": "TCGA-D8-A27M",
+        "Question": "was the her2 protein staining positive or negative?"
+    },
+    {
+        "Answer": "nhg3",
+        "Choice": [
+            "nhg1",
+            "nhg2",
+            "nhg3",
+            "the slide doesn't mention it"
+        ],
+        "Id": "TCGA-D8-A27M",
+        "Question": "what is the assigned histopathological grade?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-D8-A27M",
+        "Question": "From the slide, can you infer the histological_type?"
+    },
+    {
+        "Answer": "Negative",
+        "Id": "TCGA-D8-A27M",
+        "Question": "From the slide, can you infer the progesterone_receptor?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-D8-A27M",
+        "Question": "what is the result of vital_status in the slide?"
+    },
+    {
+        "Answer": "410",
+        "Id": "TCGA-D8-A27M",
+        "Question": "Can you help the pathologist to predict survival time?"
+    },
+    {
+        "Answer": "total mastectomy",
+        "Choice": [
+            "lumpectomy",
+            "chemotherapy",
+            "total mastectomy",
+            "radiation therapy"
+        ],
+        "Id": "TCGA-AO-A1KP",
+        "Question": "what is the recommended treatment for the patient?"
+    },
+    {
+        "Answer": "biopsy results",
+        "Choice": [
+            "biopsy results",
+            "physical examination",
+            "imaging tests",
+            "special studies"
+        ],
+        "Id": "TCGA-AO-A1KP",
+        "Question": "what is the diagnosis of the patient based on?"
+    },
+    {
+        "Answer": "moderate",
+        "Choice": [
+            "high",
+            "low",
+            "moderate",
+            "not mentioned"
+        ],
+        "Id": "TCGA-AO-A1KP",
+        "Question": "what is the nuclear grade of the invasive ductal carcinoma?"
+    },
+    {
+        "Answer": "yes",
+        "Choice": [
+            "yes",
+            "no",
+            "not mentioned",
+            "cannot be determined"
+        ],
+        "Id": "TCGA-AO-A1KP",
+        "Question": "are all the tumor masses well-circumscribed and firm?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-AO-A1KP",
+        "Question": "Can you help the pathologist to predict histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-AO-A1KP",
+        "Question": "what is progesterone_receptor according to the slide?"
+    },
+    {
+        "Answer": "1+",
+        "Id": "TCGA-AO-A1KP",
+        "Question": "what is her2 according to the slide?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-AO-A1KP",
+        "Question": "Could you predict vital_status?"
+    },
+    {
+        "Answer": "2513",
+        "Id": "TCGA-AO-A1KP",
+        "Question": "what is the result of survival time in the slide?"
+    },
+    {
+        "Answer": "fibroadipose tissue with focal fat necrosis;",
+        "Choice": [
+            "invasive ductal carcinoma;",
+            "fibroadipose tissue with focal fat necrosis;",
+            "atypical ductal hyperplasia;",
+            "fibroadenomatous changes."
+        ],
+        "Id": "TCGA-OL-A66P",
+        "Question": "what is the finding in the superior mastectomy flap?"
+    },
+    {
+        "Answer": "two;",
+        "Choice": [
+            "one;",
+            "two;",
+            "three;",
+            "four."
+        ],
+        "Id": "TCGA-OL-A66P",
+        "Question": "how many foci of invasive ductal carcinoma are found in the breast simple mastectomy?"
+    },
+    {
+        "Answer": "fibroadipose tissue in the inferior and medial flaps;",
+        "Choice": [
+            "metastatic carcinoma;",
+            "fibroadipose tissue in the inferior and medial flaps;",
+            "intraductal carcinoma in situ;",
+            "normal breast tissue."
+        ],
+        "Id": "TCGA-OL-A66P",
+        "Question": "what is one of the changes mentioned in the slide outside the primary finding?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-OL-A66P",
+        "Question": "please predict histological_type?"
+    },
+    {
+        "Answer": "Negative",
+        "Id": "TCGA-OL-A66P",
+        "Question": "what is progesterone_receptor according to the slide?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-OL-A66P",
+        "Question": "From the slide, can you infer the vital_status?"
+    },
+    {
+        "Answer": "428",
+        "Id": "TCGA-OL-A66P",
+        "Question": "what is survival time according to the slide?"
+    },
+    {
+        "Answer": "suspicion of cancer in the left breast",
+        "Choice": [
+            "suspicion of cancer in the right breast",
+            "suspicion of cancer in the left breast",
+            "suspicion of cancer in both breasts",
+            "suspicion of cancer in an unknown location"
+        ],
+        "Id": "TCGA-D8-A73U",
+        "Question": "what is the clinical diagnosis of the patient?"
+    },
+    {
+        "Answer": "invasive lobular carcinoma",
+        "Choice": [
+            "invasive ductal carcinoma",
+            "invasive lobular carcinoma",
+            "ductal carcinoma in situ",
+            "fibroadenoma"
+        ],
+        "Id": "TCGA-D8-A73U",
+        "Question": "what is the histopathological examination result of the tumor?"
+    },
+    {
+        "Answer": "4x2.2x1.6cm",
+        "Choice": [
+            "4x2.2x1.6cm",
+            "2x1.6x4cm",
+            "1.6x2x4cm",
+            "2.2x4x1.6cm"
+        ],
+        "Id": "TCGA-D8-A73U",
+        "Question": "what was the size of the tumor?"
+    },
+    {
+        "Answer": "invasive ductal carcinoma",
+        "Choice": [
+            "invasive ductal carcinoma",
+            "invasive lobular carcinoma",
+            "ductal carcinoma in situ",
+            "fibroadenoma"
+        ],
+        "Id": "TCGA-D8-A73U",
+        "Question": "what type of carcinoma was identified microscopically?"
+    },
+    {
+        "Answer": "75%",
+        "Choice": [
+            "15%",
+            "25%",
+            "50%",
+            "75%"
+        ],
+        "Id": "TCGA-D8-A73U",
+        "Question": "what percentage of neoplastic cell nuclei had estrogen and progesterone receptors?"
+    },
+    {
+        "Answer": "Infiltrating Lobular Carcinoma",
+        "Id": "TCGA-D8-A73U",
+        "Question": "please predict histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-D8-A73U",
+        "Question": "From the slide, can you infer the progesterone_receptor?"
+    },
+    {
+        "Answer": "1+",
+        "Id": "TCGA-D8-A73U",
+        "Question": "Could you predict her2?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-D8-A73U",
+        "Question": "please predict vital_status?"
+    },
+    {
+        "Answer": "492",
+        "Id": "TCGA-D8-A73U",
+        "Question": "what is the result of survival time in the slide?"
+    },
+    {
+        "Answer": "the biopsy is positive for carcinoma",
+        "Choice": [
+            "the biopsy is negative for carcinoma",
+            "the biopsy is positive for carcinoma",
+            "the biopsy is positive for sclerosing adenosis",
+            "the biopsy is positive for focal ductal carcinoma"
+        ],
+        "Id": "TCGA-AO-A12D",
+        "Question": "what does the pathological slide indicate about the biopsy of the breast?"
+    },
+    {
+        "Answer": "the presence of sclerosing adenosis and focal ductal carcinoma",
+        "Choice": [
+            "no other findings are mentioned",
+            "the presence of sclerosing adenosis and focal ductal carcinoma",
+            "the biopsy is positive for carcinoma",
+            "the slide does not mention any other findings"
+        ],
+        "Id": "TCGA-AO-A12D",
+        "Question": "what other findings are mentioned in the pathological slide?"
+    },
+    {
+        "Answer": "staining and test results",
+        "Choice": [
+            "no additional tests are pending",
+            "staining and test results",
+            "biopsy results",
+            "the slide does not mention any additional tests"
+        ],
+        "Id": "TCGA-AO-A12D",
+        "Question": "what additional tests are pending according to the slide?"
+    },
+    {
+        "Answer": "yes, it is confirmed",
+        "Choice": [
+            "no, it is not confirmed",
+            "yes, it is confirmed",
+            "the slide does not provide a diagnosis",
+            "the slide is inconclusive"
+        ],
+        "Id": "TCGA-AO-A12D",
+        "Question": "is the diagnosis of carcinoma confirmed by the pathological slide?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-AO-A12D",
+        "Question": "please predict histological_type?"
+    },
+    {
+        "Answer": "Negative",
+        "Id": "TCGA-AO-A12D",
+        "Question": "what is progesterone_receptor according to the slide?"
+    },
+    {
+        "Answer": "3+",
+        "Id": "TCGA-AO-A12D",
+        "Question": "Can you help the pathologist to predict her2?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-AO-A12D",
+        "Question": "Could you predict vital_status?"
+    },
+    {
+        "Answer": "1948",
+        "Id": "TCGA-AO-A12D",
+        "Question": "Can you help the pathologist to predict survival time?"
+    },
+    {
+        "Answer": "3.5 cm",
+        "Choice": [
+            "2.5 cm",
+            "3.5 cm",
+            "4.5 cm",
+            "5.5 cm"
+        ],
+        "Id": "TCGA-E9-A1RE",
+        "Question": "what was the size of the tumor found in the breast?"
+    },
+    {
+        "Answer": "infiltrating ductal carcinoma",
+        "Choice": [
+            "infiltrating lobular carcinoma",
+            "ductal carcinoma in situ",
+            "infiltrating ductal carcinoma",
+            "invasive lobular carcinoma"
+        ],
+        "Id": "TCGA-E9-A1RE",
+        "Question": "what type of carcinoma was found?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "yes",
+            "no",
+            "not specified",
+            "partially"
+        ],
+        "Id": "TCGA-E9-A1RE",
+        "Question": "were the margins of the tumor involved?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "yes",
+            "no",
+            "not specified",
+            "partial evidence"
+        ],
+        "Id": "TCGA-E9-A1RE",
+        "Question": "was there evidence of venous invasion?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-E9-A1RE",
+        "Question": "Can you help the pathologist to predict histological_type?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-E9-A1RE",
+        "Question": "Could you predict vital_status?"
+    },
+    {
+        "Answer": "659",
+        "Id": "TCGA-E9-A1RE",
+        "Question": "From the slide, can you infer the survival time?"
+    },
+    {
+        "Answer": "3.0 x 2.1 x 1.3 cm",
+        "Choice": [
+            "3.0 x 2.1 x 1.3 cm",
+            "2.0 x 1.5 x 1.0 cm",
+            "4.5 x 3.2 x 2.0 cm",
+            "1.8 x 1.3 x 0.9 cm"
+        ],
+        "Id": "TCGA-D8-A1JB",
+        "Question": "what was the size of the tumor in the breast?"
+    },
+    {
+        "Answer": "lobular carcinoma in situ (lcs) and mastopathia fibrosa et cystica",
+        "Choice": [
+            "lobular carcinoma in situ (lcs) and mastopathia fibrosa et cystica",
+            "adenosis sclerosans and calcifications",
+            "columnar cell changes (ccc) and ductal carcinoma in situ (ocis)",
+            "hyperplasia ductalis simplex (udh) and adenosis sclerosans"
+        ],
+        "Id": "TCGA-D8-A1JB",
+        "Question": "what additional lesions were found in the glandular tissue?"
+    },
+    {
+        "Answer": "invasive ductal carcinoma (nhg2) with foci of ductal carcinoma in situ (ocis)",
+        "Choice": [
+            "invasive ductal carcinoma (nhg2) with foci of ductal carcinoma in situ (ocis)",
+            "invasive lobular carcinoma with foci of ductal carcinoma in situ (ocis)",
+            "metastatic carcinoma in axillary lymph node no. 1/viii",
+            "lobular carcinoma in situ (lcs) and mastopathia fibrosa et cystica, hyperplasia ductalis simplex (udh)"
+        ],
+        "Id": "TCGA-D8-A1JB",
+        "Question": "what was the diagnosis of the cancer in the breast?"
+    },
+    {
+        "Answer": "e-cadherin positive and ck7 positive",
+        "Choice": [
+            "e-cadherin positive and ck7 positive",
+            "estrogen receptors positive and progesterone receptors positive",
+            "her2 staining with a score of 2+",
+            "her2/neu gene amplification"
+        ],
+        "Id": "TCGA-D8-A1JB",
+        "Question": "what was the immunophenotype of the neoplastic cells?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-D8-A1JB",
+        "Question": "what is the result of histological_type in the slide?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-D8-A1JB",
+        "Question": "please predict progesterone_receptor?"
+    },
+    {
+        "Answer": "2+",
+        "Id": "TCGA-D8-A1JB",
+        "Question": "what is the result of her2 in the slide?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-D8-A1JB",
+        "Question": "From the slide, can you infer the vital_status?"
+    },
+    {
+        "Answer": "569",
+        "Id": "TCGA-D8-A1JB",
+        "Question": "what is the result of survival time in the slide?"
+    },
+    {
+        "Answer": "pain",
+        "Choice": [
+            "breast tumor",
+            "symptomatic",
+            "lump in the breast",
+            "pain"
+        ],
+        "Id": "TCGA-C8-A1HJ",
+        "Question": "what is the chief complaint of the patient?"
+    },
+    {
+        "Answer": "breast tumor",
+        "Choice": [
+            "breast tumor",
+            "symptomatic",
+            "pain",
+            "lump in the breast"
+        ],
+        "Id": "TCGA-C8-A1HJ",
+        "Question": "what are the symptoms slideed by the patient?"
+    },
+    {
+        "Answer": "pain",
+        "Choice": [
+            "symptomatic, in bed less than 50% of the day",
+            "breast tumor",
+            "lump in the breast",
+            "pain"
+        ],
+        "Id": "TCGA-C8-A1HJ",
+        "Question": "what is the performance scale of the patient?"
+    },
+    {
+        "Answer": "pain",
+        "Choice": [
+            "post-menopausal",
+            "breast tumor",
+            "lump in the breast",
+            "pain"
+        ],
+        "Id": "TCGA-C8-A1HJ",
+        "Question": "what is the menopausal status of the patient?"
+    },
+    {
+        "Answer": "pain",
+        "Choice": [
+            "condom, oral contraceptive or iud",
+            "breast tumor",
+            "symptomatic",
+            "pain"
+        ],
+        "Id": "TCGA-C8-A1HJ",
+        "Question": "what methods of birth control does the patient use?"
+    },
+    {
+        "Answer": "birth control methods",
+        "Choice": [
+            "results of diagnostic studies",
+            "microscopic appearance of the tumor",
+            "birth control methods",
+            "menopausal status"
+        ],
+        "Id": "TCGA-C8-A1HJ",
+        "Question": "what information is not provided in the caption?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-C8-A1HJ",
+        "Question": "Can you help the pathologist to predict histological_type?"
+    },
+    {
+        "Answer": "Negative",
+        "Id": "TCGA-C8-A1HJ",
+        "Question": "Can you help the pathologist to predict progesterone_receptor?"
+    },
+    {
+        "Answer": "invasive ductal carcinoma",
+        "Choice": [
+            "leukemia",
+            "invasive ductal carcinoma",
+            "lung cancer",
+            "breast fibroadenoma"
+        ],
+        "Id": "TCGA-A2-A1FW",
+        "Question": "what kind of cancer did the patient have?"
+    },
+    {
+        "Answer": "mastectomy and sentinel lymph node biopsy",
+        "Choice": [
+            "colonoscopy and biopsy",
+            "endoscopy and abdominal surgery",
+            "mastectomy and sentinel lymph node biopsy",
+            "hysterectomy and oophorectomy"
+        ],
+        "Id": "TCGA-A2-A1FW",
+        "Question": "what surgical procedures did the patient undergo?"
+    },
+    {
+        "Answer": "75 mm",
+        "Choice": [
+            "75 mm",
+            "9",
+            "4 and 6",
+            "13"
+        ],
+        "Id": "TCGA-A2-A1FW",
+        "Question": "what was the size of the tumor?"
+    },
+    {
+        "Answer": "stage iiia",
+        "Choice": [
+            "stage ia",
+            "stage iiib",
+            "stage iiia",
+            "stage iv"
+        ],
+        "Id": "TCGA-A2-A1FW",
+        "Question": "what is the final pathological stage of the cancer?"
+    },
+    {
+        "Answer": "extensive angiolymphatic invasion and microcalcifications",
+        "Choice": [
+            "no abnormalities were observed",
+            "extensive angiolymphatic invasion and microcalcifications",
+            "fibrocystic changes",
+            "incidental fibroadenoma"
+        ],
+        "Id": "TCGA-A2-A1FW",
+        "Question": "what additional findings were noted on examination?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-A2-A1FW",
+        "Question": "From the slide, can you infer the histological_type?"
+    },
+    {
+        "Answer": "Negative",
+        "Id": "TCGA-A2-A1FW",
+        "Question": "From the slide, can you infer the progesterone_receptor?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-A2-A1FW",
+        "Question": "please predict vital_status?"
+    },
+    {
+        "Answer": "528",
+        "Id": "TCGA-A2-A1FW",
+        "Question": "From the slide, can you infer the survival time?"
+    },
+    {
+        "Answer": "lobular carcinoma",
+        "Choice": [
+            "ductal carcinoma",
+            "lobular carcinoma",
+            "squamous cell carcinoma",
+            "basal cell carcinoma"
+        ],
+        "Id": "TCGA-A2-A25A",
+        "Question": "what type of carcinoma was observed in the breast?"
+    },
+    {
+        "Answer": "atypical lobular hyperplasia",
+        "Choice": [
+            "atypical lobular hyperplasia",
+            "atypical ductal hyperplasia",
+            "focal hyperplasia",
+            "ductal hyperplasia"
+        ],
+        "Id": "TCGA-A2-A25A",
+        "Question": "what type of hyperplasia was observed in the breast?"
+    },
+    {
+        "Answer": "80-90%",
+        "Choice": [
+            "70-80%",
+            "80-90%",
+            "90-100%",
+            "50-60%"
+        ],
+        "Id": "TCGA-A2-A25A",
+        "Question": "what was the percentage of nuclear staining for progesterone receptors in the patient's breast?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "yes",
+            "no",
+            "unclear",
+            "not mentioned"
+        ],
+        "Id": "TCGA-A2-A25A",
+        "Question": "was her2/neu amplification observed in the patient's slide?"
+    },
+    {
+        "Answer": "no other significant finding is mentioned in the slide.",
+        "Choice": [
+            "no other significant finding is mentioned in the slide.",
+            "enlarged lymph nodes were observed.",
+            "malignant cells were found in the bone.",
+            "c:malignant cells were found in the bone. d:multiple metastases were observed in the liver."
+        ],
+        "Id": "TCGA-A2-A25A",
+        "Question": "what significant findings were observed in the patient's slide apart from breast carcinoma?"
+    },
+    {
+        "Answer": "left breast",
+        "Choice": [
+            "right breast",
+            "left breast",
+            "both breasts",
+            "unclear"
+        ],
+        "Id": "TCGA-A2-A25A",
+        "Question": "which breast was scheduled for sentinel node biopsy?"
+    },
+    {
+        "Answer": "4.5 cm",
+        "Choice": [
+            "2.5 cm",
+            "3 cm",
+            "4.5 cm",
+            "6.3 cm"
+        ],
+        "Id": "TCGA-A8-A09Q",
+        "Question": "what is the size of the breast tumor mentioned in the slide?"
+    },
+    {
+        "Answer": "invasive ductal carcinoma",
+        "Choice": [
+            "invasive ductal carcinoma",
+            "infiltrated lymph nodes",
+            "metastatic tumor",
+            "benign tumor"
+        ],
+        "Id": "TCGA-A8-A09Q",
+        "Question": "what is the invasive status of the tumor mentioned in the slide?"
+    },
+    {
+        "Answer": "rest of the breast tissue",
+        "Choice": [
+            "tumor",
+            "surrounding skin",
+            "axillary lymph nodes",
+            "rest of the breast tissue"
+        ],
+        "Id": "TCGA-A8-A09Q",
+        "Question": "which breast tissue is affected by fibrolipomatous changes?"
+    },
+    {
+        "Answer": "grade 3",
+        "Choice": [
+            "grade 1",
+            "grade 2",
+            "grade 3",
+            "grade 4"
+        ],
+        "Id": "TCGA-A8-A09Q",
+        "Question": "what is the grade of differentiation of the tumor mentioned in the slide?"
+    },
+    {
+        "Answer": "additional malignancy testing",
+        "Choice": [
+            "further chemotherapy",
+            "surgery",
+            "additional malignancy testing",
+            "radiation therapy"
+        ],
+        "Id": "TCGA-A8-A09Q",
+        "Question": "what is the recommended next step mentioned in the slide?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-A8-A09Q",
+        "Question": "please predict histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-A8-A09Q",
+        "Question": "please predict progesterone_receptor?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-A8-A09Q",
+        "Question": "please predict vital_status?"
+    },
+    {
+        "Answer": "761",
+        "Id": "TCGA-A8-A09Q",
+        "Question": "Could you predict survival time?"
+    },
+    {
+        "Answer": "invasive ductal carcinoma",
+        "Choice": [
+            "invasive ductal carcinoma",
+            "intracystic papilloma",
+            "fibrocystic changes with hyperplasia",
+            "radial scar"
+        ],
+        "Id": "TCGA-BH-A0EE",
+        "Question": "what is the diagnosis of the breast tumor?"
+    },
+    {
+        "Answer": "5.5 cm",
+        "Choice": [
+            "1 cm",
+            "3 cm",
+            "5.5 cm",
+            "8 cm"
+        ],
+        "Id": "TCGA-BH-A0EE",
+        "Question": "what is the size of the tumor?"
+    },
+    {
+        "Answer": "8/9",
+        "Choice": [
+            "6/9",
+            "8/9",
+            "9/10",
+            "2/5"
+        ],
+        "Id": "TCGA-BH-A0EE",
+        "Question": "what is the nottingham score of the tumor?"
+    },
+    {
+        "Answer": "er and pr negative",
+        "Choice": [
+            "er and pr positive",
+            "er and pr negative",
+            "er positive, pr negative",
+            "er negative, pr positive"
+        ],
+        "Id": "TCGA-BH-A0EE",
+        "Question": "what is the hormone receptor status of the tumor?"
+    },
+    {
+        "Answer": "her-2/neu positive",
+        "Choice": [
+            "her-2/neu positive",
+            "her-2/neu negative",
+            "her-2/neu equivocal",
+            "her-2/neu indeterminate"
+        ],
+        "Id": "TCGA-BH-A0EE",
+        "Question": "what is the her-2/neu status of the tumor?"
+    },
+    {
+        "Answer": "pt3, pn0, pmx",
+        "Choice": [
+            "pt1, pn0, pmx",
+            "pt2, pn1, pmx",
+            "pt3, pn0, pmx",
+            "pt4, pn2, pr1"
+        ],
+        "Id": "TCGA-BH-A0EE",
+        "Question": "what is the final pathological stage of the tumor?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-BH-A0EE",
+        "Question": "Can you help the pathologist to predict histological_type?"
+    },
+    {
+        "Answer": "Negative",
+        "Id": "TCGA-BH-A0EE",
+        "Question": "what is the result of progesterone_receptor in the slide?"
+    },
+    {
+        "Answer": "3+",
+        "Id": "TCGA-BH-A0EE",
+        "Question": "please predict her2?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-BH-A0EE",
+        "Question": "Could you predict vital_status?"
+    },
+    {
+        "Answer": "943",
+        "Id": "TCGA-BH-A0EE",
+        "Question": "Could you predict survival time?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-BH-A0EA",
+        "Question": "Could you predict histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-BH-A0EA",
+        "Question": "please predict progesterone_receptor?"
+    },
+    {
+        "Answer": "Dead",
+        "Id": "TCGA-BH-A0EA",
+        "Question": "what is the result of vital_status in the slide?"
+    },
+    {
+        "Answer": "991",
+        "Id": "TCGA-BH-A0EA",
+        "Question": "Could you predict survival time?"
+    },
+    {
+        "Answer": "invasive ductal carcinoma with lobular features",
+        "Choice": [
+            "medullary carcinoma",
+            "invasive ductal carcinoma with lobular features",
+            "ductal carcinoma in situ",
+            "invasive lobular carcinoma"
+        ],
+        "Id": "TCGA-A2-A0CZ",
+        "Question": "what type of breast cancer did the patient have?"
+    },
+    {
+        "Answer": "no, there was no tumor necrosis or microcalcifications",
+        "Choice": [
+            "yes, there was both tumor necrosis and microcalcifications",
+            "no, there was no tumor necrosis or microcalcifications",
+            "there was tumor necrosis, but no microcalcifications",
+            "there were microcalcifications, but no tumor necrosis"
+        ],
+        "Id": "TCGA-A2-A0CZ",
+        "Question": "was there any tumor necrosis or microcalcifications?"
+    },
+    {
+        "Answer": "pt2n0",
+        "Choice": [
+            "pt2n1",
+            "pt3n1",
+            "pt2n0",
+            "pt1n0"
+        ],
+        "Id": "TCGA-A2-A0CZ",
+        "Question": "what was the final pathologic stage of the cancer?"
+    },
+    {
+        "Answer": "negative",
+        "Choice": [
+            "positive",
+            "negative",
+            "fish amplification",
+            "not mentioned"
+        ],
+        "Id": "TCGA-A2-A0CZ",
+        "Question": "was her-2 positive or negative by immunohistochemistry?"
+    },
+    {
+        "Answer": "cystic change, apocrine metaplasia, and columnar cell change",
+        "Choice": [
+            "squamous metaplasia, papillary carcinoma, and spindle cell neoplasm",
+            "cystic change, apocrine metaplasia, and columnar cell change",
+            "lobular carcinoma in situ, atypical ductal hyperplasia, and radial scar",
+            "metaplastic carcinoma, angiosarcoma, and dermatofibroma"
+        ],
+        "Id": "TCGA-A2-A0CZ",
+        "Question": "what type of additional pathologic changes were mentioned?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-A2-A0CZ",
+        "Question": "Could you predict histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-A2-A0CZ",
+        "Question": "please predict progesterone_receptor?"
+    },
+    {
+        "Answer": "1+",
+        "Id": "TCGA-A2-A0CZ",
+        "Question": "what is the result of her2 in the slide?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-A2-A0CZ",
+        "Question": "what is the result of vital_status in the slide?"
+    },
+    {
+        "Answer": "1616",
+        "Id": "TCGA-A2-A0CZ",
+        "Question": "Could you predict survival time?"
+    },
+    {
+        "Answer": "4.9 cm",
+        "Choice": [
+            "0.3 cm",
+            "4.9 cm",
+            "2.1 cm",
+            "1.5 cm"
+        ],
+        "Id": "TCGA-AQ-A54N",
+        "Question": "what was the size of the tumor?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "yes",
+            "no",
+            "not mentioned",
+            "unclear"
+        ],
+        "Id": "TCGA-AQ-A54N",
+        "Question": "was lymphovascular invasion present?"
+    },
+    {
+        "Answer": "grade 3",
+        "Choice": [
+            "grade 1",
+            "grade 2",
+            "grade 3",
+            "grade 4"
+        ],
+        "Id": "TCGA-AQ-A54N",
+        "Question": "what was the grade of the tumor?"
+    },
+    {
+        "Answer": "unifocal",
+        "Choice": [
+            "multifocal",
+            "unifocal",
+            "not mentioned",
+            "unclear"
+        ],
+        "Id": "TCGA-AQ-A54N",
+        "Question": "was the tumor multifocal or unifocal?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "yes",
+            "no",
+            "not mentioned",
+            "unclear"
+        ],
+        "Id": "TCGA-AQ-A54N",
+        "Question": "were any microcalcifications identified?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-AQ-A54N",
+        "Question": "Could you predict histological_type?"
+    },
+    {
+        "Answer": "Negative",
+        "Id": "TCGA-AQ-A54N",
+        "Question": "Can you help the pathologist to predict progesterone_receptor?"
+    },
+    {
+        "Answer": "2+",
+        "Id": "TCGA-AQ-A54N",
+        "Question": "please predict her2?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-AQ-A54N",
+        "Question": "From the slide, can you infer the vital_status?"
+    },
+    {
+        "Answer": "78",
+        "Id": "TCGA-AQ-A54N",
+        "Question": "Can you help the pathologist to predict survival time?"
+    },
+    {
+        "Answer": "45.2*2.5 cm",
+        "Choice": [
+            "45.1*2.5 cm",
+            "45.1*2.6 cm",
+            "45.2*2.5 cm",
+            "45.2*2.6 cm"
+        ],
+        "Id": "TCGA-D8-A13Z",
+        "Question": "what were the measurements of the tumor in the breast?"
+    },
+    {
+        "Answer": "negative",
+        "Choice": [
+            "positive",
+            "negative",
+            "inconclusive",
+            "not tested"
+        ],
+        "Id": "TCGA-D8-A13Z",
+        "Question": "what were the results of the examination for estrogen and progesterone receptors?"
+    },
+    {
+        "Answer": "negative",
+        "Choice": [
+            "positive",
+            "negative",
+            "inconclusive",
+            "not tested"
+        ],
+        "Id": "TCGA-D8-A13Z",
+        "Question": "what was the reaction of the her2 protein?"
+    },
+    {
+        "Answer": "1.1*1.3 cm",
+        "Choice": [
+            "1.1*1.2 cm",
+            "1.1*1.3 cm",
+            "1.2*1.2 cm",
+            "1.2*1.3 cm"
+        ],
+        "Id": "TCGA-D8-A13Z",
+        "Question": "what size was the second tumor?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-D8-A13Z",
+        "Question": "Could you predict histological_type?"
+    },
+    {
+        "Answer": "Negative",
+        "Id": "TCGA-D8-A13Z",
+        "Question": "Could you predict progesterone_receptor?"
+    },
+    {
+        "Answer": "1+",
+        "Id": "TCGA-D8-A13Z",
+        "Question": "please predict her2?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-D8-A13Z",
+        "Question": "From the slide, can you infer the vital_status?"
+    },
+    {
+        "Answer": "635",
+        "Id": "TCGA-D8-A13Z",
+        "Question": "Could you predict survival time?"
+    },
+    {
+        "Answer": "3 cm",
+        "Choice": [
+            "2 cm",
+            "3 cm",
+            "4 cm",
+            "5 cm"
+        ],
+        "Id": "TCGA-BH-A42U",
+        "Question": "what is the size of the tumor?"
+    },
+    {
+        "Answer": "negative",
+        "Choice": [
+            "positive",
+            "negative",
+            "equivocal",
+            "not mentioned"
+        ],
+        "Id": "TCGA-BH-A42U",
+        "Question": "what is the result of cadherin immunostaining?"
+    },
+    {
+        "Answer": "negative",
+        "Choice": [
+            "positive",
+            "negative",
+            "equivocal",
+            "not mentioned"
+        ],
+        "Id": "TCGA-BH-A42U",
+        "Question": "what is the status of lymphatic or vascular invasion?"
+    },
+    {
+        "Answer": "t2n0mx",
+        "Choice": [
+            "t1n0mx",
+            "t2n0mx",
+            "t3n0mx",
+            "t4n0mx"
+        ],
+        "Id": "TCGA-BH-A42U",
+        "Question": "what is the stage classification of the tumor?"
+    },
+    {
+        "Answer": "Infiltrating Lobular Carcinoma",
+        "Id": "TCGA-BH-A42U",
+        "Question": "Could you predict histological_type?"
+    },
+    {
+        "Answer": "Negative",
+        "Id": "TCGA-BH-A42U",
+        "Question": "what is progesterone_receptor according to the slide?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-BH-A42U",
+        "Question": "From the slide, can you infer the vital_status?"
+    },
+    {
+        "Answer": "3364",
+        "Id": "TCGA-BH-A42U",
+        "Question": "please predict survival time?"
+    },
+    {
+        "Answer": "7 cm",
+        "Choice": [
+            "7 cm",
+            "2 cm",
+            "4 cm",
+            "10 cm"
+        ],
+        "Id": "TCGA-AC-A3TM",
+        "Question": "what is the size of the invasive tumor in the breast?"
+    },
+    {
+        "Answer": "grade ii",
+        "Choice": [
+            "grade ii",
+            "grade i",
+            "grade iii",
+            "grade iv"
+        ],
+        "Id": "TCGA-AC-A3TM",
+        "Question": "what is the grade of the cancer according to the bloom-richardson grading system?"
+    },
+    {
+        "Answer": "t3n(mi)",
+        "Choice": [
+            "t3n(mi)",
+            "t2n0",
+            "t1n1",
+            "t4n3"
+        ],
+        "Id": "TCGA-AC-A3TM",
+        "Question": "what is the tnm stage of the cancer?"
+    },
+    {
+        "Answer": "negative",
+        "Choice": [
+            "negative",
+            "positive",
+            "indeterminate",
+            "not mentioned in the slide"
+        ],
+        "Id": "TCGA-AC-A3TM",
+        "Question": "are the surgical margins positive or negative?"
+    },
+    {
+        "Answer": "Infiltrating Lobular Carcinoma",
+        "Id": "TCGA-AC-A3TM",
+        "Question": "please predict histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-AC-A3TM",
+        "Question": "Can you help the pathologist to predict progesterone_receptor?"
+    },
+    {
+        "Answer": "2+",
+        "Id": "TCGA-AC-A3TM",
+        "Question": "please predict her2?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-AC-A3TM",
+        "Question": "what is vital_status according to the slide?"
+    },
+    {
+        "Answer": "762",
+        "Id": "TCGA-AC-A3TM",
+        "Question": "Can you help the pathologist to predict survival time?"
+    },
+    {
+        "Answer": "2.2 centimeters",
+        "Choice": [
+            "3.0 centimeters",
+            "2.2 centimeters",
+            "1.5 centimeters",
+            "2.8 centimeters"
+        ],
+        "Id": "TCGA-A8-A07U",
+        "Question": "what is the size of the invasive ductal breast carcinoma?"
+    },
+    {
+        "Answer": "invasive ductal carcinoma",
+        "Choice": [
+            "infiltrating lobular carcinoma",
+            "intraductal carcinoma",
+            "invasive ductal carcinoma",
+            "medullary carcinoma"
+        ],
+        "Id": "TCGA-A8-A07U",
+        "Question": "what type of tumor is the breast carcinoma?"
+    },
+    {
+        "Answer": "grade 3",
+        "Choice": [
+            "grade 2",
+            "grade 3",
+            "grade 1",
+            "grade 4"
+        ],
+        "Id": "TCGA-A8-A07U",
+        "Question": "what is the grade of the tumor?"
+    },
+    {
+        "Answer": "stage iiia",
+        "Choice": [
+            "stage ii",
+            "stage ia",
+            "stage iib",
+            "stage iiia"
+        ],
+        "Id": "TCGA-A8-A07U",
+        "Question": "what stage is the tumor classified as?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-A8-A07U",
+        "Question": "what is histological_type according to the slide?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-A8-A07U",
+        "Question": "Can you help the pathologist to predict progesterone_receptor?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-A8-A07U",
+        "Question": "what is vital_status according to the slide?"
+    },
+    {
+        "Answer": "760",
+        "Id": "TCGA-A8-A07U",
+        "Question": "what is survival time according to the slide?"
+    },
+    {
+        "Answer": "t1bnomx,",
+        "Choice": [
+            "t1an0m0,",
+            "t1bn1m0,",
+            "t1bnomx,",
+            "t1cn0m0"
+        ],
+        "Id": "TCGA-A2-A0EM",
+        "Question": "what is the ajcc staging for this case?"
+    },
+    {
+        "Answer": "1cm,",
+        "Choice": [
+            "1mm,",
+            "1cm,",
+            "1dm,",
+            "1m"
+        ],
+        "Id": "TCGA-A2-A0EM",
+        "Question": "what is the size of the infiltrative ductal carcinoma?"
+    },
+    {
+        "Answer": "cribiform pattern",
+        "Choice": [
+            "acinar pattern,",
+            "cystic pattern,",
+            "papillary pattern,",
+            "cribiform pattern"
+        ],
+        "Id": "TCGA-A2-A0EM",
+        "Question": "what type of pattern does the infiltrative ductal carcinoma demonstrate?"
+    },
+    {
+        "Answer": "all of the above",
+        "Choice": [
+            "fibrosis,",
+            "cysts,",
+            "apocrine metaplasia,",
+            "all of the above"
+        ],
+        "Id": "TCGA-A2-A0EM",
+        "Question": "what can be found in fibrocystic changes?"
+    },
+    {
+        "Answer": "no,",
+        "Choice": [
+            "yes,",
+            "no,",
+            "unclear,",
+            "not mentioned"
+        ],
+        "Id": "TCGA-A2-A0EM",
+        "Question": "was lymphovascular space invasion identified?"
+    },
+    {
+        "Answer": "2mm,",
+        "Choice": [
+            "2mm,",
+            "2cm,",
+            "2dm,",
+            "2m"
+        ],
+        "Id": "TCGA-A2-A0EM",
+        "Question": "what is the distance between the nearest margin and the tumor?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-A2-A0EM",
+        "Question": "From the slide, can you infer the histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-A2-A0EM",
+        "Question": "please predict progesterone_receptor?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-A2-A0EM",
+        "Question": "Could you predict vital_status?"
+    },
+    {
+        "Answer": "3094",
+        "Id": "TCGA-A2-A0EM",
+        "Question": "what is survival time according to the slide?"
+    },
+    {
+        "Answer": "not otherwise specified (nos), grade iii",
+        "Choice": [
+            "not otherwise specified (nos), grade iii",
+            "well differentiated invasive ductal carcinoma",
+            "grade i, with stage t2",
+            "medullary carcinoma"
+        ],
+        "Id": "TCGA-A8-A097",
+        "Question": "what is the provisional tumor classification?"
+    },
+    {
+        "Answer": "2.8 cm",
+        "Choice": [
+            "3.1 cm",
+            "2.8 cm",
+            "1.5 cm",
+            "5.2 cm"
+        ],
+        "Id": "TCGA-A8-A097",
+        "Question": "what is the size of the tumor?"
+    },
+    {
+        "Answer": "poorly differentiated invasive ductal carcinoma with an intraductal component",
+        "Choice": [
+            "well differentiated invasive ductal carcinoma",
+            "poorly differentiated invasive ductal carcinoma with an intraductal component",
+            "medullary carcinoma with micrometastasis",
+            "not otherwise specified (nos), grade iii"
+        ],
+        "Id": "TCGA-A8-A097",
+        "Question": "what is the diagnosis given in the pathological slide?"
+    },
+    {
+        "Answer": "stage t2",
+        "Choice": [
+            "stage t1",
+            "stage t2",
+            "stage t3",
+            "stage t4"
+        ],
+        "Id": "TCGA-A8-A097",
+        "Question": "what is the stage of the tumor?"
+    },
+    {
+        "Answer": "presence of micrometastasis -n1mi(sn)lovoro",
+        "Choice": [
+            "no micrometastasis present",
+            "presence of micrometastasis -n1mi(sn)lovoro",
+            "micrometastasis detected in the axillary lymph nodes",
+            "micrometastasis confirmed in the distant organs"
+        ],
+        "Id": "TCGA-A8-A097",
+        "Question": "what is the presence of micrometastasis?"
+    },
+    {
+        "Answer": "grade iii",
+        "Choice": [
+            "grade i",
+            "grade ii",
+            "grade iii",
+            "grade iv"
+        ],
+        "Id": "TCGA-A8-A097",
+        "Question": "what is the tumor grade?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-A8-A097",
+        "Question": "what is histological_type according to the slide?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-A8-A097",
+        "Question": "what is the result of progesterone_receptor in the slide?"
+    },
+    {
+        "Answer": "2+",
+        "Id": "TCGA-A8-A097",
+        "Question": "Can you help the pathologist to predict her2?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-A8-A097",
+        "Question": "Can you help the pathologist to predict vital_status?"
+    },
+    {
+        "Answer": "365",
+        "Id": "TCGA-A8-A097",
+        "Question": "please predict survival time?"
+    },
+    {
+        "Answer": "breast cancer",
+        "Choice": [
+            "melanoma",
+            "thyroid cancer",
+            "colon cancer",
+            "breast cancer"
+        ],
+        "Id": "TCGA-A2-A1FX",
+        "Question": "what was the patient's pre-operative diagnosis?"
+    },
+    {
+        "Answer": "cytokeratin and e-cadherin",
+        "Choice": [
+            "hematoxylin and eosin",
+            "alcian blue",
+            "cytokeratin and e-cadherin",
+            "periodic acid-schiff (pas)"
+        ],
+        "Id": "TCGA-A2-A1FX",
+        "Question": "what stains were performed to support the diagnosis?"
+    },
+    {
+        "Answer": "infiltrating carcinoma in the right breast",
+        "Choice": [
+            "infiltrating carcinoma in the left breast",
+            "infiltrating carcinoma in the right breast",
+            "lung cancer with metastasis",
+            "melanoma with metastasis"
+        ],
+        "Id": "TCGA-A2-A1FX",
+        "Question": "what was the final diagnosis of the patient?"
+    },
+    {
+        "Answer": "t2n2a",
+        "Choice": [
+            "t1n0m0",
+            "t1n1m0",
+            "t2n0m0",
+            "t2n2a"
+        ],
+        "Id": "TCGA-A2-A1FX",
+        "Question": "what was the patient\u2019s tnm classification?"
+    },
+    {
+        "Answer": "axillary contents",
+        "Choice": [
+            "brain",
+            "liver",
+            "axillary contents",
+            "lung"
+        ],
+        "Id": "TCGA-A2-A1FX",
+        "Question": "where was metastasis detected?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-A2-A1FX",
+        "Question": "From the slide, can you infer the histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-A2-A1FX",
+        "Question": "Can you help the pathologist to predict progesterone_receptor?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-A2-A1FX",
+        "Question": "From the slide, can you infer the vital_status?"
+    },
+    {
+        "Answer": "1119",
+        "Id": "TCGA-A2-A1FX",
+        "Question": "what is the result of survival time in the slide?"
+    },
+    {
+        "Answer": "4.6cm",
+        "Choice": [
+            "2.5cm",
+            "4.6cm",
+            "3.2cm",
+            "5.1cm"
+        ],
+        "Id": "TCGA-A2-A3XU",
+        "Question": "what was the size of the infiltrative ductal carcinoma?"
+    },
+    {
+        "Answer": "grade iii",
+        "Choice": [
+            "grade i",
+            "grade iii",
+            "grade ii",
+            "grade iv"
+        ],
+        "Id": "TCGA-A2-A3XU",
+        "Question": "what is the grade of the tumor?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "yes",
+            "no",
+            "can't determine",
+            "maybe"
+        ],
+        "Id": "TCGA-A2-A3XU",
+        "Question": "is there any evidence of dcis?"
+    },
+    {
+        "Answer": "superior margin",
+        "Choice": [
+            "inferior margin",
+            "lateral margin",
+            "medial margin",
+            "superior margin"
+        ],
+        "Id": "TCGA-A2-A3XU",
+        "Question": "in which margin(s) the surgical margins are involved?"
+    },
+    {
+        "Answer": "t2, n1mi, mx",
+        "Choice": [
+            "t2, n0, mx",
+            "t3, n1mi, m0",
+            "t1, n1mi, m0",
+            "t2, n1mi, mx"
+        ],
+        "Id": "TCGA-A2-A3XU",
+        "Question": "what is the tnm classification of the tumor?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-A2-A3XU",
+        "Question": "Can you help the pathologist to predict histological_type?"
+    },
+    {
+        "Answer": "Negative",
+        "Id": "TCGA-A2-A3XU",
+        "Question": "From the slide, can you infer the progesterone_receptor?"
+    },
+    {
+        "Answer": "Dead",
+        "Id": "TCGA-A2-A3XU",
+        "Question": "Can you help the pathologist to predict vital_status?"
+    },
+    {
+        "Answer": "912",
+        "Id": "TCGA-A2-A3XU",
+        "Question": "what is the result of survival time in the slide?"
+    },
+    {
+        "Answer": "nottingham grade ii",
+        "Choice": [
+            "nottingham grade i",
+            "nottingham grade iii",
+            "nottingham grade iv",
+            "nottingham grade ii"
+        ],
+        "Id": "TCGA-AR-A24S",
+        "Question": "what was the grade of the tumor?"
+    },
+    {
+        "Answer": "not applicable",
+        "Choice": [
+            "yes",
+            "no",
+            "insufficient information",
+            "not applicable"
+        ],
+        "Id": "TCGA-AR-A24S",
+        "Question": "was ductal carcinoma in situ present?"
+    },
+    {
+        "Answer": "1.0 x 0.9 x 0.8 cm",
+        "Choice": [
+            "2.3 x 1.5 x 1.2 cm",
+            "1.6 x 1.3 x 1.1 cm",
+            "1.3 x 1.1 x 1.0 cm",
+            "1.0 x 0.9 x 0.8 cm"
+        ],
+        "Id": "TCGA-AR-A24S",
+        "Question": "what was the size of the tumor?"
+    },
+    {
+        "Answer": "not applicable",
+        "Choice": [
+            "yes",
+            "no",
+            "insufficient information",
+            "not applicable"
+        ],
+        "Id": "TCGA-AR-A24S",
+        "Question": "did the biopsy site show any changes?"
+    },
+    {
+        "Answer": "no observable changes",
+        "Choice": [
+            "nonproliferative fibrocystic changes",
+            "proliferative fibrocystic changes",
+            "epithelial hyperplasia",
+            "no observable changes"
+        ],
+        "Id": "TCGA-AR-A24S",
+        "Question": "what type of breast tissue changes were observed?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-AR-A24S",
+        "Question": "what is histological_type according to the slide?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-AR-A24S",
+        "Question": "what is progesterone_receptor according to the slide?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-AR-A24S",
+        "Question": "what is the result of vital_status in the slide?"
+    },
+    {
+        "Answer": "2976",
+        "Id": "TCGA-AR-A24S",
+        "Question": "please predict survival time?"
+    },
+    {
+        "Answer": "nottingham grade iii",
+        "Choice": [
+            "nottingham grade i",
+            "nottingham grade ii",
+            "nottingham grade iii",
+            "nottingham grade iv"
+        ],
+        "Id": "TCGA-AR-A1AU",
+        "Question": "what was the grade of the infiltrating ductal carcinoma?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "yes",
+            "no",
+            "not mentioned",
+            "cannot be determined"
+        ],
+        "Id": "TCGA-AR-A1AU",
+        "Question": "was there any evidence of distant metastasis?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-AR-A1AU",
+        "Question": "Could you predict histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-AR-A1AU",
+        "Question": "what is progesterone_receptor according to the slide?"
+    },
+    {
+        "Answer": "2+",
+        "Id": "TCGA-AR-A1AU",
+        "Question": "Can you help the pathologist to predict her2?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-AR-A1AU",
+        "Question": "what is the result of vital_status in the slide?"
+    },
+    {
+        "Answer": "1409",
+        "Id": "TCGA-AR-A1AU",
+        "Question": "Could you predict survival time?"
+    },
+    {
+        "Answer": "3.5 cm",
+        "Choice": [
+            "1.1 cm",
+            "3 cm",
+            "3.5 cm",
+            "10 cm"
+        ],
+        "Id": "TCGA-E2-A14P",
+        "Question": "what is the size of the largest metastasis found?"
+    },
+    {
+        "Answer": "invasive ductal carcinoma",
+        "Choice": [
+            "invasive ductal carcinoma",
+            "metastatic carcinoma",
+            "solid and cribriform types",
+            "comedo necrosis"
+        ],
+        "Id": "TCGA-E2-A14P",
+        "Question": "what type of carcinoma is found in the breast lumpectomy specimen?"
+    },
+    {
+        "Answer": "3 cm",
+        "Choice": [
+            "1.1 cm",
+            "3 cm",
+            "3.5 cm",
+            "10 cm"
+        ],
+        "Id": "TCGA-E2-A14P",
+        "Question": "what is the size of the tumor found in the breast lumpectomy specimen?"
+    },
+    {
+        "Answer": "ductal carcinoma in situ",
+        "Choice": [
+            "metastatic carcinoma",
+            "comedo necrosis",
+            "solid and cribriform types",
+            "ductal carcinoma in situ"
+        ],
+        "Id": "TCGA-E2-A14P",
+        "Question": "what is present in the breast lumpectomy specimen besides invasive ductal carcinoma?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-E2-A14P",
+        "Question": "Can you help the pathologist to predict histological_type?"
+    },
+    {
+        "Answer": "Negative",
+        "Id": "TCGA-E2-A14P",
+        "Question": "From the slide, can you infer the progesterone_receptor?"
+    },
+    {
+        "Answer": "3+",
+        "Id": "TCGA-E2-A14P",
+        "Question": "what is the result of her2 in the slide?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-E2-A14P",
+        "Question": "please predict vital_status?"
+    },
+    {
+        "Answer": "1246",
+        "Id": "TCGA-E2-A14P",
+        "Question": "what is survival time according to the slide?"
+    },
+    {
+        "Answer": "2.6 cm",
+        "Choice": [
+            "1.6 cm",
+            "2.3 cm",
+            "2.6 cm",
+            "3.2 cm"
+        ],
+        "Id": "TCGA-AC-A5XS",
+        "Question": "what was the size of the invasive lobular carcinoma in the breast?"
+    },
+    {
+        "Answer": "grade 1",
+        "Choice": [
+            "grade 1",
+            "grade 2",
+            "grade 3",
+            "grade 4"
+        ],
+        "Id": "TCGA-AC-A5XS",
+        "Question": "what was the grade of the invasive lobular carcinoma?"
+    },
+    {
+        "Answer": "negative for lymph node involvement",
+        "Choice": [
+            "positive for carcinoma",
+            "negative for carcinoma",
+            "positive for lymph node involvement",
+            "negative for lymph node involvement"
+        ],
+        "Id": "TCGA-AC-A5XS",
+        "Question": "what were the results of the sentinel node biopsy?"
+    },
+    {
+        "Answer": "negative for her2, positive for estrogen and progesterone receptors",
+        "Choice": [
+            "positive for her2, negative for estrogen and progesterone receptors",
+            "negative for her2, positive for estrogen and progesterone receptors",
+            "positive for her2, positive for estrogen and progesterone receptors",
+            "negative for her2, negative for estrogen and progesterone receptors"
+        ],
+        "Id": "TCGA-AC-A5XS",
+        "Question": "what were the results of the tumor receptor testing?"
+    },
+    {
+        "Answer": "negative for carcinoma",
+        "Choice": [
+            "positive for carcinoma",
+            "negative for carcinoma",
+            "positive for lymph node involvement",
+            "negative for lymph node involvement"
+        ],
+        "Id": "TCGA-AC-A5XS",
+        "Question": "what were the margin of excision results?"
+    },
+    {
+        "Answer": "score of 6",
+        "Choice": [
+            "score of 2",
+            "score of 4",
+            "score of 6",
+            "score of 8"
+        ],
+        "Id": "TCGA-BH-A0BQ",
+        "Question": "what was the total score for the excision of the breast?"
+    },
+    {
+        "Answer": "ductal adenocarcinoma",
+        "Choice": [
+            "ductal adenocarcinoma",
+            "metastatic mammary carcinoma",
+            "tubular formation",
+            "comedo necrosis"
+        ],
+        "Id": "TCGA-BH-A0BQ",
+        "Question": "what type of tumor is the invasive component?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "yes",
+            "no",
+            "not enough information",
+            "invasive component"
+        ],
+        "Id": "TCGA-BH-A0BQ",
+        "Question": "was lymphovascular space invasion identified?"
+    },
+    {
+        "Answer": "grade 2",
+        "Choice": [
+            "grade 1",
+            "grade 2",
+            "grade 4",
+            "grade 8"
+        ],
+        "Id": "TCGA-BH-A0BQ",
+        "Question": "what was the nottingham grade for the tumor type?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "yes",
+            "no",
+            "not enough information",
+            "5 mm"
+        ],
+        "Id": "TCGA-BH-A0BQ",
+        "Question": "were the surgical margins involved by the invasive component?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-BH-A0BQ",
+        "Question": "From the slide, can you infer the histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-BH-A0BQ",
+        "Question": "what is progesterone_receptor according to the slide?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-BH-A0BQ",
+        "Question": "Could you predict vital_status?"
+    },
+    {
+        "Answer": "2255",
+        "Id": "TCGA-BH-A0BQ",
+        "Question": "what is the result of survival time in the slide?"
+    },
+    {
+        "Answer": "grade 3",
+        "Choice": [
+            "grade 1",
+            "grade 2",
+            "grade 3",
+            "grade 4"
+        ],
+        "Id": "TCGA-AR-A0TP",
+        "Question": "what was the grade of the infiltrating ductal carcinoma?"
+    },
+    {
+        "Answer": "3 x 3 x 2.5 cm",
+        "Choice": [
+            "2 x 2.5 x 3 cm",
+            "3 x 3 x 2.5 cm",
+            "3.5 x 2.5 x 3 cm",
+            "3 x 2.5 x 3.5 cm"
+        ],
+        "Id": "TCGA-AR-A0TP",
+        "Question": "what was the size of the tumor?"
+    },
+    {
+        "Answer": "less than 10%",
+        "Choice": [
+            "less than 5%",
+            "less than 10%",
+            "less than 15%",
+            "less than 20%"
+        ],
+        "Id": "TCGA-AR-A0TP",
+        "Question": "what percentage of the tumor was in situ?"
+    },
+    {
+        "Answer": "no",
+        "Choice": [
+            "yes",
+            "no",
+            "not mentioned",
+            "unclear"
+        ],
+        "Id": "TCGA-AR-A0TP",
+        "Question": "was vascular invasion detected?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-AR-A0TP",
+        "Question": "Could you predict histological_type?"
+    },
+    {
+        "Answer": "Negative",
+        "Id": "TCGA-AR-A0TP",
+        "Question": "Could you predict progesterone_receptor?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-AR-A0TP",
+        "Question": "Could you predict vital_status?"
+    },
+    {
+        "Answer": "2521",
+        "Id": "TCGA-AR-A0TP",
+        "Question": "From the slide, can you infer the survival time?"
+    },
+    {
+        "Answer": "infiltrative ductal carcinoma",
+        "Choice": [
+            "infiltrative lobular carcinoma",
+            "infiltrative ductal carcinoma",
+            "squamous cell carcinoma",
+            "adenocarcinoma"
+        ],
+        "Id": "TCGA-AN-A0XW",
+        "Question": "what is the patient's cancer diagnosis?"
+    },
+    {
+        "Answer": "2",
+        "Choice": [
+            "1",
+            "2",
+            "3",
+            "4"
+        ],
+        "Id": "TCGA-AN-A0XW",
+        "Question": "what is the patient's cancer grade?"
+    },
+    {
+        "Answer": "2",
+        "Choice": [
+            "0",
+            "1",
+            "2",
+            "3"
+        ],
+        "Id": "TCGA-AN-A0XW",
+        "Question": "what is the tumor stage?"
+    },
+    {
+        "Answer": "no treatment",
+        "Choice": [
+            "undergoing chemotherapy",
+            "undergoing radiation therapy",
+            "no treatment",
+            "not specified"
+        ],
+        "Id": "TCGA-AN-A0XW",
+        "Question": "what is the patient's treatment status?"
+    },
+    {
+        "Answer": "blood sample",
+        "Choice": [
+            "skin",
+            "heart",
+            "blood sample",
+            "liver"
+        ],
+        "Id": "TCGA-AN-A0XW",
+        "Question": "what is the anatomic site for the normal sample?"
+    },
+    {
+        "Answer": "frozen",
+        "Choice": [
+            "frozen",
+            "paraffin-embedded",
+            "stained",
+            "not specified"
+        ],
+        "Id": "TCGA-AN-A0XW",
+        "Question": "what is the specimen format for the normal sample?"
+    },
+    {
+        "Answer": "Infiltrating Ductal Carcinoma",
+        "Id": "TCGA-AN-A0XW",
+        "Question": "please predict histological_type?"
+    },
+    {
+        "Answer": "Positive",
+        "Id": "TCGA-AN-A0XW",
+        "Question": "From the slide, can you infer the progesterone_receptor?"
+    },
+    {
+        "Answer": "2+",
+        "Id": "TCGA-AN-A0XW",
+        "Question": "From the slide, can you infer the her2?"
+    },
+    {
+        "Answer": "Alive",
+        "Id": "TCGA-AN-A0XW",
+        "Question": "From the slide, can you infer the vital_status?"
+    },
+    {
+        "Answer": "170",
+        "Id": "TCGA-AN-A0XW",
+        "Question": "please predict survival time?"
+    }
+]
