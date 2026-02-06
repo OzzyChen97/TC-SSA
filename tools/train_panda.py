@@ -1,446 +1,764 @@
 """
-PANDA (Prostate cANcer graDe Assessment) Training Script
+Training script for PANDA ISUP Grade Classification.
 
-Train a MIL (Multiple Instance Learning) model for ISUP grade classification.
-ISUP grades: 0~5 (6 classes)
-
-Gleason to ISUP mapping:
-- Gleason 0 (negative) -> ISUP 0
-- Gleason 3+3=6 -> ISUP 1  
-- Gleason 3+4=7 -> ISUP 2
-- Gleason 4+3=7 -> ISUP 3
-- Gleason 4+4=8, 3+5=8, 5+3=8 -> ISUP 4
-- Gleason 4+5=9, 5+4=9, 5+5=10 -> ISUP 5
+Features:
+- 7:1:2 train/val/test split with stratification
+- Multi-class classification (6 ISUP grades: 0-5)
+- Comprehensive metrics (Accuracy, AUC, Quadratic Weighted Kappa)
+- Class-weighted loss for imbalanced data
+- Early stopping and learning rate scheduling
 
 Usage:
     python tools/train_panda.py \
+        --csv_path data/panda/train.csv \
         --features_dir data/CPathPatchFeature/panda/uni/pt_files \
-        --labels_csv data/panda/train.csv \
-        --output_dir outputs/panda_isup
-
-Before running, download the PANDA train.csv from Kaggle:
-    https://www.kaggle.com/competitions/prostate-cancer-grade-assessment/data
-    
-Or use the command:
-    kaggle competitions download -c prostate-cancer-grade-assessment -f train.csv
+        --feature_dim 1024 \
+        --model_type moe \
+        --num_slots 128 \
+        --num_epochs 100 \
+        --lr 1e-4 \
+        --output_dir outputs/panda_experiment
 """
 
-import os
 import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
 import argparse
-import numpy as np
-import pandas as pd
+import time
+from pathlib import Path
+
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from torch.utils.data import Dataset, DataLoader
-from pathlib import Path
+import torch.optim as optim
+from torch.utils.data import DataLoader
+from torch.cuda.amp import GradScaler, autocast
+import numpy as np
+import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, cohen_kappa_score
-from tqdm import tqdm
-import json
-from datetime import datetime
+from sklearn.metrics import (
+    accuracy_score, 
+    roc_auc_score, 
+    cohen_kappa_score,
+    confusion_matrix,
+    classification_report
+)
+
+from src.models import build_model
+from src.utils import (
+    set_seed,
+    setup_logger,
+    AverageMeter,
+    save_checkpoint
+)
 
 
-def parse_args():
-    parser = argparse.ArgumentParser(description='Train PANDA ISUP grading model')
-    parser.add_argument('--features_dir', type=str, required=True,
-                        help='Directory containing .pt feature files')
-    parser.add_argument('--labels_csv', type=str, required=True,
-                        help='Path to train.csv with image_id and isup_grade columns')
-    parser.add_argument('--output_dir', type=str, default='outputs/panda_isup',
-                        help='Output directory for checkpoints and logs')
-    parser.add_argument('--feature_dim', type=int, default=1024,
-                        help='Feature dimension (UNI uses 1024)')
-    parser.add_argument('--hidden_dim', type=int, default=512,
-                        help='Hidden dimension for MIL model')
-    parser.add_argument('--num_classes', type=int, default=6,
-                        help='Number of ISUP classes (0-5)')
-    parser.add_argument('--batch_size', type=int, default=32,
-                        help='Batch size for training')
-    parser.add_argument('--epochs', type=int, default=50,
-                        help='Number of training epochs')
-    parser.add_argument('--lr', type=float, default=1e-4,
-                        help='Learning rate')
-    parser.add_argument('--weight_decay', type=float, default=1e-4,
-                        help='Weight decay for optimizer')
-    parser.add_argument('--seed', type=int, default=42,
-                        help='Random seed')
-    parser.add_argument('--num_workers', type=int, default=4,
-                        help='Number of data loader workers')
-    return parser.parse_args()
-
-
-class AttentionMIL(nn.Module):
-    """Attention-based Multiple Instance Learning model for WSI classification."""
+class PANDADataset(torch.utils.data.Dataset):
+    """
+    Dataset for PANDA ISUP grading task.
     
-    def __init__(self, input_dim=1024, hidden_dim=512, num_classes=6, dropout=0.25):
-        super().__init__()
-        
-        # Feature transformation
-        self.feature_extractor = nn.Sequential(
-            nn.Linear(input_dim, hidden_dim),
-            nn.ReLU(),
-            nn.Dropout(dropout),
-        )
-        
-        # Attention mechanism
-        self.attention = nn.Sequential(
-            nn.Linear(hidden_dim, hidden_dim // 2),
-            nn.Tanh(),
-            nn.Linear(hidden_dim // 2, 1),
-        )
-        
-        # Classifier
-        self.classifier = nn.Sequential(
-            nn.Linear(hidden_dim, hidden_dim // 2),
-            nn.ReLU(),
-            nn.Dropout(dropout),
-            nn.Linear(hidden_dim // 2, num_classes),
-        )
+    Handles the specific PANDA CSV format:
+    - image_id: slide identifier
+    - isup_grade: ISUP grade (0-5)
+    """
     
-    def forward(self, x):
+    def __init__(
+        self,
+        dataframe: pd.DataFrame,
+        features_dir: str,
+        feature_dim: int = 1024
+    ):
         """
+        Initialize PANDA dataset.
+        
         Args:
-            x: (batch, num_patches, feature_dim) or (num_patches, feature_dim)
-        Returns:
-            logits: (batch, num_classes) or (num_classes,)
+            dataframe: DataFrame with columns [image_id, isup_grade]
+            features_dir: Directory containing .pt feature files
+            feature_dim: Feature dimension (default: 1024 for UNI)
         """
-        # Handle single sample case
-        if x.dim() == 2:
-            x = x.unsqueeze(0)
-            squeeze_output = True
-        else:
-            squeeze_output = False
+        self.dataframe = dataframe.reset_index(drop=True)
+        self.features_dir = features_dir
+        self.feature_dim = feature_dim
         
-        batch_size = x.size(0)
+        # Validate files exist
+        self._validate_files()
         
-        # Feature transformation
-        h = self.feature_extractor(x)  # (batch, num_patches, hidden_dim)
+    def _validate_files(self):
+        """Check that feature files exist."""
+        missing = 0
+        for idx, row in self.dataframe.iterrows():
+            path = os.path.join(self.features_dir, f"{row['image_id']}.pt")
+            if not os.path.exists(path):
+                missing += 1
         
-        # Attention weights
-        a = self.attention(h)  # (batch, num_patches, 1)
-        a = F.softmax(a, dim=1)  # Normalize across patches
-        
-        # Weighted aggregation
-        z = torch.sum(a * h, dim=1)  # (batch, hidden_dim)
-        
-        # Classification
-        logits = self.classifier(z)  # (batch, num_classes)
-        
-        if squeeze_output:
-            logits = logits.squeeze(0)
-        
-        return logits
-
-
-class PANDADataset(Dataset):
-    """Dataset for PANDA features with ISUP labels."""
-    
-    def __init__(self, slide_ids, labels, features_dir, max_patches=512):
-        self.slide_ids = slide_ids
-        self.labels = labels
-        self.features_dir = Path(features_dir)
-        self.max_patches = max_patches
+        if missing > 0:
+            print(f"Warning: {missing} feature files missing out of {len(self.dataframe)}")
     
     def __len__(self):
-        return len(self.slide_ids)
+        return len(self.dataframe)
     
     def __getitem__(self, idx):
-        slide_id = self.slide_ids[idx]
-        label = self.labels[idx]
+        row = self.dataframe.iloc[idx]
+        image_id = row['image_id']
+        label = row['isup_grade']
         
         # Load features
-        pt_path = self.features_dir / f"{slide_id}.pt"
+        feature_path = os.path.join(self.features_dir, f"{image_id}.pt")
+        try:
+            data = torch.load(feature_path, map_location='cpu')
+        except Exception as e:
+            raise RuntimeError(f"Error loading {feature_path}: {e}")
         
-        if not pt_path.exists():
-            # Return empty tensor if file not found
-            return torch.zeros(1, 1024), label, slide_id
+        # Handle different formats
+        if isinstance(data, dict):
+            if 'features' in data:
+                features = data['features']
+            elif 'feat' in data:
+                features = data['feat']
+            else:
+                keys = [k for k, v in data.items() if isinstance(v, torch.Tensor)]
+                features = data[keys[0]] if keys else None
+        else:
+            features = data
         
-        features = torch.load(pt_path, map_location='cpu')
+        # Ensure 2D
+        if features.dim() == 1:
+            features = features.unsqueeze(0)
+        elif features.dim() == 3 and features.size(0) == 1:
+            features = features.squeeze(0)
         
-        if isinstance(features, dict):
-            features = features.get('features', features.get('feature', list(features.values())[0]))
+        label = torch.tensor(label, dtype=torch.long)
         
-        # Random sample if too many patches
-        if features.size(0) > self.max_patches:
-            indices = torch.randperm(features.size(0))[:self.max_patches]
-            features = features[indices]
-        
-        return features, label, slide_id
+        return features, label, image_id
 
 
 def collate_fn(batch):
-    """Custom collate function for variable-length sequences."""
-    features, labels, slide_ids = zip(*batch)
+    """Collate function for variable-length sequences."""
+    features_list = []
+    labels_list = []
+    ids_list = []
     
-    # Pad sequences to max length in batch
-    max_len = max(f.size(0) for f in features)
-    feature_dim = features[0].size(1)
+    for features, label, slide_id in batch:
+        features_list.append(features)
+        labels_list.append(label)
+        ids_list.append(slide_id)
     
-    padded_features = torch.zeros(len(features), max_len, feature_dim)
-    attention_masks = torch.zeros(len(features), max_len)
+    labels_tensor = torch.stack(labels_list)
     
-    for i, f in enumerate(features):
-        padded_features[i, :f.size(0)] = f
-        attention_masks[i, :f.size(0)] = 1
-    
-    labels = torch.tensor(labels, dtype=torch.long)
-    
-    return padded_features, labels, attention_masks, list(slide_ids)
+    return features_list, labels_tensor, ids_list
 
 
-def train_epoch(model, dataloader, optimizer, criterion, device):
+class EarlyStopping:
+    """Early stopping with patience."""
+    
+    def __init__(self, patience=10, min_delta=0.0, mode='max'):
+        self.patience = patience
+        self.min_delta = min_delta
+        self.mode = mode
+        self.counter = 0
+        self.best_score = None
+        self.early_stop = False
+        
+    def __call__(self, score):
+        if self.best_score is None:
+            self.best_score = score
+            return False
+        
+        if self.mode == 'max':
+            improved = score > self.best_score + self.min_delta
+        else:
+            improved = score < self.best_score - self.min_delta
+            
+        if improved:
+            self.best_score = score
+            self.counter = 0
+        else:
+            self.counter += 1
+            if self.counter >= self.patience:
+                self.early_stop = True
+                return True
+        return False
+
+
+def compute_multiclass_metrics(labels, preds, probs, num_classes=6):
+    """
+    Compute comprehensive metrics for multi-class classification.
+    
+    Args:
+        labels: Ground truth labels
+        preds: Predicted class labels
+        probs: Predicted probabilities [N, num_classes]
+        num_classes: Number of classes
+    
+    Returns:
+        Dictionary of metrics
+    """
+    # Accuracy
+    accuracy = accuracy_score(labels, preds)
+    
+    # Quadratic Weighted Kappa (important for ordinal ISUP grades)
+    kappa = cohen_kappa_score(labels, preds, weights='quadratic')
+    
+    # Multi-class AUC (one-vs-rest)
+    try:
+        # Handle case where some classes might be missing
+        if probs.shape[1] >= 2:
+            auc = roc_auc_score(
+                labels, probs, 
+                multi_class='ovr', 
+                average='macro',
+                labels=list(range(num_classes))
+            )
+        else:
+            auc = 0.0
+    except ValueError:
+        auc = 0.0
+    
+    # Per-class accuracy from confusion matrix
+    cm = confusion_matrix(labels, preds, labels=list(range(num_classes)))
+    per_class_acc = cm.diagonal() / (cm.sum(axis=1) + 1e-10)
+    
+    return {
+        'accuracy': accuracy,
+        'kappa': kappa,
+        'auc': auc,
+        'per_class_acc': per_class_acc,
+        'confusion_matrix': cm
+    }
+
+
+def parse_args():
+    """Parse command line arguments."""
+    parser = argparse.ArgumentParser(
+        description='Train PANDA ISUP Grade Classifier'
+    )
+    
+    # Data parameters
+    parser.add_argument('--csv_path', type=str, required=True,
+                        help='Path to PANDA CSV file')
+    parser.add_argument('--features_dir', type=str, required=True,
+                        help='Directory containing .pt feature files')
+    parser.add_argument('--feature_dim', type=int, default=1024,
+                        help='Feature dimension (default: 1024)')
+    
+    # Split parameters
+    parser.add_argument('--train_ratio', type=float, default=0.7,
+                        help='Training set ratio (default: 0.7)')
+    parser.add_argument('--val_ratio', type=float, default=0.1,
+                        help='Validation set ratio (default: 0.1)')
+    parser.add_argument('--test_ratio', type=float, default=0.2,
+                        help='Test set ratio (default: 0.2)')
+    
+    # Model parameters
+    parser.add_argument('--model_type', type=str, default='moe',
+                        choices=['moe', 'mil_baseline'],
+                        help='Model architecture type')
+    parser.add_argument('--num_slots', type=int, default=128,
+                        help='Number of MoE expert slots (default: 128)')
+    parser.add_argument('--num_classes', type=int, default=6,
+                        help='Number of ISUP grades (default: 6)')
+    
+    # Training parameters
+    parser.add_argument('--num_epochs', type=int, default=100,
+                        help='Number of training epochs (default: 100)')
+    parser.add_argument('--lr', type=float, default=1e-4,
+                        help='Learning rate (default: 1e-4)')
+    parser.add_argument('--weight_decay', type=float, default=1e-5,
+                        help='Weight decay (default: 1e-5)')
+    parser.add_argument('--aux_loss_weight', type=float, default=0.01,
+                        help='Auxiliary loss weight (default: 0.01)')
+    parser.add_argument('--grad_accum_steps', type=int, default=8,
+                        help='Gradient accumulation steps (default: 8)')
+    parser.add_argument('--early_stopping_patience', type=int, default=15,
+                        help='Early stopping patience (default: 15)')
+    parser.add_argument('--use_class_weights', action='store_true',
+                        help='Use class weights for imbalanced data')
+    
+    # Optimizer settings
+    parser.add_argument('--optimizer', type=str, default='adamw',
+                        choices=['adam', 'adamw', 'sgd'],
+                        help='Optimizer type (default: adamw)')
+    parser.add_argument('--scheduler', type=str, default='plateau',
+                        choices=['cosine', 'step', 'plateau', 'none'],
+                        help='LR scheduler (default: plateau)')
+    parser.add_argument('--lr_patience', type=int, default=5,
+                        help='Patience for ReduceLROnPlateau (default: 5)')
+    parser.add_argument('--lr_factor', type=float, default=0.5,
+                        help='Factor to reduce LR by (default: 0.5)')
+    parser.add_argument('--min_lr', type=float, default=1e-6,
+                        help='Minimum learning rate (default: 1e-6)')
+    
+    # System parameters
+    parser.add_argument('--seed', type=int, default=42,
+                        help='Random seed (default: 42)')
+    parser.add_argument('--num_workers', type=int, default=4,
+                        help='Data loading workers (default: 4)')
+    parser.add_argument('--use_amp', action='store_true',
+                        help='Use Automatic Mixed Precision')
+    parser.add_argument('--device', type=str, default='cuda',
+                        help='Device to use (default: cuda)')
+    
+    # Logging
+    parser.add_argument('--output_dir', type=str, default='./outputs/panda',
+                        help='Output directory')
+    parser.add_argument('--log_interval', type=int, default=10,
+                        help='Log every N batches (default: 10)')
+    parser.add_argument('--save_freq', type=int, default=10,
+                        help='Save checkpoint every N epochs (default: 10)')
+    
+    return parser.parse_args()
+
+
+def create_data_splits(csv_path, features_dir, train_ratio=0.7, val_ratio=0.1, test_ratio=0.2, seed=42):
+    """
+    Create stratified train/val/test splits.
+    
+    Args:
+        csv_path: Path to PANDA CSV file
+        features_dir: Directory containing feature files
+        train_ratio: Training set ratio
+        val_ratio: Validation set ratio
+        test_ratio: Test set ratio
+        seed: Random seed
+    
+    Returns:
+        train_df, val_df, test_df
+    """
+    assert abs(train_ratio + val_ratio + test_ratio - 1.0) < 1e-6, \
+        "Ratios must sum to 1.0"
+    
+    # Load CSV
+    df = pd.read_csv(csv_path)
+    original_count = len(df)
+    
+    # Filter out samples without feature files
+    print(f"Filtering samples with missing feature files...")
+    valid_mask = df['image_id'].apply(
+        lambda x: os.path.exists(os.path.join(features_dir, f"{x}.pt"))
+    )
+    df = df[valid_mask].reset_index(drop=True)
+    
+    filtered_count = len(df)
+    print(f"Filtered: {original_count} -> {filtered_count} samples ({original_count - filtered_count} missing)")
+    
+    if filtered_count == 0:
+        raise ValueError("No samples with valid feature files found!")
+    
+    # First split: train vs (val + test)
+    train_df, temp_df = train_test_split(
+        df,
+        test_size=(val_ratio + test_ratio),
+        random_state=seed,
+        stratify=df['isup_grade']
+    )
+    
+    # Second split: val vs test
+    val_relative_ratio = val_ratio / (val_ratio + test_ratio)
+    val_df, test_df = train_test_split(
+        temp_df,
+        test_size=(1 - val_relative_ratio),
+        random_state=seed,
+        stratify=temp_df['isup_grade']
+    )
+    
+    return train_df, val_df, test_df
+
+
+def train_epoch(model, dataloader, criterion, optimizer, scaler, device, args, epoch, logger):
     """Train for one epoch."""
     model.train()
-    total_loss = 0
-    all_preds = []
-    all_labels = []
     
-    for features, labels, masks, _ in tqdm(dataloader, desc='Training'):
-        features = features.to(device)
+    loss_meter = AverageMeter()
+    ce_loss_meter = AverageMeter()
+    aux_loss_meter = AverageMeter()
+    
+    all_labels = []
+    all_preds = []
+    all_probs = []
+    
+    optimizer.zero_grad()
+    start_time = time.time()
+    
+    for batch_idx, (features_list, labels, slide_ids) in enumerate(dataloader):
         labels = labels.to(device)
         
+        for i, features in enumerate(features_list):
+            features = features.unsqueeze(0).to(device)
+            label = labels[i].unsqueeze(0)
+            
+            if args.use_amp:
+                with autocast():
+                    logits, aux_loss = model(features)
+                    ce_loss = criterion(logits, label)
+                    total_loss = ce_loss + args.aux_loss_weight * aux_loss
+                    total_loss = total_loss / args.grad_accum_steps
+            else:
+                logits, aux_loss = model(features)
+                ce_loss = criterion(logits, label)
+                total_loss = ce_loss + args.aux_loss_weight * aux_loss
+                total_loss = total_loss / args.grad_accum_steps
+            
+            if args.use_amp:
+                scaler.scale(total_loss).backward()
+            else:
+                total_loss.backward()
+            
+            loss_meter.update(total_loss.item() * args.grad_accum_steps, 1)
+            ce_loss_meter.update(ce_loss.item(), 1)
+            aux_loss_meter.update(aux_loss.item(), 1)
+            
+            probs = torch.softmax(logits, dim=1)
+            pred_class = torch.argmax(probs, dim=1)
+            
+            all_labels.append(label.cpu().numpy())
+            all_preds.append(pred_class.cpu().numpy())
+            all_probs.append(probs.detach().cpu().numpy())
+        
+        if (batch_idx + 1) % args.grad_accum_steps == 0:
+            if args.use_amp:
+                scaler.step(optimizer)
+                scaler.update()
+            else:
+                optimizer.step()
+            optimizer.zero_grad()
+        
+        if (batch_idx + 1) % args.log_interval == 0:
+            logger.info(
+                f'Epoch [{epoch}] Batch [{batch_idx + 1}/{len(dataloader)}] '
+                f'Loss: {loss_meter.avg:.4f} CE: {ce_loss_meter.avg:.4f} '
+                f'Aux: {aux_loss_meter.avg:.4f}'
+            )
+    
+    # Handle remaining gradients
+    if len(dataloader) % args.grad_accum_steps != 0:
+        if args.use_amp:
+            scaler.step(optimizer)
+            scaler.update()
+        else:
+            optimizer.step()
         optimizer.zero_grad()
-        logits = model(features)
-        loss = criterion(logits, labels)
-        
-        loss.backward()
-        optimizer.step()
-        
-        total_loss += loss.item()
-        preds = logits.argmax(dim=1).cpu().numpy()
-        all_preds.extend(preds)
-        all_labels.extend(labels.cpu().numpy())
     
-    avg_loss = total_loss / len(dataloader)
-    accuracy = accuracy_score(all_labels, all_preds)
-    kappa = cohen_kappa_score(all_labels, all_preds, weights='quadratic')
+    all_labels = np.concatenate(all_labels)
+    all_preds = np.concatenate(all_preds)
+    all_probs = np.vstack(all_probs)
     
-    return avg_loss, accuracy, kappa
+    metrics = compute_multiclass_metrics(all_labels, all_preds, all_probs, args.num_classes)
+    epoch_time = time.time() - start_time
+    
+    logger.info(
+        f'Epoch [{epoch}] Training - '
+        f'Loss: {loss_meter.avg:.4f} Acc: {metrics["accuracy"]:.4f} '
+        f'Kappa: {metrics["kappa"]:.4f} AUC: {metrics["auc"]:.4f} '
+        f'Time: {epoch_time:.2f}s'
+    )
+    
+    return {
+        'loss': loss_meter.avg,
+        'ce_loss': ce_loss_meter.avg,
+        'aux_loss': aux_loss_meter.avg,
+        **metrics
+    }
 
 
-def evaluate(model, dataloader, criterion, device):
-    """Evaluate model on a dataset."""
+@torch.no_grad()
+def validate(model, dataloader, criterion, device, args, epoch, logger, split_name='Validation'):
+    """Validate the model."""
     model.eval()
-    total_loss = 0
-    all_preds = []
+    
+    loss_meter = AverageMeter()
+    ce_loss_meter = AverageMeter()
+    aux_loss_meter = AverageMeter()
+    
     all_labels = []
+    all_preds = []
+    all_probs = []
     
-    with torch.no_grad():
-        for features, labels, masks, _ in tqdm(dataloader, desc='Evaluating'):
-            features = features.to(device)
-            labels = labels.to(device)
+    for features_list, labels, slide_ids in dataloader:
+        labels = labels.to(device)
+        
+        for i, features in enumerate(features_list):
+            features = features.unsqueeze(0).to(device)
+            label = labels[i].unsqueeze(0)
             
-            logits = model(features)
-            loss = criterion(logits, labels)
+            if args.use_amp:
+                with autocast():
+                    logits, aux_loss = model(features)
+                    ce_loss = criterion(logits, label)
+                    total_loss = ce_loss + args.aux_loss_weight * aux_loss
+            else:
+                logits, aux_loss = model(features)
+                ce_loss = criterion(logits, label)
+                total_loss = ce_loss + args.aux_loss_weight * aux_loss
             
-            total_loss += loss.item()
-            preds = logits.argmax(dim=1).cpu().numpy()
-            all_preds.extend(preds)
-            all_labels.extend(labels.cpu().numpy())
+            loss_meter.update(total_loss.item(), 1)
+            ce_loss_meter.update(ce_loss.item(), 1)
+            aux_loss_meter.update(aux_loss.item(), 1)
+            
+            probs = torch.softmax(logits, dim=1)
+            pred_class = torch.argmax(probs, dim=1)
+            
+            all_labels.append(label.cpu().numpy())
+            all_preds.append(pred_class.cpu().numpy())
+            all_probs.append(probs.cpu().numpy())
     
-    avg_loss = total_loss / len(dataloader)
-    accuracy = accuracy_score(all_labels, all_preds)
-    kappa = cohen_kappa_score(all_labels, all_preds, weights='quadratic')
+    all_labels = np.concatenate(all_labels)
+    all_preds = np.concatenate(all_preds)
+    all_probs = np.vstack(all_probs)
     
-    return avg_loss, accuracy, kappa, all_preds, all_labels
+    metrics = compute_multiclass_metrics(all_labels, all_preds, all_probs, args.num_classes)
+    
+    logger.info(
+        f'Epoch [{epoch}] {split_name} - '
+        f'Loss: {loss_meter.avg:.4f} Acc: {metrics["accuracy"]:.4f} '
+        f'Kappa: {metrics["kappa"]:.4f} AUC: {metrics["auc"]:.4f}'
+    )
+    
+    # Print per-class accuracy
+    logger.info(f"Per-class Accuracy: {[f'{acc:.3f}' for acc in metrics['per_class_acc']]}")
+    
+    return {
+        'loss': loss_meter.avg,
+        'ce_loss': ce_loss_meter.avg,
+        'aux_loss': aux_loss_meter.avg,
+        **metrics
+    }
 
 
 def main():
+    """Main training function."""
     args = parse_args()
     
-    # Set random seed
-    torch.manual_seed(args.seed)
-    np.random.seed(args.seed)
+    # Set seed
+    set_seed(args.seed)
     
     # Create output directory
-    os.makedirs(args.output_dir, exist_ok=True)
+    Path(args.output_dir).mkdir(parents=True, exist_ok=True)
     
-    # Device
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print(f"Using device: {device}")
+    # Setup logger
+    logger = setup_logger(log_file=os.path.join(args.output_dir, 'train.log'))
     
-    # Load labels
-    print(f"Loading labels from {args.labels_csv}")
-    df = pd.read_csv(args.labels_csv)
+    logger.info("=" * 60)
+    logger.info("PANDA ISUP Grade Classification Training")
+    logger.info("=" * 60)
+    logger.info("Configuration:")
+    for arg, value in vars(args).items():
+        logger.info(f"  {arg}: {value}")
     
-    # Check required columns
-    if 'image_id' not in df.columns:
-        raise ValueError("CSV must have 'image_id' column")
-    if 'isup_grade' not in df.columns:
-        raise ValueError("CSV must have 'isup_grade' column")
+    # Device setup
+    device = torch.device(args.device if torch.cuda.is_available() else 'cpu')
+    logger.info(f"Using device: {device}")
     
-    # Check which slides have features
-    features_dir = Path(args.features_dir)
-    available_files = set(f.stem for f in features_dir.glob('*.pt'))
-    
-    # Filter to slides with available features
-    df_filtered = df[df['image_id'].isin(available_files)].copy()
-    print(f"Found {len(df_filtered)} slides with features (out of {len(df)})")
-    
-    if len(df_filtered) == 0:
-        raise ValueError("No matching slides found between labels and features!")
-    
-    # Print class distribution
-    print("\nISUP Grade Distribution:")
-    print(df_filtered['isup_grade'].value_counts().sort_index())
-    
-    # Split data: 70% train, 10% val, 20% test (7:1:2 ratio)
-    slide_ids = df_filtered['image_id'].values
-    labels = df_filtered['isup_grade'].values
-    
-    # First split: 80% train+val, 20% test
-    train_val_ids, test_ids, train_val_labels, test_labels = train_test_split(
-        slide_ids, labels, test_size=0.2, stratify=labels, random_state=args.seed
+    # Create data splits
+    logger.info("\nCreating data splits...")
+    train_df, val_df, test_df = create_data_splits(
+        args.csv_path,
+        args.features_dir,
+        train_ratio=args.train_ratio,
+        val_ratio=args.val_ratio,
+        test_ratio=args.test_ratio,
+        seed=args.seed
     )
     
-    # Second split: 87.5% train, 12.5% val (from train+val = 70% + 10%)
-    train_ids, val_ids, train_labels, val_labels = train_test_split(
-        train_val_ids, train_val_labels, test_size=0.125, 
-        stratify=train_val_labels, random_state=args.seed
-    )
+    logger.info(f"Train samples: {len(train_df)}")
+    logger.info(f"Val samples: {len(val_df)}")
+    logger.info(f"Test samples: {len(test_df)}")
     
-    print(f"\nData split:")
-    print(f"  Train: {len(train_ids)} slides")
-    print(f"  Val:   {len(val_ids)} slides")
-    print(f"  Test:  {len(test_ids)} slides")
+    # Print label distributions
+    logger.info("\nTrain label distribution:")
+    logger.info(f"{train_df['isup_grade'].value_counts().sort_index().to_dict()}")
+    logger.info("\nVal label distribution:")
+    logger.info(f"{val_df['isup_grade'].value_counts().sort_index().to_dict()}")
+    logger.info("\nTest label distribution:")
+    logger.info(f"{test_df['isup_grade'].value_counts().sort_index().to_dict()}")
+    
+    # Save splits to CSV for reproducibility
+    train_df.to_csv(os.path.join(args.output_dir, 'train_split.csv'), index=False)
+    val_df.to_csv(os.path.join(args.output_dir, 'val_split.csv'), index=False)
+    test_df.to_csv(os.path.join(args.output_dir, 'test_split.csv'), index=False)
+    logger.info("\nSaved data splits to output directory")
     
     # Create datasets
-    train_dataset = PANDADataset(train_ids, train_labels, args.features_dir)
-    val_dataset = PANDADataset(val_ids, val_labels, args.features_dir)
-    test_dataset = PANDADataset(test_ids, test_labels, args.features_dir)
+    train_dataset = PANDADataset(train_df, args.features_dir, args.feature_dim)
+    val_dataset = PANDADataset(val_df, args.features_dir, args.feature_dim)
+    test_dataset = PANDADataset(test_df, args.features_dir, args.feature_dim)
     
+    # Create dataloaders
     train_loader = DataLoader(
-        train_dataset, batch_size=args.batch_size, shuffle=True,
-        num_workers=args.num_workers, collate_fn=collate_fn, pin_memory=True
+        train_dataset,
+        batch_size=1,
+        shuffle=True,
+        num_workers=args.num_workers,
+        collate_fn=collate_fn,
+        pin_memory=True
     )
+    
     val_loader = DataLoader(
-        val_dataset, batch_size=args.batch_size, shuffle=False,
-        num_workers=args.num_workers, collate_fn=collate_fn, pin_memory=True
+        val_dataset,
+        batch_size=1,
+        shuffle=False,
+        num_workers=args.num_workers,
+        collate_fn=collate_fn,
+        pin_memory=True
     )
+    
     test_loader = DataLoader(
-        test_dataset, batch_size=args.batch_size, shuffle=False,
-        num_workers=args.num_workers, collate_fn=collate_fn, pin_memory=True
+        test_dataset,
+        batch_size=1,
+        shuffle=False,
+        num_workers=args.num_workers,
+        collate_fn=collate_fn,
+        pin_memory=True
     )
     
-    # Create model
-    model = AttentionMIL(
+    # Build model
+    logger.info("\nBuilding model...")
+    model = build_model(
+        model_type=args.model_type,
         input_dim=args.feature_dim,
-        hidden_dim=args.hidden_dim,
+        num_slots=args.num_slots,
         num_classes=args.num_classes
-    ).to(device)
-    
-    print(f"\nModel parameters: {sum(p.numel() for p in model.parameters()):,}")
-    
-    # Loss and optimizer
-    criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.AdamW(
-        model.parameters(), lr=args.lr, weight_decay=args.weight_decay
     )
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-        optimizer, T_max=args.epochs, eta_min=1e-6
+    model = model.to(device)
+    
+    num_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    logger.info(f"Model has {num_params:,} trainable parameters")
+    
+    # Loss function
+    if args.use_class_weights:
+        class_counts = train_df['isup_grade'].value_counts().sort_index().values
+        class_weights = torch.tensor(
+            len(train_df) / (args.num_classes * class_counts),
+            dtype=torch.float32
+        ).to(device)
+        logger.info(f"Using class weights: {class_weights.cpu().numpy()}")
+        criterion = nn.CrossEntropyLoss(weight=class_weights)
+    else:
+        criterion = nn.CrossEntropyLoss()
+    
+    # Optimizer
+    if args.optimizer == 'adam':
+        optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+    elif args.optimizer == 'adamw':
+        optimizer = optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+    elif args.optimizer == 'sgd':
+        optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=0.9, weight_decay=args.weight_decay)
+    
+    # Scheduler
+    scheduler = None
+    if args.scheduler == 'cosine':
+        scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.num_epochs, eta_min=args.min_lr)
+    elif args.scheduler == 'step':
+        scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=args.num_epochs // 3, gamma=0.1)
+    elif args.scheduler == 'plateau':
+        scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+            optimizer, mode='max', factor=args.lr_factor,
+            patience=args.lr_patience, min_lr=args.min_lr
+        )
+        logger.info(f"Using ReduceLROnPlateau: patience={args.lr_patience}, factor={args.lr_factor}")
+    
+    # Mixed precision scaler
+    scaler = GradScaler() if args.use_amp else None
+    
+    # Early stopping
+    early_stopper = EarlyStopping(
+        patience=args.early_stopping_patience,
+        min_delta=0.0,
+        mode='max'
     )
+    logger.info(f"Early stopping: patience={args.early_stopping_patience}")
     
     # Training loop
-    best_val_kappa = -1
-    best_epoch = 0
-    history = {'train_loss': [], 'train_acc': [], 'train_kappa': [],
-               'val_loss': [], 'val_acc': [], 'val_kappa': []}
+    logger.info("\n" + "=" * 60)
+    logger.info("Starting training...")
+    logger.info("=" * 60)
     
-    print("\nStarting training...")
-    for epoch in range(args.epochs):
+    best_val_kappa = -1.0
+    best_val_auc = 0.0
+    
+    for epoch in range(1, args.num_epochs + 1):
         # Train
-        train_loss, train_acc, train_kappa = train_epoch(
-            model, train_loader, optimizer, criterion, device
+        train_metrics = train_epoch(
+            model, train_loader, criterion, optimizer,
+            scaler, device, args, epoch, logger
         )
         
         # Validate
-        val_loss, val_acc, val_kappa, _, _ = evaluate(
-            model, val_loader, criterion, device
+        val_metrics = validate(
+            model, val_loader, criterion, device, args, epoch, logger, 'Validation'
         )
         
+        # Save best model (using Kappa as primary metric for ordinal classification)
+        if val_metrics['kappa'] > best_val_kappa:
+            best_val_kappa = val_metrics['kappa']
+            best_val_auc = val_metrics['auc']
+            save_checkpoint(
+                {
+                    'epoch': epoch,
+                    'model_state_dict': model.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict(),
+                    'train_metrics': train_metrics,
+                    'val_metrics': val_metrics,
+                    'args': vars(args)
+                },
+                filename=os.path.join(args.output_dir, 'best_model.pth')
+            )
+            logger.info(f"Saved best model with Kappa: {best_val_kappa:.4f}")
+        
         # Update scheduler
-        scheduler.step()
+        if scheduler:
+            if args.scheduler == 'plateau':
+                scheduler.step(val_metrics['kappa'])
+                current_lr = optimizer.param_groups[0]['lr']
+                logger.info(f"Current learning rate: {current_lr:.6f}")
+            else:
+                scheduler.step()
         
-        # Save history
-        history['train_loss'].append(train_loss)
-        history['train_acc'].append(train_acc)
-        history['train_kappa'].append(train_kappa)
-        history['val_loss'].append(val_loss)
-        history['val_acc'].append(val_acc)
-        history['val_kappa'].append(val_kappa)
+        # Early stopping
+        if early_stopper(val_metrics['kappa']):
+            logger.info(f"Early stopping triggered at epoch {epoch}")
+            break
+        else:
+            logger.info(f"Early stopping counter: {early_stopper.counter}/{args.early_stopping_patience}")
         
-        print(f"\nEpoch {epoch+1}/{args.epochs}")
-        print(f"  Train - Loss: {train_loss:.4f}, Acc: {train_acc:.4f}, Kappa: {train_kappa:.4f}")
-        print(f"  Val   - Loss: {val_loss:.4f}, Acc: {val_acc:.4f}, Kappa: {val_kappa:.4f}")
-        
-        # Save best model
-        if val_kappa > best_val_kappa:
-            best_val_kappa = val_kappa
-            best_epoch = epoch + 1
-            torch.save({
-                'epoch': epoch + 1,
-                'model_state_dict': model.state_dict(),
-                'optimizer_state_dict': optimizer.state_dict(),
-                'val_kappa': val_kappa,
-                'val_acc': val_acc,
-            }, os.path.join(args.output_dir, 'best_model.pt'))
-            print(f"  >> New best model saved! (Kappa: {val_kappa:.4f})")
+        # Save periodic checkpoints
+        if epoch % args.save_freq == 0:
+            save_checkpoint(
+                {
+                    'epoch': epoch,
+                    'model_state_dict': model.state_dict(),
+                    'optimizer_state_dict': optimizer.state_dict(),
+                    'train_metrics': train_metrics,
+                    'val_metrics': val_metrics,
+                    'args': vars(args)
+                },
+                filename=os.path.join(args.output_dir, f'checkpoint_epoch_{epoch}.pth')
+            )
     
-    # Load best model for testing
-    print(f"\n{'='*60}")
-    print(f"Training complete! Best epoch: {best_epoch}")
-    print(f"Loading best model for testing...")
+    # Final evaluation on test set
+    logger.info("\n" + "=" * 60)
+    logger.info("Final Evaluation on Test Set")
+    logger.info("=" * 60)
     
-    checkpoint = torch.load(os.path.join(args.output_dir, 'best_model.pt'))
-    model.load_state_dict(checkpoint['model_state_dict'])
+    # Load best model
+    best_checkpoint = torch.load(os.path.join(args.output_dir, 'best_model.pth'))
+    model.load_state_dict(best_checkpoint['model_state_dict'])
     
-    # Test
-    test_loss, test_acc, test_kappa, test_preds, test_labels = evaluate(
-        model, test_loader, criterion, device
+    test_metrics = validate(
+        model, test_loader, criterion, device, args, 0, logger, 'Test'
     )
     
-    print(f"\nTest Results:")
-    print(f"  Loss: {test_loss:.4f}")
-    print(f"  Accuracy: {test_acc:.4f}")
-    print(f"  Quadratic Kappa: {test_kappa:.4f}")
+    logger.info("\n" + "=" * 60)
+    logger.info("Training Complete!")
+    logger.info("=" * 60)
+    logger.info(f"Best Validation Kappa: {best_val_kappa:.4f}")
+    logger.info(f"Best Validation AUC: {best_val_auc:.4f}")
+    logger.info(f"Test Accuracy: {test_metrics['accuracy']:.4f}")
+    logger.info(f"Test Kappa: {test_metrics['kappa']:.4f}")
+    logger.info(f"Test AUC: {test_metrics['auc']:.4f}")
     
-    # Classification report
-    print("\nClassification Report:")
-    print(classification_report(test_labels, test_preds, 
-                                target_names=[f'ISUP {i}' for i in range(args.num_classes)]))
-    
-    # Confusion matrix
-    cm = confusion_matrix(test_labels, test_preds)
-    print("\nConfusion Matrix:")
-    print(cm)
-    
-    # Save results
-    results = {
-        'test_loss': test_loss,
-        'test_accuracy': test_acc,
-        'test_kappa': test_kappa,
-        'best_epoch': best_epoch,
-        'best_val_kappa': best_val_kappa,
-        'history': history,
-        'confusion_matrix': cm.tolist(),
-        'config': vars(args)
-    }
-    
-    with open(os.path.join(args.output_dir, 'results.json'), 'w') as f:
-        json.dump(results, f, indent=2)
-    
-    # Save split information
-    splits = {
-        'train': train_ids.tolist(),
-        'val': val_ids.tolist(),
-        'test': test_ids.tolist()
-    }
-    with open(os.path.join(args.output_dir, 'splits.json'), 'w') as f:
-        json.dump(splits, f, indent=2)
-    
-    print(f"\nResults saved to {args.output_dir}")
+    # Print confusion matrix
+    logger.info("\nTest Set Confusion Matrix:")
+    logger.info(f"\n{test_metrics['confusion_matrix']}")
 
 
 if __name__ == '__main__':

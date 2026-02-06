@@ -43,40 +43,67 @@ from vqa.src.vqa_model import MoE_Qwen_VQA
 
 def find_feature_file(slide_id, features_dir, feature_suffix=1024):
     """
-    Find the feature file for a given slide ID in the GTEx-TCGA-Embeddings directory.
+    Find the feature file for a given slide ID.
+    
+    Supports multiple directory structures:
+    1. GTEx-TCGA-Embeddings: features_dir/TCGA-XXX/TCGA-XXX/slide_id.*_N_suffix.npy
+    2. SlideChat/Feat: features_dir/TCGA_XXX_feat_conch/slide_id.csv
     
     Args:
         slide_id: Slide ID like 'TCGA-05-4244-01Z-00-DX1'
         features_dir: Base directory for features
-        feature_suffix: Suffix in filename (512 or 1024) - refers to patch size, not feature dim
+        feature_suffix: Preferred suffix (1024 or 512), will fallback to alternative if not found
     
     Returns:
         Path to feature file or None if not found
     """
-    # Search in all subdirectories
     subdirs = ['TCGA-LUNG', 'TCGA-GBM', 'TCGA-BR', 'TCGA-BLCA', 'TCGA-COAD', 
                'TCGA-HNSC', 'TCGA-LGG', 'TCGA-SKCM', 'TCGA-Rest']
     
-    for subdir in subdirs:
-        # Pattern: slide_id.*_0_1024.npy or slide_id.*_1_1024.npy
-        pattern = os.path.join(features_dir, subdir, subdir, f"{slide_id}.*_*_{feature_suffix}.npy")
-        matches = glob.glob(pattern)
+    # Try preferred suffix first, then fallback to alternative
+    suffixes_to_try = [feature_suffix]
+    if feature_suffix == 1024:
+        suffixes_to_try.append(512)  # Fallback to 512
+    elif feature_suffix == 512:
+        suffixes_to_try.append(1024)  # Fallback to 1024
+    
+    for suffix in suffixes_to_try:
+        # Method 1: GTEx-TCGA-Embeddings format (*.npy) - specific subdirs
+        for subdir in subdirs:
+            # Pattern: slide_id.*_0_1024.npy or slide_id.*_1_1024.npy
+            pattern = os.path.join(features_dir, subdir, subdir, f"{slide_id}.*_*_{suffix}.npy")
+            matches = glob.glob(pattern)
+            
+            if matches:
+                # Prefer _0_ version (usually the first/main embedding with more patches)
+                for m in matches:
+                    if '_0_' in m:
+                        return m
+                return matches[0]
         
+        # Also try direct pattern for GTEx format (any subdir)
+        pattern = os.path.join(features_dir, "*", "*", f"{slide_id}.*_*_{suffix}.npy")
+        matches = glob.glob(pattern)
         if matches:
-            # Prefer _0_ version (usually the first/main embedding with more patches)
             for m in matches:
                 if '_0_' in m:
                     return m
             return matches[0]
     
-    # Also try direct pattern
-    pattern = os.path.join(features_dir, "*", "*", f"{slide_id}.*_*_{feature_suffix}.npy")
-    matches = glob.glob(pattern)
-    if matches:
-        for m in matches:
-            if '_0_' in m:
-                return m
-        return matches[0]
+    # Method 2: SlideChat/Feat format (*.csv) - TCGA_XXX_feat_conch/slide_id.csv
+    feat_dirs_pattern = os.path.join(features_dir, "TCGA_*_feat_*")
+    feat_dirs = glob.glob(feat_dirs_pattern)
+    
+    for feat_dir in feat_dirs:
+        csv_path = os.path.join(feat_dir, f"{slide_id}.csv")
+        if os.path.exists(csv_path):
+            return csv_path
+    
+    # Method 3: Direct file in features_dir (any format)
+    for ext in ['.csv', '.npy', '.pt', '.pth']:
+        direct_path = os.path.join(features_dir, f"{slide_id}{ext}")
+        if os.path.exists(direct_path):
+            return direct_path
     
     return None
 
@@ -151,9 +178,22 @@ class BenchmarkDatasetCSV(Dataset):
         answer = row['Answer']  # 'A', 'B', 'C', or 'D'
         category = f"{row['Broad Category']}/{row['Narrow Category']}"
         
-        # Format multiple choice prompt
+        # Format multiple choice prompt - SlideChat style
         choices_text = "\n".join(choices)
-        prompt = f"<image> {question}\n{choices_text}\nAnswer with only the letter (A/B/C/D):"
+        user_content = f"<image> {question}\n{choices_text}"
+        
+        # Use chat template for consistent format with training
+        if hasattr(self.tokenizer, 'apply_chat_template'):
+            messages = [
+                {"role": "user", "content": user_content}
+            ]
+            prompt = self.tokenizer.apply_chat_template(
+                messages,
+                tokenize=False,
+                add_generation_prompt=True  # Add assistant prompt for generation
+            )
+        else:
+            prompt = f"User: {user_content}\nAssistant:"
         
         # Tokenize
         encoding = self.tokenizer(
@@ -166,22 +206,35 @@ class BenchmarkDatasetCSV(Dataset):
         input_ids = encoding['input_ids'].squeeze(0)
         attention_mask = encoding['attention_mask'].squeeze(0)
         
-        # Load features
+        # Load features - support multiple formats
         feat_path = self.feature_paths[slide_id]
-        data = np.load(feat_path, allow_pickle=True)
         
-        # Handle dict format (common in GTEx-TCGA-Embeddings)
-        if data.dtype == np.object_:
-            data = data.item()
-            if isinstance(data, dict) and 'feature' in data:
-                patch_features = data['feature']
-                # Convert to tensor if not already
-                if not isinstance(patch_features, torch.Tensor):
-                    patch_features = torch.from_numpy(patch_features)
+        if feat_path.endswith('.csv'):
+            # CSV format (SlideChat/Feat) - each row is a patch, columns are features
+            df = pd.read_csv(feat_path, header=None)
+            # Remove last column if it's a string (patch filename)
+            if df.iloc[:, -1].dtype == object:
+                df = df.iloc[:, :-1]
+            patch_features = torch.from_numpy(df.values.astype(np.float32))
+        elif feat_path.endswith('.pt') or feat_path.endswith('.pth'):
+            patch_features = torch.load(feat_path, map_location='cpu')
+        elif feat_path.endswith('.npy'):
+            data = np.load(feat_path, allow_pickle=True)
+            
+            # Handle dict format (common in GTEx-TCGA-Embeddings)
+            if data.dtype == np.object_:
+                data = data.item()
+                if isinstance(data, dict) and 'feature' in data:
+                    patch_features = data['feature']
+                    # Convert to tensor if not already
+                    if not isinstance(patch_features, torch.Tensor):
+                        patch_features = torch.from_numpy(patch_features)
+                else:
+                    raise ValueError(f"Unexpected data format in {feat_path}")
             else:
-                raise ValueError(f"Unexpected data format in {feat_path}")
+                patch_features = torch.from_numpy(data)
         else:
-            patch_features = torch.from_numpy(data)
+            raise ValueError(f"Unsupported feature format: {feat_path}")
         
         if patch_features.dtype != torch.float32:
             patch_features = patch_features.float()
@@ -255,22 +308,46 @@ def benchmark_collate_fn(batch):
 def extract_answer(text):
     """
     Extract answer choice (A/B/C/D) from generated text.
+    Improved logic with multiple patterns.
     """
-    text = text.strip().upper()
+    # Clean the text - remove repetitions and newlines
+    text = text.strip()
     
-    # Pattern 1: Direct answer "A" or "A)" or "A."
-    match = re.search(r'\b([A-D])\b', text)
+    # Handle repetitions like "C\nAnswer with only..." - take first line
+    first_line = text.split('\n')[0].strip()
+    
+    # Try to extract from first line first
+    text_upper = first_line.upper()
+    
+    # Pattern 1: Single letter response "A", "B", "C", "D"
+    if len(first_line) <= 3:
+        for char in first_line.upper():
+            if char in ['A', 'B', 'C', 'D']:
+                return char
+    
+    # Pattern 2: Letter with punctuation "A." "A)" "A:"
+    match = re.match(r'^([A-D])[\.):\s]', text_upper)
     if match:
         return match.group(1)
     
-    # Pattern 2: "The answer is A"
-    match = re.search(r'ANSWER\s+IS\s+([A-D])', text)
+    # Pattern 3: "The answer is A" or "Answer: A"
+    match = re.search(r'(?:ANSWER\s*(?:IS)?[:\s]*)([A-D])', text_upper)
     if match:
         return match.group(1)
     
-    # Pattern 3: First letter if it's A/B/C/D
-    if len(text) > 0 and text[0] in ['A', 'B', 'C', 'D']:
-        return text[0]
+    # Pattern 4: "Option A" or "Choice A"
+    match = re.search(r'(?:OPTION|CHOICE)\s*([A-D])', text_upper)
+    if match:
+        return match.group(1)
+    
+    # Pattern 5: First standalone A/B/C/D in text
+    match = re.search(r'\b([A-D])\b', text_upper)
+    if match:
+        return match.group(1)
+    
+    # Pattern 6: First character if it's A/B/C/D
+    if len(text_upper) > 0 and text_upper[0] in ['A', 'B', 'C', 'D']:
+        return text_upper[0]
     
     return None
 
@@ -297,15 +374,16 @@ def evaluate_model(model, dataloader, args):
             attention_mask = batch['attention_mask'].cuda()
             patch_features = batch['patch_features'].cuda()
             
-            # Generate responses
+            # Generate responses - fix repetition with proper parameters
             generated_ids = model.generate(
                 input_ids=input_ids,
                 attention_mask=attention_mask,
                 patch_features=patch_features,
-                max_new_tokens=64,
+                max_new_tokens=16,  # Reduced - we only need A/B/C/D
                 temperature=0.1,
                 top_p=0.9,
-                do_sample=False
+                do_sample=False,
+                repetition_penalty=1.2  # Prevent repetition
             )
             
             # Decode generated text
@@ -340,23 +418,48 @@ def evaluate_model(model, dataloader, args):
     total = len(all_predictions)
     overall_accuracy = correct / total if total > 0 else 0
     
-    # Per-category accuracy
+    # Per-category accuracy (narrow: Diagnosis/Grading, etc.)
     category_stats = defaultdict(lambda: {'correct': 0, 'total': 0})
+    
+    # Broad category accuracy (Microscopy, Diagnosis, Clinical)
+    broad_category_stats = defaultdict(lambda: {'correct': 0, 'total': 0})
     
     for pred, gt, cat in zip(all_predictions, all_ground_truth, all_categories):
         category_stats[cat]['total'] += 1
         if pred == gt:
             category_stats[cat]['correct'] += 1
+        
+        # Extract broad category (first part before '/')
+        broad_cat = cat.split('/')[0] if '/' in cat else cat
+        broad_category_stats[broad_cat]['total'] += 1
+        if pred == gt:
+            broad_category_stats[broad_cat]['correct'] += 1
     
     category_accuracies = {
         cat: stats['correct'] / stats['total'] if stats['total'] > 0 else 0
         for cat, stats in category_stats.items()
     }
     
+    broad_category_accuracies = {
+        cat: stats['correct'] / stats['total'] if stats['total'] > 0 else 0
+        for cat, stats in broad_category_stats.items()
+    }
+    
     results = {
         'overall_accuracy': overall_accuracy,
         'total_samples': total,
         'correct_predictions': correct,
+        # Broad category stats (Microscopy, Diagnosis, Clinical)
+        'broad_category_accuracies': broad_category_accuracies,
+        'broad_category_stats': {
+            cat: {
+                'accuracy': acc,
+                'correct': broad_category_stats[cat]['correct'],
+                'total': broad_category_stats[cat]['total']
+            }
+            for cat, acc in broad_category_accuracies.items()
+        },
+        # Narrow category stats
         'category_accuracies': category_accuracies,
         'category_stats': {
             cat: {
@@ -396,8 +499,27 @@ def print_results(results):
     print(f"Total Samples: {results['total_samples']}")
     print(f"Correct Predictions: {results['correct_predictions']}")
     
+    # Broad category stats (Microscopy, Diagnosis, Clinical)
     print("\n" + "-" * 80)
-    print("Per-Category Accuracy:")
+    print("BROAD CATEGORY ACCURACY (Microscopy / Diagnosis / Clinical):")
+    print("-" * 80)
+    
+    print(f"{'Category':<20} {'Accuracy':<15} {'Correct/Total':<20}")
+    print("-" * 80)
+    
+    for cat in ['Microscopy', 'Diagnosis', 'Clinical']:
+        if cat in results.get('broad_category_stats', {}):
+            stats = results['broad_category_stats'][cat]
+            acc = stats['accuracy']
+            correct = stats['correct']
+            total = stats['total']
+            print(f"{cat:<20} {acc:>7.2%}         {correct:>4}/{total:<4}")
+    
+    print("=" * 80)
+    
+    # Narrow category stats
+    print("\n" + "-" * 80)
+    print("Per-Category Accuracy (Narrow):")
     print("-" * 80)
     
     print(f"{'Category':<40} {'Accuracy':<15} {'Correct/Total':<20}")
@@ -445,6 +567,24 @@ def save_results(results, output_path):
             results['correct_predictions']
         ]
     }
+    
+    # Add broad category stats first (Microscopy, Diagnosis, Clinical)
+    summary_data['Metric'].append('')  # Empty row separator
+    summary_data['Value'].append('')
+    summary_data['Metric'].append('=== BROAD CATEGORIES ===')
+    summary_data['Value'].append('')
+    
+    for cat in ['Microscopy', 'Diagnosis', 'Clinical']:
+        if cat in results.get('broad_category_stats', {}):
+            stats = results['broad_category_stats'][cat]
+            summary_data['Metric'].append(f"{cat} Accuracy")
+            summary_data['Value'].append(f"{stats['accuracy']:.2%} ({stats['correct']}/{stats['total']})")
+    
+    # Add narrow category stats
+    summary_data['Metric'].append('')  # Empty row separator
+    summary_data['Value'].append('')
+    summary_data['Metric'].append('=== NARROW CATEGORIES ===')
+    summary_data['Value'].append('')
     
     for cat, stats in sorted(results['category_stats'].items()):
         summary_data['Metric'].append(f"{cat} Accuracy")

@@ -1,143 +1,201 @@
-# WSI Classification with MoE-based Token Compression
+# TC-SSA: Token Compression via Semantic Slot Aggregation for Gigapixel Spatial Reasoning
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-red.svg)](https://pytorch.org/)
+[![Conference](https://img.shields.io/badge/MICCAI-2026-brightgreen.svg)](https://www.miccai.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Production-ready PyTorch research codebase for **Whole Slide Image (WSI) Classification** using a novel **Mixture of Experts (MoE) Token Compression** mechanism.
-
-## 🎯 Overview
-
-This project implements a deep learning pipeline for Whole Slide Image (WSI) analysis, featuring both **Classification** and **Visual Question Answering (SlideChat)**. The core innovation is the **MoE Token Compressor** that intelligently reduces thousands of variable-length patch embeddings into a fixed set of semantic tokens.
-
-### Key Innovation
-
-**MoE Token Compressor**: Each patch is routed to expert slots via a gating network, aggregated with weighted pooling, and processed by dedicated experts. This approach:
-- ✅ Compresses N variable patches → K fixed semantic tokens
-- ✅ Learns semantic clustering of tissue patterns
-- ✅ Ensures load balancing across experts
-- ✅ Outperforms standard attention-based MIL
-
+Official PyTorch implementation of **TC-SSA**, a learnable token-budgeting mechanism that compresses gigapixel Whole Slide Images (WSIs) into compact semantic representations for vision-language models.
 
 ---
 
-## 🔧 Model Architecture
+## 🎯 Abstract
 
-**MoE Token Compressor**:
+Gigapixel Whole-Slide Images (WSIs) pose a fundamental challenge for vision-language assistants due to extreme sequence lengths. We propose **TC-SSA** (Token Compression via Semantic Slot Aggregation), a learnable token-budgeting mechanism that aggregates $N$ patch features into a fixed budget of $K$ semantic slots ($K \ll N$) via **gated Top-2 assignment**. TC-SSA is regularized by a **Semantic Affinity Clustering** objective.
+
+### 🏆 Key Results
+- **95.83% AUC** on TCGA-BRCA
+- **98.27% AUC** on TCGA-NSCLC  
+- **78.34% Overall Accuracy** on SlideChat VQA
+- **98.3% Token Reduction** (57.56× fewer visual tokens)
+- **120× Patch-to-Slot Aggregation Ratio** (when $N=3840$, $K=32$)
+
+---
+
+## 💡 Motivation
+
+The "gigapixel bottleneck" is a formidable barrier in computational pathology: a single WSI can contain upward of $10^5$ patches, creating sequence lengths that far exceed the limits of standard Transformer architectures.
+
+### The Problem with Existing Approaches
+
+| Approach | Method | Limitation |
+|----------|--------|------------|
+| **Spatial Sampling** | LLaVA-Med, Quilt-LLaVA | ⚠️ May miss diagnostically critical regions (unsafe pruning) |
+| **Sparse Attention** | SlideChat | ⚠️ High inference cost |
+| **MIL Aggregation** | TransMIL, ABMIL | ⚠️ Limited multimodal reasoning |
+
+### Our Solution: Safety-First Compression
+
+TC-SSA replaces **patch pruning** with **semantic aggregation** that preserves global slide context. All patch evidence contributes to the final representation — nothing is discarded.
+
+---
+
+## 🏗️ Architecture
+
+TC-SSA is a mixture-of-experts (MoE) style token compressor that maps variable-length patch features to a fixed number of slot tokens.
+
+<p align="center">
+  <img src="docs/flowchart.png" alt="TC-SSA Architecture" width="100%"/>
+</p>
+
+### Pipeline Overview
 
 ```
-Input: [Batch=1, N, 1024] (Variable N per slide)
+Input: [B, N, D] (Variable N patches per slide, D=1024 from CONCH)
     ↓
-Gate Network: Linear(1024 → K slots)
+┌─────────────────────────────────────────────────────────┐
+│ 1. Gated Routing                                        │
+│    z(x_j) = W_g · x_j  →  Softmax with Gaussian noise   │
+└─────────────────────────────────────────────────────────┘
     ↓
-Top-1 Routing: Assign patches to expert slots
+┌─────────────────────────────────────────────────────────┐
+│ 2. Top-2 Assignment                                     │
+│    Each patch → Top 2 highest-probability slots         │
+└─────────────────────────────────────────────────────────┘
     ↓
-Weighted Aggregation: Pool patches per slot
+┌─────────────────────────────────────────────────────────┐
+│ 3. Weighted Slot Aggregation                            │
+│    c_k = Σ(P̃_{j,k} · x_j) / Σ(P̃_{j,k})                │
+└─────────────────────────────────────────────────────────┘
     ↓
-Expert Processing: Each slot refines features
+┌─────────────────────────────────────────────────────────┐
+│ 4. Per-Slot Expert Refinement                           │
+│    y_k = c_k + LN(W_2 · Dropout(GELU(W_1 · c_k)))      │
+└─────────────────────────────────────────────────────────┘
     ↓
-Output: [Batch=1, K, 1024] (Fixed K tokens)
+Output: [B, K, D] (Fixed K=32 semantic tokens)
 ```
 
-**Load Balancing Loss**:
-```
-expert_importance = Σ gate_probs per slot
-CV² = (std / mean)²
-Total Loss = CrossEntropyLoss + λ × CV²
-```
+### Mathematical Formulation
 
-**Complete WSI Classifier**:
+**Gated Routing:**
+$$z(x_j) = W_g x_j, \quad W_g \in \mathbb{R}^{K \times D}$$
+$$\tilde{z}(x_j) = z(x_j) + \epsilon, \quad \epsilon \sim \mathcal{N}(0, \sigma^2), \; \sigma=0.1$$
 
-```
-Input [1, N, 1024]
-  ↓
-MoE Compressor [1, K, 1024]
-  ↓
-Mean Pooling [1, 1024]
-  ↓
-MLP Classifier [1, num_classes]
-  ↓
-Output: Logits
-```
+**Routing Probabilities:**
+$$P(x_j) = \text{Softmax}(\tilde{z}(x_j)) \in \mathbb{R}^{K}$$
+
+**Weighted Aggregation:**
+$$c_k = \frac{\sum_{j=1}^{N} \tilde{P}_{j,k}\,x_j}{\sum_{j=1}^{N} \tilde{P}_{j,k} + \delta}, \quad \delta = 10^{-9}$$
+
+### Semantic Affinity Clustering Loss
+
+The auxiliary loss combines three terms to ensure balanced slot utilization:
+
+| Loss Term | Formula | Purpose |
+|-----------|---------|---------|
+| **Switch Loss** | $\mathcal{L}_{\text{switch}} = K\sum_{i=1}^{K} P_i f_i$ | Load balancing |
+| **Entropy Loss** | $\mathcal{L}_{\text{ent}} = 1 - \frac{-\sum_{i=1}^{K} P_i\log(P_i+\eta)}{\log K}$ | Prevent collapse |
+| **Z-Loss** | $\mathcal{L}_{z} = \gamma(\mathbb{E}_{j}[\log \sum_{i=1}^{K} \exp(z_i)])^2$ | Stabilize logits |
+
+**Total:** $\mathcal{L}_{aux} = \mathcal{L}_{\text{switch}} + 0.5\,\mathcal{L}_{\text{ent}} + \mathcal{L}_{z}$
+
+### Computational Complexity
+
+| Method | Complexity |
+|--------|------------|
+| Dense Self-Attention | $O(N^2 \cdot D)$ |
+| **TC-SSA** | $O(N \cdot K \cdot D)$ |
 
 ---
 
-## 🎛️ Hyperparameter Tuning
+## 📊 Experimental Results
 
-### Key Parameters
+### SlideChat VQA Benchmark
 
-| Parameter | Range | Effect |
-|-----------|-------|--------|
-| `num_slots` | 32-128 | Compression vs. capacity trade-off |
-| `aux_loss_weight` | 0.001-0.1 | Load balancing strength |
-| `lr` | 5e-5 to 2e-4 | Learning rate |
-| `grad_accum_steps` | 4-16 | Effective batch size |
+<p align="center">
+  <img src="docs/optimize.png" alt="Efficiency vs Effectiveness" width="90%"/>
+</p>
 
+| Methods | Microscopy | Diagnosis | Clinical | Overall | SlideBench(BCNB) | WSI-VQA* |
+|---------|------------|-----------|----------|---------|------------------|----------|
+| *SlideChat (Upper Bound)* | *87.64* | *73.27* | *84.26* | *81.17* | *54.14* | *60.18* |
+| Random Baseline | 24.44 | 24.91 | 26.44 | 25.02 | 24.40 | 24.14 |
+| GPT-4o | 62.89 | 46.69 | 66.77 | 57.91 | 41.43 | 30.41 |
+| LLaVA-Med | 47.34 | 32.78 | 47.96 | 42.00 | 30.10 | 26.31 |
+| Quilt-LLaVA | 57.76 | 35.96 | 53.07 | 48.07 | 32.19 | 44.43 |
+| MedDr | 73.30 | 57.78 | 74.25 | 67.70 | 33.67 | 54.36 |
+| **TC-SSA (Ours)** | **81.94** | **77.14** | **76.53** | **78.34** | **55.94** | **56.62** |
+
+> 💡 **Key Finding:** In the challenging *Diagnosis* task, TC-SSA achieves **77.14%**, exceeding SlideChat (73.27%). Our aggregation-based compression acts as a semantic filter — while uncompressed sparse attention may retain redundancy, our gated slot mechanism clusters homogeneous tissue patterns and suppresses background noise.
+
+### TCGA MIL Classification (AUC)
+
+| Method | TCGA-BRCA | TCGA-NSCLC |
+|--------|-----------|------------|
+| ABMIL | 94.05±3.49 | 97.04±1.60 |
+| TransMIL | 93.33±3.50 | 97.27±1.58 |
+| RRTMIL | 94.61±3.18 | 97.88±1.18 |
+| 2DMamba | 93.08±4.20 | 97.14±1.48 |
+| ResNet-50+ABMILX | 95.17 | 97.06 |
+| **TC-SSA (Ours)** | **95.83** | **98.27** |
+
+### Expert Specialization Visualization
+
+<p align="center">
+  <img src="docs/expert_clustering_multi_tsne.png" alt="Expert Clustering t-SNE" width="90%"/>
+</p>
+
+Multi-dataset t-SNE of patch embeddings grouped by expert/slot (TCGA-BLCA, TCGA-BR, TCGA-COAD). Colored clusters correspond to different tissue semantics, demonstrating that expert assignment induces coherent, dataset-consistent grouping.
 
 ---
 
+## 🔧 Model Configuration
 
-# Evaluation Results
-## 1. Summary of New Training Results
-Based on the latest evaluation runs in `/workspace/ETC/eval_results`, here are the performance metrics for the four categories:
-| Model | Dataset | Accuracy | AUC | Precision | Recall | F1 Score |
-|-------|---------|----------|-----|-----------|--------|----------|
-| **ResNet-50** | TCGA-BRCA | 0.8021 | 0.6958 | 0.6433 | 0.8021 | 0.7140 |
-| **UNI** | TCGA-BRCA | 0.9271 | 0.9672 | 0.9259 | 0.9271 | 0.9263 |
-| **ResNet-50** | TCGA-NSCLC | 0.7423 | 0.8315 | 0.7571 | 0.7423 | 0.7398 |
-| **UNI** | TCGA-NSCLC | 0.8969 | 0.9881 | 0.9076 | 0.8969 | 0.8959 |
-**Key Observations:**
-- The **UNI encoder** significantly outperforms ResNet-50 on both datasets, achieving near 99% AUC on NSCLC and 97% on BRCA.
-- **ResNet-50 on BRCA** shows signs of mode collapse (predicting only the majority class), resulting in an accuracy that matches the majority class prevalence (~80%) but a poor Recall for the minority class (0.0).
+| Parameter | Value | Description |
+|-----------|-------|-------------|
+| Visual Backbone | CONCH (frozen) | Patch feature extractor |
+| Feature Dimension | 1024 | Input/output dimension |
+| Number of Slots (K) | 32 | Default semantic slot budget |
+| Routing | Top-2 Gated | Assignment strategy |
+| Expert Hidden Dim | 512 | MLP hidden dimension |
+| Dropout | 0.25 | Expert MLP dropout |
+| Aux Loss Weight (λ) | 0.1 | Semantic Affinity Clustering |
+
+### Ablation: Number of Slots
+
+<p align="center">
+  <img src="docs/auc_chart.png" alt="Slots Ablation" width="80%"/>
+</p>
+
+- **TCGA-BRCA:** Stable for $K \in \{16, 32, 64\}$; drops at $K=128$ due to over-fragmentation
+- **TCGA-NSCLC:** Marginal gains beyond $K=32$
+- **Recommendation:** $K=32$ as balanced choice
+
 ---
-## 2. Training Visualization
-Selected training plots showing the progression of Accuracy, AUC, and Loss.
-### TCGA-BRCA (ResNet-50 vs UNI)
-| ResNet-50 AUC | UNI AUC |
-|:---:|:---:|
-| ![BRCA R50 AUC](./eval_results/amy_plots/brca-r50/auc_epoch.png) | ![BRCA UNI AUC](./eval_results/amy_plots/brca-uni/auc_epoch.png) |
-| ResNet-50 Loss | UNI Loss |
-| ![BRCA R50 Loss](./eval_results/amy_plots/brca-r50/loss_epoch.png) | ![BRCA UNI Loss](./eval_results/amy_plots/brca-uni/loss_epoch.png) |
-### TCGA-NSCLC (ResNet-50 vs UNI)
-| ResNet-50 AUC | UNI AUC |
-|:---:|:---:|
-| ![NSCLC R50 AUC](./eval_results/amy_plots/nsclc-r50/auc_epoch.png) | ![NSCLC UNI AUC](./eval_results/amy_plots/nsclc-uni/auc_epoch.png) |
----
-## 3. Analysis: BRCA-ResNet-50 AUC Decline
-A detailed inspection of the training process for `brca-r50` reveals a problematic trend where the AUC may degrade or stagnate despite reasonable accuracy.
-**Root Cause Analysis:**
-The evaluation metrics show a confusion matrix of:
+
+## 🚀 Quick Start
+
+### Installation
+
+```bash
+git clone https://github.com/your-repo/TC-SSA.git
+cd TC-SSA
+pip install -r requirements.txt
 ```
-[[77, 0],
- [19, 0]]
+
+### Training
+
+**MIL Classification:**
+```bash
+python tools/train.py \
+    --dataset tcga-brca \
+    --num_slots 32 \
+    --aux_loss_weight 0.1 \
+    --epochs 100
 ```
-This indicates **Mode Collapse** where the model predicts the negative class (0) for all samples. 
-- **High Accuracy (80.2%)** is misleading; it simply reflects the class imbalance (77/96 samples are class 0).
-- **Declining/Low AUC**: Since the model is not learning to discriminate and pushes all probabilities towards one class or becomes unconfident/random regarding the minority class, the ranking capability (AUC) suffers.
-- **Possible Reasons**:
-    1. **Severe Class Imbalance**: The dataset has significantly more negatives than positives. Without oversampling or weighted loss, the model falls into the local minimum of "always predict majority".
-    2. **Encoder Capacity**: ResNet-50 might be struggling to extract robust features for this specific task compared to UNI, leading to faster overfitting to the majority class priors.
-    3. **Hyperparameters**: The learning rate might be too high, preventing the model from settling into a solution that distinguishes the minority class.
-**Recommendation**: Implement **Weighted Cross Entropy Loss** or perform **Oversampling** for the minority class to force the ResNet-50 model to learn features for Class 1.
 
----
-
-## 💬 SlideChat: WSI Visual Question Answering
-
-We extend the MoE Token Compressor to serve as a visual encoder for a Multimodal Large Language Model (MLLM), enabling **SlideChat** - a Conversational Assistant for Whole Slide Images.
-
-### Architecture
-- **Visual Encoder**: Pre-trained MoE Token Compressor (frozen)
-- **Projector**: Linear projection to align MoE tokens with LLM embedding space
-- **LLM**: Qwen3-4B-Instruct
-- **Input**: WSI Patch Features + Text Question
-- **Output**: Text Answer
-
-### Training Pipeline
-The training consists of two stages:
-
-**Stage 1: Captioning Pre-training (Projector Alignment)**
-Trains only the projector to align visual tokens with text using captioning data.
+**SlideChat VQA (Stage 1 - Projector Alignment):**
 ```bash
 torchrun --nproc_per_node=4 vqa/tools/train_slidechat.py \
     --stage 1 \
@@ -149,8 +207,7 @@ torchrun --nproc_per_node=4 vqa/tools/train_slidechat.py \
     --moe_num_slots 32
 ```
 
-**Stage 2: VQA Finetuning (LoRA)**
-Finetunes the LLM using LoRA adapters to learn complex reasoning on VQA pairs.
+**SlideChat VQA (Stage 2 - LoRA Finetuning):**
 ```bash
 torchrun --nproc_per_node=4 vqa/tools/train_slidechat_stage2.py \
     --moe_checkpoint /path/to/moe_checkpoint.pth \
@@ -167,8 +224,8 @@ torchrun --nproc_per_node=4 vqa/tools/train_slidechat_stage2.py \
     --moe_num_slots 32
 ```
 
-### Evaluation (SlideBench)
-Evaluate the model on the SlideBench benchmark (CSV format):
+### Evaluation
+
 ```bash
 python vqa/tools/test_benchmark_csv.py \
     --model_path vqa/outputs/slidechat_stage2_lora/epoch2_step500 \
@@ -176,46 +233,52 @@ python vqa/tools/test_benchmark_csv.py \
     --llm_path vqa/data/Qwen3-4B-Instruct-2507 \
     --benchmark_path vqa/data/SlideChat/SlideBench-VQA-TCGA.csv \
     --features_dir vqa/data/GTEx-TCGA-Embeddings \
-    --output_path vqa/results/benchmark_tcga_results_v3.json \
-    --batch_size 16 \
-    --visual_dim 512
+    --output_path vqa/results/benchmark_results.json \
+    --batch_size 16
 ```
-
-### SlideBench-VQA-TCGA Results
-
-Evaluation on 1473 samples from SlideBench-VQA-TCGA using 512-dim features (MoE-Qwen-VQA):
-
-| Model | Overall Accuracy |
-|-------|------------------|
-| **SlideChat (SOTA)** | 81.17% |
-| **MoE-Qwen-VQA (Ours)** | **54.65%** |
-| Random Baseline | 25.00% |
-
-**Performance by Category:**
-
-| Category | Accuracy | Correct/Total |
-|----------|----------|---------------|
-| **Microscopy (Overall)** | **65.4%** | 250/382 |
-| - Tissue Architecture | 66.90% | 97/145 |
-| - Cytomorphological | 66.67% | 26/39 |
-| - Tumor Characteristics | 64.20% | 52/81 |
-| - Histopathological Changes | 64.10% | 75/117 |
-| **Clinical (Overall)** | **58.2%** | 57/98 |
-| - Treatment Guidance | 66.67% | 30/45 |
-| **Diagnosis (Overall)** | **49.8%** | 498/993 |
-| - Disease Classification | 60.96% | 217/356 |
-
-**Note**: 
-- A critical padding bug was fixed in `test_benchmark_csv.py`, improving accuracy from 38.56% to 54.65%.
-- Current limitation: Using 512-dim features (vs projected 1024-dim in SOTA) and limited training epochs.
 
 ---
 
-## 📚 Additional Resources
+## 📁 Project Structure
 
-- **Quick Start Guide**: See `QUICKSTART.md` for step-by-step tutorial
-- **Project Structure**: See `PROJECT_STRUCTURE.md` for detailed organization
-- **Example Configs**: Check `configs/default.yaml` for configuration templates
+```
+TC-SSA/
+├── src/
+│   └── models/
+│       └── moe_compressor.py    # TC-SSA core implementation
+├── tools/
+│   ├── train.py                 # MIL classification training
+│   └── train_panda.py           # PANDA dataset training
+├── vqa/
+│   ├── tools/
+│   │   ├── train_slidechat.py   # Stage 1 training
+│   │   ├── train_slidechat_stage2.py  # Stage 2 LoRA finetuning
+│   │   └── test_benchmark_csv.py      # Evaluation
+│   └── data/                    # Data and model checkpoints
+├── docs/
+│   ├── miccai.tex              # Paper source
+│   ├── flowchart.png           # Architecture diagram
+│   ├── optimize.png            # Efficiency plot
+│   └── auc_chart.png           # Ablation plot
+└── configs/
+    └── default.yaml            # Default configuration
+```
+
+---
+
+## 🔬 Discussion
+
+### Key Contributions
+
+1. **Safety-First Compression:** We replace patch pruning with semantic aggregation that preserves global slide context — no evidence is discarded.
+
+2. **TC-SSA Architecture:** A novel gated assignment bottleneck that distills gigapixel-scale inputs into concise semantic slots.
+
+### Limitations and Future Work
+
+- **Fixed slot budget:** A single $K$ may not be optimal across slides with varying complexity; dynamic slot budgeting is a promising direction.
+- **Encoder dependence:** Slot quality depends on the patch encoder; stronger or domain-adapted backbones may further improve quality.
+- **Spatial structure:** Aggregation may lose fine-grained local geometry; integrating lightweight spatial priors could improve localization tasks.
 
 ---
 
@@ -225,34 +288,27 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## 📧 Contact
-
-For questions, issues, or collaboration:
-- **GitHub Issues**: [Report bugs or request features](https://github.com/OzzyChen97/wsi-moe-classifier/issues)
-- **Email**: comfortableapple@gmail.com
-
----
-
-## 🙏 Acknowledgments
-
-- Built with PyTorch
-- Inspired by Mixture of Experts literature
-- Designed for computational pathology research
-
----
-
 ## ⭐ Citation
 
 If you use this code in your research, please cite:
 
 ```bibtex
-@software{wsi_moe_classifier,
-  title={WSI Classification with MoE Token Compression},
-  author={OzzyChen97},
-  year={2024},
-  url={https://github.com/OzzyChen97/wsi-moe-classifier}
+@inproceedings{tc-ssa2026,
+  title={TC-SSA: Token Compression via Semantic Slot Aggregation for Gigapixel Spatial Reasoning},
+  author={Anonymized Authors},
+  booktitle={Medical Image Computing and Computer Assisted Intervention (MICCAI)},
+  year={2026}
 }
 ```
+
+---
+
+## 🙏 Acknowledgments
+
+- CONCH foundation model for pathology feature extraction
+- SlideChat benchmark for VQA evaluation
+- TCGA for public pathology datasets
+- Built with PyTorch and Hugging Face Transformers
 
 ---
 

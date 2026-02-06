@@ -1,0 +1,301 @@
+\documentclass[runningheads]{llncs}
+\usepackage{esvect}
+\usepackage[T1]{fontenc}
+
+% Filter harmless amsmath warning under LNCS (must be set before loading amsmath).
+\usepackage{silence}
+\WarningFilter{amsmath}{Unable to redefine math accent \vec}
+\ErrorFilter{amstext}{Command \showhyphens has changed}
+\WarningFilter{latex}{Underfull}
+% Avoid LNCS/amsmath clash on \vec
+\let\vec\relax
+\usepackage{amsmath,amssymb}
+\usepackage{microtype}
+\usepackage[numbers]{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+\usepackage{graphicx,verbatim}
+\usepackage{booktabs}
+\usepackage{xcolor}
+
+\setlength{\emergencystretch}{3em}
+
+% Used for displaying a sample figure. If possible, figure files should
+% be included in EPS format.
+%
+% If you use the hyperref package, please uncomment the following two lines
+% to display URLs in blue roman font according to Springer's eBook style:
+\usepackage{color}
+\renewcommand\UrlFont{\color{blue}\rmfamily}
+\urlstyle{rm}
+%
+% Avoid forcing pages to be exactly the same height (helps with Underfull \vbox warnings).
+\raggedbottom
+
+\begin{document}
+%
+\title{TC-SSA: Token Compression via Semantic Slot Aggregation for Gigapixel Spatial Reasoning}
+\titlerunning{TC-SSA for Gigapixel Spatial Reasoning}
+% If the paper title is too long for the running head, you can set
+% an abbreviated paper title here
+%
+\begin{comment}  %% Removed for anonymized MICCAI submission
+\author{First Author\inst{1}\orcidID{0000-1111-2222-3333} \and
+Second Author\inst{2,3}\orcidID{1111-2222-3333-4444} \and
+Third Author\inst{3}\orcidID{2222--3333-4444-5555}}
+%
+\authorrunning{F. Author et al.}
+% First names are abbreviated in the running head.
+% If there are more than two authors, 'et al.' is used.
+%
+\institute{Princeton University, Princeton NJ 08544, USA \and
+Springer Heidelberg, Tiergartenstr. 17, 69121 Heidelberg, Germany
+\email{lncs@springer.com}\\
+\url{http://www.springer.com/gp/computer-science/lncs} \and
+ABC Institute, Rupert-Karls-University Heidelberg, Heidelberg, Germany\\
+\email{\{abc,lncs\}@uni-heidelberg.de}}
+
+\end{comment}
+
+\author{Anonymized Authors}  %% Added for anonymized MICCAI submission
+\authorrunning{Anonymized Author et al.}
+\institute{Anonymized Affiliations\\\email{email@anonymized.com}}
+  
+\maketitle              % typeset the header of the contribution
+%
+\begin{abstract}
+Gigapixel Whole-Slide Images (WSIs) pose a fundamental challenge for vision-language assistants due to extreme sequence lengths. We propose \textsc{TC-SSA} (Token Compression via Semantic Slot Aggregation), a learnable token-budgeting mechanism that aggregates $N$ patch features into a fixed budget of $K$ semantic slots ($K \ll N$) via gated Top-2 assignment. \textsc{TC-SSA} is regularized by a Semantic Affinity Clustering objective. \textsc{TC-SSA} achieves an AUC of 95.83\% on TCGA-BRCA and 98.27\% on TCGA-NSCLC, and an overall accuracy of 78.34\% on SlideChat. Under a fixed visual token budget, it aggregates evidence at a patch-to-slot ratio of $N/K$ (e.g., $120\times$ when $N=3840$ and $K=32$), yielding an overall token reduction of 98.3\% (57.56$\times$ fewer visual tokens).
+
+\keywords{Gigapixel pathology  \and Token compression \and Vision-language models.}
+
+\end{abstract}
+%
+%
+%
+\section{Introduction}
+
+The integration of Large Vision-Language Models (VLMs) into computational pathology has catalyzed a paradigm shift in diagnostic assistants, enabling complex reasoning over gigapixel Whole Slide Images (WSIs). However, the "gigapixel bottleneck" remains a formidable barrier: a single WSI can contain upward of $10^5$ patches, creating a sequence length $N$ that far exceeds the quadratic complexity limits of standard Transformer architectures. Historically, this challenge was addressed through weakly supervised Multiple Instance Learning (MIL) \citep{lu2021data} and correlated feature aggregation models such \textsc{as TransMIL} \citep{DBLP:conf/nips/ShaoBCWZJZ21}. Although effective in classification, these methods lack the multimodal reasoning capabilities required for modern clinical copilots.
+
+The current era of the "Foundation Model" has seen the rise of general-purpose pathology models trained in various data sources, including medical social networks \citep{huang2023visual} and massive real-world clinical datasets \citep{xu2024whole, chen2024towards}. These models have evolved from simple visual-language alignment \citep{lu2024visual} to sophisticated multimodal generative AI copilots \citep{lu2024multimodal} and unified architectures like \textsc{CPath-Omni} \citep{DBLP:conf/cvpr/0002SZGZCZSLY25}, which handle both patch and slide-level analysis. Despite their prowess, deploying these models on full slides requires a critical trade-off between efficiency and diagnostic effectiveness.
+
+Prevailing strategies generally follow two paths. \textit{Spatial sampling} (e.g., \textsc{LLaVA-Med}, \textsc{Quilt-LLaVA}) fits a fixed context window by discarding most patches, but may miss diagnostically critical regions. In contrast, sparse-attention systems (e.g., \textsc{SlideChat}) retain broader evidence at substantially higher inference cost. Importantly, this trade-off is not purely computational: sampling-based compression can amount to \textbf{unsafe pruning} in pathology, implicitly assuming discarded regions are benign and thus increasing false-negative risk.
+
+To address both efficiency and safety, we introduce \textsc{TC-SSA} (Token Compression via Semantic Slot Aggregation), a \textbf{learnable token-budgeting framework} that compresses $N$ patch tokens into a fixed budget of $K$ semantic slots ($K \ll N$) via gated Top-2 assignment and aggregation. To prevent rare but critical evidence from being systematically under-represented, we further regularize slot utilization with a \textbf{Semantic Affinity Clustering} objective. Under a fixed token budget, this bottleneck preserves global slide coverage while avoiding the quadratic cost of dense attention.
+
+Recent pathology vision-language models and foundation models \citep{huang2023visual, chen2024towards, lu2024visual, lu2024multimodal, xu2024whole, DBLP:conf/cvpr/0002SZGZCZSLY25} have enabled stronger multimodal reasoning, but full-slide inference remains challenging. Existing efficiency strategies range from patch sampling (e.g., \textsc{LLaVA-Med}, \textsc{Quilt-LLaVA}) \citep{DBLP:conf/nips/LiWZULYNPG23, DBLP:conf/cvpr/SeyfiogluIGKS24} to diagnosis-guided sampling \citep{DBLP:journals/corr/abs-2404-15127} and MIL-style aggregation \citep{DBLP:conf/nips/ShaoBCWZJZ21}, motivating token compression approaches \citep{tang2025revisitingendtoendlearningslidelevel, guo2025focus, chen2025cost}.
+
+\vspace{1em}
+\noindent\textbf{Key Contributions:}
+\begin{itemize}
+    \item \textbf{Safety-First Compression:} We replace patch pruning with a semantic aggregation mechanism that preserves global slide context.
+    \item \textbf{TC-SSA Architecture:} We introduce a novel gated assignment bottleneck that distills gigapixel-scale inputs into concise semantic slots, achieving a patch-to-slot aggregation ratio of $N/K$ (e.g., $120\times$ when $N=3840$ and $K=32$) and an overall token reduction of 98.3\% (57.56$\times$ fewer visual tokens).
+\end{itemize}
+
+
+\section{Methodology}
+\label{sec:methodology}
+
+\textsc{TC-SSA} is a mixture-of-experts (MoE) style token compressor that maps a variable number of patch features to a fixed number of slot tokens. Given patch features extracted by \textsc{CONCH} as $X \in \mathbb{R}^{B \times N \times D}$, the compressor outputs $X' \in \mathbb{R}^{B \times K \times D}$ with $K \ll N$ (Figure~\ref{fig:flowchart}).
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{flowchart.png}
+    \caption{The \textsc{TC-SSA} Architectural Workflow. Variable-length input features $N$ are assigned to $K$ semantic slots via a gated mechanism. Patches are then aggregated through weighted summation. Each slot is independently refined to produce the final compressed tokens $X'$, which are projected into the VLM space.}
+    \label{fig:flowchart}
+\end{figure}
+
+\subsection{Gated Routing and Top-2 Assignment}
+For each patch feature $x_j \in \mathbb{R}^{D}$, a linear gate produces routing logits $z(x_j) \in \mathbb{R}^{K}$:
+\begin{equation}
+    z(x_j) = W_g x_j, \quad W_g \in \mathbb{R}^{K \times D}.
+\end{equation}
+During training we add Gaussian noise to encourage exploration:
+\begin{equation}
+    \tilde{z}(x_j) = z(x_j) + \epsilon, \quad \epsilon \sim \mathcal{N}(0, \sigma^2), \; \sigma=0.1.
+\end{equation}
+We compute routing probabilities with softmax:
+\begin{equation}
+    P(x_j) = \text{Softmax}(\tilde{z}(x_j)) \in \mathbb{R}^{K}, \quad \sum_{k=1}^{K} P_{j,k}=1.
+\end{equation}
+We then apply \textbf{Top-2 routing} and keep only the two highest-probability slots for each patch \citep{DBLP:conf/cvpr/0002CKXJZSK25, Cao_2023_ICCV, xin2025i2moe}. Let $m_{j,k} \in \{0,1\}$ denote this hard Top-2 mask.
+
+\subsection{Weighted Slot Aggregation}
+We aggregate patches into $K$ slots using truncated routing weights $\tilde{P}_{j,k}=m_{j,k}P_{j,k}$. For slot $k$, the aggregated feature $c_k \in \mathbb{R}^{D}$ is computed as a weighted average:
+\begin{equation}
+    c_k = \frac{\sum_{j=1}^{N} \tilde{P}_{j,k}\,x_j}{\sum_{j=1}^{N} \tilde{P}_{j,k} + \delta}, \quad \delta = 10^{-9}.
+\end{equation}
+In implementation, this corresponds to a batched matrix product $\text{bmm}(\tilde{P}^{\top}, X)$ followed by normalization by the per-slot weight sum.
+
+\subsection{Per-slot Expert Refinement}
+Each slot is refined by an independent expert MLP with residual connection (matching the code):
+\begin{equation}
+    y_k = c_k + \text{LN}\bigl(W_2\,\text{Dropout}(\phi(W_1 c_k))\bigr),
+\end{equation}
+where $\phi(\cdot)$ is GELU, $W_1 \in \mathbb{R}^{H\times D}$, $W_2 \in \mathbb{R}^{D\times H}$, and LN is LayerNorm. Stacking $\{y_k\}_{k=1}^{K}$ gives $X' \in \mathbb{R}^{B\times K\times D}$, which is then projected to the downstream VLM hidden size.
+
+\subsection{Semantic Affinity Clustering}
+We use an auxiliary load-balancing loss (only during training) with three terms. First, the Switch-style term:
+\begin{equation}
+    \mathcal{L}_{\text{switch}} = K\sum_{i=1}^{K} P_i\, f_i,
+\end{equation}
+where $P_i = \mathbb{E}_{j}[P_{j,i}]$ is the mean routing probability, and $f_i = \mathbb{E}_{j}[m_{j,i}]$ is the fraction of patches routed to slot $i$.
+Second, an entropy term that penalizes collapsed routing:
+\begin{equation}
+    \mathcal{L}_{\text{ent}} = 1 - \frac{-\sum_{i=1}^{K} P_i\log(P_i+\eta)}{\log K}, \quad \eta=10^{-8}.
+\end{equation}
+Third, a z-loss that penalizes large logits:
+\begin{equation}
+    \mathcal{L}_{z} = \gamma\,\Bigl(\mathbb{E}_{j}[\log \sum_{i=1}^{K} \exp(z(x_j)_i)]\Bigr)^2, \quad \gamma=10^{-4}.
+\end{equation}
+The final auxiliary loss is:
+\begin{equation}
+    \mathcal{L}_{aux} = \mathcal{L}_{\text{switch}} + 0.5\,\mathcal{L}_{\text{ent}} + \mathcal{L}_{z}.
+\end{equation}
+
+\subsection{Computational Complexity}
+Dense self-attention scales as $O(N^2\cdot D)$, while \textsc{TC-SSA} aggregation scales as $O(N\cdot K\cdot D)$.
+
+
+
+
+
+\section{Experiments}
+\label{sec:experiments}
+
+We evaluate \textsc{TC-SSA} from three perspectives: (i) \textbf{efficiency--effectiveness trade-off} on gigapixel VQA (Figure~\ref{fig:optimize}); (ii) \textbf{MIL classification} on TCGA cohorts; and (iii) \textbf{ablation/analysis} of the slot bottleneck (e.g., slot budget $K$ and auxiliary objectives).
+
+\subsection{Efficiency and Pareto Optimality}
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{optimize.png}
+    \caption{Accuracy vs. sequence length on the \textsc{SlideChat} VQA benchmark (overall). \textsc{SlideChat} serves as an \textit{uncompressed} reference (no explicit token-budgeting bottleneck), while Full-WSI inference is infeasible due to OOM. Under an extremely low VLM token budget ($K=32$ condensed visual tokens, with $N=3840$ patches so $N/K=120$), \textsc{TC-SSA} aggregates evidence at a $120\times$ patch-to-slot ratio and improves accuracy by \textbf{+10.6\%} over sampling-based baselines; this corresponds to an overall token reduction of \textbf{98.3\%} (\textbf{57.56$\times$} fewer visual tokens) in our pipeline. Note that all $N$ patches are still processed before aggregation; only the \emph{condensed} $K$ tokens are fed into the VLM.}
+    \label{fig:optimize}
+\end{figure}
+
+As illustrated in \textbf{Figure \ref{fig:optimize}}, we visualize the efficiency--effectiveness trade-off for \textbf{VQA} on gigapixel WSIs. With $N=3840$ patches and $K=32$ slots, each compressed token summarizes information from roughly $N/K=120$ patches on average, enabling wide spatial coverage under a fixed VLM context window.
+
+Compared to sampling-based VQA baselines (e.g., \textsc{LLaVA-Med} and \textsc{Quilt-LLaVA}) that must drop most patches, \textsc{TC-SSA} presents only $K$ condensed visual tokens to the LLM, yielding a substantially better accuracy--token trade-off.
+This linear-time complexity $O(N \cdot K)$ allows for practical deployment in clinical settings where memory and latency are constrained.
+
+\subsection{Implementation Details and Main Experiments}
+\textbf{Model Configuration.} We employ the \textsc{CONCH} foundation model~\citealp{lu2024visual} as a frozen visual backbone to extract patch-level feature representations $X \in \mathbb{R}^{B \times N \times 1024}$. The proposed \textsc{TC-SSA} compressor is instantiated with $K=32$ latent \textbf{semantic slots} using a \textbf{Top-2 gated assignment strategy} to capture diverse morphological patterns. Each independent \textbf{slot processor} is designed as a modular MLP comprising two linear layers (hidden dimension 512), GELU activation, and a dropout rate of 0.25 to facilitate robust feature distillation. The auxiliary loss hyperparameter is set to 0.1 for all experiments.
+
+\subsection{SlideChat VQA Benchmark}
+We conduct comprehensive evaluations on the \textsc{SlideChat} benchmark \citep{chen2024slidechat}, which assesses large vision-language assistants on gigapixel Whole-Slide Images. For our VQA experiments, \textsc{TC-SSA} is trained using \textbf{2$\times$ NVIDIA A6000} GPUs, whereas \textsc{SlideChat} reports training with \textbf{8$\times$ NVIDIA A100} GPUs.
+Performance is evaluated across:
+\begin{itemize}
+    \item \textbf{Microscopy}: Extraction of low-level morphological and staining features.
+    \item \textbf{Diagnosis}: High-level clinical reasoning for grading and subtyping.
+    \item \textbf{Clinical}: Integration of pathology findings with prognostic context.
+    \item \textbf{Overall Accuracy}: Aggregate performance across all multi-choice VQA pairs.
+\end{itemize}
+Zero-shot generalization is further tested on \textit{SlideBench-VQA (BCNB)} and \textit{WSI-VQA*} datasets.
+
+The performance comparison is summarized in \textbf{Table \ref{tab:results}}. \textsc{TC-SSA} establishes a new performance ceiling for efficiency-oriented medical foundation models.
+
+\begin{table}[ht]
+\centering
+\caption{Performance Comparison on SlideChat Benchmarks(Accuracy). Results demonstrate that our aggregation-based compression significantly outperforms sampling-based models.}
+\label{tab:results}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Methods} & \textbf{Microscopy} & \textbf{Diagnosis} & \textbf{Clinical} & \textbf{Overall} & \textbf{SlideBench(BCNB)} & \textbf{WSI-VQA*} \\
+\midrule
+% SlideChat moved to top as Upper Bound in gray
+\textcolor{gray}{SlideChat (Upper Bound) \cite{chen2024slidechat}} & \textcolor{gray}{87.64} & \textcolor{gray}{73.27} & \textcolor{gray}{84.26} & \textcolor{gray}{81.17} & \textcolor{gray}{54.14} & \textcolor{gray}{60.18} \\
+\midrule
+Random Baseline & 24.44 & 24.91 & 26.44 & 25.02 & 24.40 & 24.14 \\
+GPT-4o & 62.89 & 46.69 & 66.77 & 57.91 & 41.43 & 30.41 \\
+LLaVA-Med \cite{DBLP:conf/nips/LiWZULYNPG23} & 47.34 & 32.78 & 47.96 & 42.00 & 30.10 & 26.31 \\
+Quilt-LLaVA \cite{DBLP:conf/cvpr/SeyfiogluIGKS24} & 57.76 & 35.96 & 53.07 & 48.07 & 32.19 & 44.43 \\
+MedDr \cite{DBLP:journals/corr/abs-2404-15127} & 73.30 & 57.78 & 74.25 & 67.70 & 33.67 & 54.36 \\
+\midrule
+\textbf{TC-SSA (Ours)} & \textcolor{red}{\textbf{81.94}} & \textcolor{red}{\textbf{77.14}} & \textcolor{red}{\textbf{76.53}} & \textcolor{red}{\textbf{78.34}} & \textcolor{red}{\textbf{55.94}} & \textcolor{red}{\textbf{56.62}} \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\noindent\textbf{Quantitative Analysis.} As shown in Table~\ref{tab:results}, \textsc{TC-SSA} achieves a leading overall accuracy of \textbf{78.34\%}. We treat \textsc{SlideChat} as an \emph{upper bound} in the sense of \textbf{evidence/compute}: it performs \textbf{no token compression} and directly reasons over uncompressed WSI features (i.e., it keeps the raw patch tokens ``in play'').
+
+Despite operating under a strict compressed token budget, in the challenging \textit{Diagnosis} task our method attains \textbf{77.14\%}, exceeding \textsc{SlideChat} (73.27\%). This suggests that our \textbf{aggregation-based compression} does more than save tokens; it can act as a semantic filter. While uncompressed sparse attention (SlideChat) may retain substantial redundancy, our gated slot mechanism clusters homogeneous tissue patterns and suppresses background noise, yielding a compact yet discriminative representation.
+
+
+\subsection{Qualitative Analysis: Expert Specialization and Diversity}
+To validate our "aggregation vs. computation" narrative, we analyze the semantic properties of the learned experts/slots across multiple TCGA cohorts.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\linewidth]{expert_clustering_multi_tsne.png}
+    \caption{Multi-dataset t-SNE of patch embeddings grouped by expert/slot (TCGA-BLCA, TCGA-BR, and TCGA-COAD). Colored clusters correspond to different tissue semantics, showing that expert assignment induces coherent, dataset-consistent grouping in the embedding space.}
+    \label{fig:tsne}
+\end{figure}
+
+Figure~\ref{fig:tsne} provides direct evidence of expert-level specialization: across datasets, patches associated with similar tissue semantics concentrate into cohesive regions in the embedding space, indicating that the gating mechanism consistently routes semantically related patterns to the same expert. Importantly, the fact that these clusters remain interpretable across multiple TCGA cohorts suggests that expert partitioning is not dataset-specific memorization but a robust semantic decomposition.
+
+\textbf{Semantic topology and semantic geometry.} We interpret this behavior as the emergence of a \emph{semantic topology} induced by slot assignment in the feature space: semantically similar tissue structures become topologically ``near'' because they are mapped to the same slot and consequently aggregated into the same bottleneck token. This comes with an intentional trade-off: the compressor is not designed to preserve fine-grained \emph{Euclidean geometry} (e.g., exact spatial adjacency between patches), but rather to preserve a more compute-efficient \emph{semantic geometry} that is aligned with diagnostic categories and supports downstream clinical reasoning.
+
+
+\subsection{Ablation Studies}
+\textbf{Choosing the Number of Slots.} Figure~\ref{fig:auc_slots} reports MIL AUC as a function of the slot budget $K$. For TCGA-BRCA, performance is stable for $K\in\{16,32,64\}$ and drops at overly large budgets (e.g., $K=128$), suggesting diminishing returns and possible over-fragmentation of semantic evidence. For TCGA-NSCLC, larger $K$ brings only marginal gains beyond $K=32$.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.9\linewidth]{auc_chart.png}
+    \caption{AUC performance vs. the number of semantic slots $K$ on TCGA-BRCA and TCGA-NSCLC. We use $K=32$ by default as a balanced choice that achieves strong performance while maintaining a compact VLM token budget.}
+    \label{fig:auc_slots}
+\end{figure}
+
+\textbf{Top-K and Semantic Affinity Clustering.} Utilizing Top-2 assignment with $\lambda=0.1$ was found to be critical for stability. Reducing $\lambda$ led to slot collapse, where a single slot aggregated over 60\% of patches, significantly degrading performance in heterogeneous cases.
+
+\subsection{Classification (MIL) Analysis}
+\label{sec:mil_analysis}
+\textbf{Performance on TCGA Benchmarks.} As detailed in Table~\ref{tab:tcga_mil_auc}, our method demonstrates strong performance across different cancer types. On TCGA-NSCLC, \textsc{TC-SSA} achieves the best AUC (98.27), outperforming RRTMIL (97.88) and ResNet-50+ABMILX (97.06). On TCGA-BRCA, \textsc{TC-SSA} improves over ResNet-50+ABMILX (95.17), reaching an AUC of 95.83.
+
+\begin{table}[ht]
+\centering
+\caption{Results (AUC) on TCGA MIL benchmarks.}
+\label{tab:tcga_mil_auc}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Method} & \textbf{TCGA-BRCA} & \textbf{TCGA-NSCLC}\\
+\midrule
+ABMIL & $94.05\pm3.49$ & $97.04\pm1.60$\\
+TransMIL & $93.33\pm3.50$ & $97.27\pm1.58$\\
+RRTMIL & $94.61\pm3.18$ & \textbf{$97.88\pm1.18$}\\
+2DMamba & $93.08\pm4.20$ & $97.14\pm1.48$\\
+ResNet-50+ABMILX & $95.17$ & $97.06$\\
+TC-SSA (Ours) & \textcolor{red}{\textbf{95.83}} & \textcolor{red}{\textbf{98.27}}\\
+\bottomrule
+\end{tabular}
+\end{table}
+\section{Discussion and Limitations}
+\label{sec:discussion}
+
+\paragraph{Discussion.}
+\textsc{TC-SSA} reframes gigapixel WSI understanding as \textbf{aggregation-based token condensation}. Instead of discarding patches to fit the LLM context window, all patch evidence contributes to a small set of slot vectors that preserve global slide context. Empirically, this semantic bottleneck can also act as a denoiser by merging redundant tissue patterns, helping the LLM focus on diagnostically salient cues under a fixed token budget.
+
+\paragraph{Limitations and Future Work.}
+\begin{itemize}
+    \item \textbf{Fixed slot budget.} A single $K$ may not be optimal across slides with very different complexity; dynamic slot budgeting is a promising direction.
+    \item \textbf{Encoder dependence.} Slot quality depends on the patch encoder; stronger or domain-adapted backbones may further improve condensation quality.
+    \item \textbf{Spatial structure.} Aggregation may lose fine-grained local geometry; integrating lightweight spatial priors (e.g., neighborhood cues) could improve tasks requiring precise localization.
+\end{itemize}
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+In this work, we introduced \textsc{TC-SSA}, a modular architecture designed to overcome the "gigapixel bottleneck" in computational pathology via \textbf{aggregation-based compression}. By reframing whole-slide spatial reasoning as the distillation of $N$ patch tokens into $K$ semantic slots, our method bridges the gap between lightweight sampling-based assistants and computationally intensive sparse-attention models.
+
+Our experimental evaluation on the \textsc{SlideChat} benchmark demonstrates that \textsc{TC-SSA} achieves a strong balance between efficiency and effectiveness, attaining an overall accuracy of 76.78\%. Notably, in the \textit{Diagnosis} sub-task, our model reaches 75.13\%, outperforming even the sparse-attention based \textsc{SlideChat}. Beyond raw accuracy, \textsc{TC-SSA} establishes a new efficiency-effectiveness Pareto frontier by offering a $120\times$ \textbf{input attention budget} (processing range) gain under the same token budget (assuming $N=3840$ and $K=32$).
+
+The modular design of \textsc{TC-SSA} preserves the spatial heterogeneity of cancer tissues within learned semantic slots, providing a robust and scalable solution for real-world clinical deployment. Future work will focus on integrating local geometric priors with global semantic aggregation and extending the compression paradigm to cross-modal longitudinal analysis.
+
+\renewcommand{\bibname}{References}
+\bibliographystyle{splncs04}
+\bibliography{References}
+
+\appendix
+
+\end{document}

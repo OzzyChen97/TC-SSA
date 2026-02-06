@@ -327,7 +327,8 @@ class MoE_Qwen_VQA(nn.Module):
         max_new_tokens=128,
         temperature=0.7,
         top_p=0.9,
-        do_sample=True
+        do_sample=True,
+        repetition_penalty=1.0
     ):
         """
         Generate text response for inference.
@@ -340,6 +341,7 @@ class MoE_Qwen_VQA(nn.Module):
             temperature: Sampling temperature
             top_p: Nucleus sampling parameter
             do_sample: Whether to use sampling
+            repetition_penalty: Penalty for repeating tokens (1.0 = no penalty)
 
         Returns:
             generated_ids: [B, L+new_tokens] - Generated token IDs
@@ -363,6 +365,7 @@ class MoE_Qwen_VQA(nn.Module):
             temperature=temperature,
             top_p=top_p,
             do_sample=do_sample,
+            repetition_penalty=repetition_penalty,
             pad_token_id=self.tokenizer.pad_token_id,
             eos_token_id=self.tokenizer.eos_token_id
         )

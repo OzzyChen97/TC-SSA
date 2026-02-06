@@ -9,18 +9,18 @@ Supports:
 - Checkpointing and logging
 
 python tools/train.py \
-    --train_csv data/brca/train_histology.csv \
-    --val_csv data/brca/val_histology.csv \
-    --features_dir data/CPathPatchFeature/brca/uni/pt_files \
+    --train_csv data/nsclc/train.csv \
+    --val_csv data/nsclc/test.csv \
+    --features_dir data/CPathPatchFeature/nsclc/uni/pt_files \
     --feature_dim 1024 \
     --model_type moe \
-    --num_slots 32 \
+    --num_slots 128 \
     --num_classes 2 \
     --num_epochs 100 \
     --lr 1e-4 \
     --aux_loss_weight 0.1 \
     --use_amp \
-    --output_dir outputs/brca_uni_moe_experiment
+    --output_dir outputs/nsclc_uni_moe_experiment128
 """
 
 import sys

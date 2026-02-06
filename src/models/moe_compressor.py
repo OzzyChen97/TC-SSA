@@ -96,8 +96,9 @@ class MoE_Compressor(nn.Module):
 
         # Add noise during training to encourage exploration (prevent collapse)
         if self.training:
-            # Standard Normal Noise from GShard/Switch Transformer
-            noise = torch.randn_like(logits) * (1.0 / self.num_slots)
+            # Stronger noise to encourage exploration
+            noise_scale = 0.1  # Increased from 1/num_slots
+            noise = torch.randn_like(logits) * noise_scale
             logits = logits + noise
 
         probs = F.softmax(logits, dim=-1)
@@ -106,28 +107,33 @@ class MoE_Compressor(nn.Module):
         topk_probs, topk_indices = torch.topk(probs, self.top_k, dim=-1)
 
         # 3. Compute auxiliary load balancing loss
-        # Switch Transformer style loss: mean(probs) * mean(fractions) * num_slots
         aux_loss = torch.tensor(0.0, device=x.device)
         if self.training:
             # P_i: Fraction of probability assigned to expert i
             # f_i: Fraction of patches routed to expert i
             
             # 1. P_i (average probability per expert)
-            # [B, N, num_slots] -> [num_slots]
             prob_per_expert = probs.mean(dim=(0, 1))
             
             # 2. f_i (fraction of samples routed to expert i)
-            # Create hardness mask for top-k selection
-            # [B, N, top_k] -> scatter -> [B, N, num_slots]
             zeros = torch.zeros_like(probs)
             mask_hard = zeros.scatter(-1, topk_indices, 1.0)
             frac_per_expert = mask_hard.mean(dim=(0, 1))
             
             # 3. Switch Transformer Loss: N * sum(P_i * f_i)
-            # We want both P and f to be uniform (1/N)
-            # If uniform: sum(1/N * 1/N) = N * (1/N^2) = 1/N
-            # Scaled by N, it becomes 1. Minimal value is 1.
-            aux_loss = self.num_slots * torch.sum(prob_per_expert * frac_per_expert)
+            switch_loss = self.num_slots * torch.sum(prob_per_expert * frac_per_expert)
+            
+            # 4. Entropy Loss: Encourage uniform probability distribution
+            # Higher entropy = more uniform = better load balancing
+            entropy = -torch.sum(prob_per_expert * torch.log(prob_per_expert + 1e-8))
+            max_entropy = torch.log(torch.tensor(self.num_slots, dtype=torch.float32, device=x.device))
+            entropy_loss = 1.0 - (entropy / max_entropy)  # 0 when uniform, 1 when collapsed
+            
+            # 5. Z-Loss: Penalize large logits to prevent one expert dominating
+            z_loss = torch.logsumexp(logits, dim=-1).mean() ** 2 * 1e-4
+            
+            # Combined loss
+            aux_loss = switch_loss + entropy_loss * 0.5 + z_loss
 
         # 4. Aggregation / Compression
         # Create mask for top-k routing

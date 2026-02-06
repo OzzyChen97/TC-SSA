@@ -360,7 +360,7 @@ def main():
 
     # Load checkpoint to get model configuration
     logger.info(f"Loading checkpoint from {args.checkpoint}")
-    checkpoint = torch.load(args.checkpoint, map_location='cpu')
+    checkpoint = torch.load(args.checkpoint, map_location='cpu', weights_only=False)
 
     # Get model parameters from checkpoint args
     if 'args' in checkpoint:
