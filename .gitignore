@@ -55,7 +55,7 @@ wandb/
 runs/
 
 # Data (uncomment if you don't want to track data)
-# data/
+data/
 # *.pt
 # *.pth
 # *.csv
