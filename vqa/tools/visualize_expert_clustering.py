@@ -533,24 +533,24 @@ def plot_expert_clustering(
             )
     
     # Axis labels
-    ax.set_xlabel(f'{method.upper()} Dimension 1', fontsize=14, fontweight='bold')
-    ax.set_ylabel(f'{method.upper()} Dimension 2', fontsize=14, fontweight='bold')
-    ax.tick_params(labelsize=12)
+    ax.set_xlabel(f'{method.upper()} Dimension 1', fontsize=18, fontweight='bold')
+    ax.set_ylabel(f'{method.upper()} Dimension 2', fontsize=18, fontweight='bold')
+    ax.tick_params(labelsize=14)
     
     # Title
     ax.set_title('MoE Expert Semantic Clustering\n(Labels inferred from feature statistics)',
-                 fontsize=16, fontweight='bold', pad=15)
+                 fontsize=20, fontweight='bold', pad=15)
     
     # Legend - positioned outside the plot for better readability
     legend = ax.legend(
         loc='upper left',
         bbox_to_anchor=(1.02, 1),
-        fontsize=10,
+        fontsize=14,
         frameon=True,
         fancybox=True,
         shadow=False,
         title='Expert Tissue Types',
-        title_fontsize=11,
+        title_fontsize=16,
         markerscale=1.5
     )
     legend.get_frame().set_facecolor('white')
@@ -591,9 +591,15 @@ def plot_multi_source_clustering(
     print("Creating multi-source horizontal visualization...")
     
     n_sources = len(all_embeddings)
-    fig, axes = plt.subplots(1, n_sources, figsize=(7 * n_sources, 7))
     
-    if n_sources == 1:
+    # Use 2 columns layout
+    ncols = 2
+    nrows = (n_sources + ncols - 1) // ncols
+    
+    fig, axes = plt.subplots(nrows, ncols, figsize=(16, 8 * nrows))
+    if isinstance(axes, np.ndarray):
+        axes = axes.flatten()
+    else:
         axes = [axes]
     
     # Define consistent colors for top experts across all subplots
@@ -641,10 +647,10 @@ def plot_multi_source_clustering(
                 legend_handles.append((scatter, f"{label_text} ({mask.sum():,})"))
         
         # Subplot title
-        ax.set_title(source_name, fontsize=18, fontweight='bold', pad=12)
-        ax.set_xlabel(f'{method.upper()} Dim 1', fontsize=14)
-        ax.set_ylabel(f'{method.upper()} Dim 2', fontsize=14)
-        ax.tick_params(labelsize=12)
+        ax.set_title(source_name, fontsize=24, fontweight='bold', pad=12)
+        ax.set_xlabel(f'{method.upper()} Dim 1', fontsize=18)
+        ax.set_ylabel(f'{method.upper()} Dim 2', fontsize=18)
+        ax.tick_params(labelsize=14)
         
         # Set 1:1 aspect ratio
         ax.set_aspect('equal', adjustable='datalim')
@@ -659,7 +665,7 @@ def plot_multi_source_clustering(
                 [h[0] for h in legend_handles],
                 [h[1] for h in legend_handles],
                 loc='upper right',
-                fontsize=10,
+                fontsize=14,
                 frameon=True,
                 fancybox=True,
                 markerscale=1.3,
@@ -672,6 +678,10 @@ def plot_multi_source_clustering(
             legend.get_frame().set_edgecolor('#CCCCCC')
             legend.set_zorder(100)  # Ensure legend is on top
     
+    # Hide unused axes
+    for i in range(n_sources, len(axes)):
+        axes[i].axis('off')
+
     plt.tight_layout()
     plt.savefig(output_path, dpi=400, bbox_inches='tight', facecolor='white')
     plt.close()
@@ -729,18 +739,20 @@ def plot_slot_similarity_heatmap(
     
     # Add colorbar
     cbar = plt.colorbar(im, ax=ax, shrink=0.8, label='Cosine Similarity')
-    cbar.ax.tick_params(labelsize=11)
+    cbar.ax.tick_params(labelsize=14)
+    # cbar label size
+    cbar.set_label('Cosine Similarity', fontsize=14)
     
     # Set axis labels
     ax.set_xticks(range(len(active_slots)))
     ax.set_yticks(range(len(active_slots)))
-    ax.set_xticklabels([f'S{s}' for s in active_slots], fontsize=9)
-    ax.set_yticklabels([f'S{s}' for s in active_slots], fontsize=9)
+    ax.set_xticklabels([f'S{s}' for s in active_slots], fontsize=12)
+    ax.set_yticklabels([f'S{s}' for s in active_slots], fontsize=12)
     
-    ax.set_xlabel('Slot Index', fontsize=13, fontweight='bold')
-    ax.set_ylabel('Slot Index', fontsize=13, fontweight='bold')
+    ax.set_xlabel('Slot Index', fontsize=16, fontweight='bold')
+    ax.set_ylabel('Slot Index', fontsize=16, fontweight='bold')
     ax.set_title('Slot Feature Similarity Matrix\n(Cosine similarity between slot-aggregated features)',
-                 fontsize=14, fontweight='bold', pad=15)
+                 fontsize=18, fontweight='bold', pad=15)
     
     # Add text annotations for similarity values (only for small matrices)
     if len(active_slots) <= 20:
@@ -748,7 +760,7 @@ def plot_slot_similarity_heatmap(
             for j in range(len(active_slots)):
                 text_color = 'white' if abs(similarity_matrix[i, j]) > 0.5 else 'black'
                 ax.text(j, i, f'{similarity_matrix[i, j]:.2f}',
-                       ha='center', va='center', fontsize=7, color=text_color)
+                       ha='center', va='center', fontsize=10, color=text_color)
     
     plt.tight_layout()
     plt.savefig(output_path, dpi=200, bbox_inches='tight', facecolor='white')
@@ -809,8 +821,8 @@ def plot_multi_source_similarity_heatmap(
         
         if len(slot_vectors) < 2:
             ax.text(0.5, 0.5, 'Not enough\nactive slots', 
-                   ha='center', va='center', fontsize=14)
-            ax.set_title(source_name, fontsize=18, fontweight='bold')
+                   ha='center', va='center', fontsize=18)
+            ax.set_title(source_name, fontsize=24, fontweight='bold')
             continue
         
         slot_vectors = np.array(slot_vectors)
@@ -829,12 +841,12 @@ def plot_multi_source_similarity_heatmap(
         # Set axis labels
         ax.set_xticks(range(len(active_slots)))
         ax.set_yticks(range(len(active_slots)))
-        ax.set_xticklabels([f'{s}' for s in active_slots], fontsize=11)
-        ax.set_yticklabels([f'{s}' for s in active_slots], fontsize=11)
+        ax.set_xticklabels([f'{s}' for s in active_slots], fontsize=14)
+        ax.set_yticklabels([f'{s}' for s in active_slots], fontsize=14)
         
-        ax.set_xlabel('Slot Index', fontsize=14)
-        ax.set_ylabel('Slot Index', fontsize=14)
-        ax.set_title(source_name, fontsize=18, fontweight='bold', pad=12)
+        ax.set_xlabel('Slot Index', fontsize=18)
+        ax.set_ylabel('Slot Index', fontsize=18)
+        ax.set_title(source_name, fontsize=24, fontweight='bold', pad=12)
     
     # Add single shared colorbar on the right, completely separate from heatmaps
     if im_last is not None:
@@ -843,8 +855,8 @@ def plot_multi_source_similarity_heatmap(
         # Create colorbar axes
         cbar_ax = fig.add_axes([0.88, 0.15, 0.02, 0.7])  # [left, bottom, width, height]
         cbar = fig.colorbar(im_last, cax=cbar_ax)
-        cbar.ax.tick_params(labelsize=12)
-        cbar.set_label('Cosine Similarity', fontsize=14)
+        cbar.ax.tick_params(labelsize=14)
+        cbar.set_label('Cosine Similarity', fontsize=18)
     
     plt.savefig(output_path, dpi=400, bbox_inches='tight', facecolor='white')
     plt.close()
@@ -873,16 +885,16 @@ def plot_expert_probability_heatmap(
     # Bar plot of average probabilities
     colors = plt.cm.viridis(np.linspace(0.2, 0.9, num_slots))
     bars = ax1.bar(range(num_slots), sorted_probs, color=colors[sorted_indices])
-    ax1.set_xlabel('Expert (sorted by probability)', fontsize=12, fontweight='bold')
-    ax1.set_ylabel('Average Routing Probability', fontsize=12, fontweight='bold')
-    ax1.set_title('Expert Routing Probability Distribution', fontsize=14, fontweight='bold')
+    ax1.set_xlabel('Expert (sorted by probability)', fontsize=16, fontweight='bold')
+    ax1.set_ylabel('Average Routing Probability', fontsize=16, fontweight='bold')
+    ax1.set_title('Expert Routing Probability Distribution', fontsize=18, fontweight='bold')
     ax1.set_xticks(range(0, num_slots, max(1, num_slots // 8)))
     ax1.set_xticklabels([f'{sorted_indices[i]}' for i in range(0, num_slots, max(1, num_slots // 8))])
     
     # Add value labels on top bars
     for i, bar in enumerate(bars[:5]):
         ax1.text(bar.get_x() + bar.get_width()/2, bar.get_height(),
-                f'{sorted_probs[i]:.2%}', ha='center', va='bottom', fontsize=9)
+                f'{sorted_probs[i]:.2%}', ha='center', va='bottom', fontsize=12)
     
     # Heatmap of probabilities (sample)
     sample_size = min(100, len(expert_probs))
@@ -890,13 +902,13 @@ def plot_expert_probability_heatmap(
     sample_probs = expert_probs[sample_indices]
     
     im = ax2.imshow(sample_probs[:, sorted_indices].T, aspect='auto', cmap='viridis')
-    ax2.set_xlabel('Sample Patches', fontsize=12, fontweight='bold')
-    ax2.set_ylabel('Expert Index (sorted)', fontsize=12, fontweight='bold')
-    ax2.set_title('Routing Probability Heatmap (sampled)', fontsize=14, fontweight='bold')
+    ax2.set_xlabel('Sample Patches', fontsize=16, fontweight='bold')
+    ax2.set_ylabel('Expert Index (sorted)', fontsize=16, fontweight='bold')
+    ax2.set_title('Routing Probability Heatmap (sampled)', fontsize=18, fontweight='bold')
     
     # Color bar
     cbar = plt.colorbar(im, ax=ax2)
-    cbar.set_label('Routing Probability', fontsize=11)
+    cbar.set_label('Routing Probability', fontsize=14)
     
     plt.tight_layout()
     plt.savefig(output_path, dpi=150, bbox_inches='tight', facecolor='white')

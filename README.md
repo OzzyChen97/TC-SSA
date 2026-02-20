@@ -2,7 +2,6 @@
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-red.svg)](https://pytorch.org/)
-[![Conference](https://img.shields.io/badge/MICCAI-2026-brightgreen.svg)](https://www.miccai.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Official PyTorch implementation of **TC-SSA**, a learnable token-budgeting mechanism that compresses gigapixel Whole Slide Images (WSIs) into compact semantic representations for vision-language models.
@@ -256,7 +255,6 @@ TC-SSA/
 │   │   └── test_benchmark_csv.py      # Evaluation
 │   └── data/                    # Data and model checkpoints
 ├── docs/
-│   ├── miccai.tex              # Paper source
 │   ├── flowchart.png           # Architecture diagram
 │   ├── optimize.png            # Efficiency plot
 │   └── auc_chart.png           # Ablation plot
@@ -285,21 +283,6 @@ TC-SSA/
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## ⭐ Citation
-
-If you use this code in your research, please cite:
-
-```bibtex
-@inproceedings{tc-ssa2026,
-  title={TC-SSA: Token Compression via Semantic Slot Aggregation for Gigapixel Spatial Reasoning},
-  author={Anonymized Authors},
-  booktitle={Medical Image Computing and Computer Assisted Intervention (MICCAI)},
-  year={2026}
-}
-```
 
 ---
 

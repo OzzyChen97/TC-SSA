@@ -34,6 +34,9 @@ venv.bak/
 # VS Code
 .vscode/
 
+# Claude
+.claude/
+
 # Jupyter Notebook
 .ipynb_checkpoints
 *.ipynb
@@ -110,6 +113,17 @@ site/
 *.safetensors
 *.bin
 *.onnx
+
+# Documents
+*.pdf
+*.tex
+*.txt
+*.doc
+*.docx
+*.xls
+*.xlsx
+*.ppt
+*.pptx
 
 # Data directories (large datasets)
 vqa/data/GTEx-TCGA-Embeddings/
