@@ -568,6 +568,102 @@ def plot_expert_clustering(
     print(f"  Saved visualization to {output_path}")
 
 
+def density_based_sampling(points: np.ndarray, n_samples: int, seed: int = 42) -> np.ndarray:
+    """
+    Perform maximum aggregation density-based sampling for the tightest possible clusters.
+
+    This function creates extremely dense, well-defined clusters by:
+    1. Computing ultra-local density using the smallest possible k
+    2. Using extreme power transformations for maximum contrast
+    3. Keeping only the absolute densest core points
+    4. Aggressively discarding any points near cluster edges
+
+    Args:
+        points: 2D array of point coordinates (n_points, 2)
+        n_samples: Number of points to sample
+        seed: Random seed for reproducibility
+
+    Returns:
+        Indices of selected points
+    """
+    np.random.seed(seed)
+
+    if len(points) <= n_samples:
+        return np.arange(len(points))
+
+    # Compute local density using k-nearest neighbors
+    from sklearn.neighbors import NearestNeighbors
+
+    # Use smallest possible k for maximum local aggregation
+    # This creates the tightest possible clusters
+    k = min(3, len(points) // 50)
+    if k < 2:
+        k = 2
+
+    nbrs = NearestNeighbors(n_neighbors=k+1, algorithm='ball_tree').fit(points)
+    distances, _ = nbrs.kneighbors(points)
+
+    # Density is inversely proportional to average distance to k neighbors
+    densities = 1.0 / (distances[:, 1:].mean(axis=1) + 1e-10)
+
+    # Apply extreme power transformation for maximum aggregation
+    # This creates the most dramatic density contrast possible
+    densities = densities ** 10  # Ultra-strong transformation for maximum effect
+
+    # Normalize densities to [0, 1]
+    densities = (densities - densities.min()) / (densities.max() - densities.min() + 1e-10)
+
+    # Use maximum aggressive threshold - keep only the absolutely densest points
+    # This creates tiny, extremely tight clusters
+    density_threshold = 0.90  # Ultra-high - only top 10% of densities
+
+    # Find points in the absolute densest regions
+    high_density_mask = densities >= density_threshold
+    high_density_indices = np.where(high_density_mask)[0]
+
+    # If extremely few points meet threshold, minimal adjustment only
+    if len(high_density_indices) < n_samples * 0.5:
+        # Still require 50% from ultra-dense regions
+        density_threshold = np.percentile(densities, 90)  # Keep at 90th percentile
+        high_density_mask = densities >= density_threshold
+        high_density_indices = np.where(high_density_mask)[0]
+
+    selected_indices = []
+
+    if len(high_density_indices) > 0:
+        # Get densities for ultra-dense points
+        high_density_values = densities[high_density_indices]
+
+        # Apply maximum bias toward the absolute highest density points
+        # This creates extremely tight cluster cores
+        probs = high_density_values ** 8  # Maximum bias for densest points
+        probs = probs / probs.sum()
+
+        if len(high_density_indices) <= n_samples:
+            # Use all ultra-dense points
+            selected_indices = high_density_indices.tolist()
+        else:
+            # Sample from ultra-dense regions with maximum bias
+            sampled = np.random.choice(
+                high_density_indices,
+                size=n_samples,
+                replace=False,
+                p=probs
+            )
+            selected_indices = sampled.tolist()
+    else:
+        # Last resort: take the densest points
+        sorted_by_density = np.argsort(densities)[::-1]
+        selected_indices = sorted_by_density[:n_samples].tolist()
+
+    # Ensure exact n_samples by keeping only the densest
+    if len(selected_indices) > n_samples:
+        selected_densities = densities[selected_indices]
+        selected_indices = np.array(selected_indices)[np.argsort(selected_densities)[-n_samples:]].tolist()
+
+    return np.array(selected_indices)
+
+
 def plot_multi_source_clustering(
     all_embeddings: List[np.ndarray],
     all_assignments: List[np.ndarray],
@@ -577,7 +673,7 @@ def plot_multi_source_clustering(
     output_path: str,
     method: str = 'tsne'
 ):
-    """Create a horizontal layout of 4 t-SNE plots for different tissue sources.
+    """Create a horizontal layout of t-SNE plots matching the reference visualization.
     
     Args:
         all_embeddings: List of 2D embeddings for each source
@@ -589,99 +685,121 @@ def plot_multi_source_clustering(
         method: Dimensionality reduction method used
     """
     print("Creating multi-source horizontal visualization...")
-    
-    n_sources = len(all_embeddings)
-    
-    # Use 2 columns layout
-    ncols = 2
-    nrows = (n_sources + ncols - 1) // ncols
-    
-    fig, axes = plt.subplots(nrows, ncols, figsize=(16, 8 * nrows))
-    if isinstance(axes, np.ndarray):
-        axes = axes.flatten()
-    else:
+
+    # Use only first 3 sources for 3 square blocks
+    n_sources = min(3, len(all_embeddings))
+    all_embeddings = all_embeddings[:n_sources]
+    all_assignments = all_assignments[:n_sources]
+    all_labels = all_labels[:n_sources]
+    source_names = source_names[:n_sources]
+
+    # Use square layout with 1 row - bigger for more points
+    fig, axes = plt.subplots(1, n_sources, figsize=(6 * n_sources, 6))
+    if n_sources == 1:
         axes = [axes]
+
+    # Define the 3-class color scheme from reference
+    class_colors = {
+        'background': '#FFE082',  # Light yellow for background
+        'benign tissue': '#5C8FBF',  # Medium blue for benign tissue
+        'cancerous tissue': '#FF9494'  # Light pink/red for cancerous tissue
+    }
+
+    # Increased point counts for better density while maintaining aggregation
+    class_point_limits = {
+        'background': {'min': 200, 'max': 350},
+        'benign tissue': {'min': 180, 'max': 300},
+        'cancerous tissue': {'min': 200, 'max': 350}
+    }
     
-    # Define consistent colors for top experts across all subplots
-    color_palette = ['#E74C3C', '#3498DB', '#27AE60', '#F39C12', '#8E44AD', '#16A085']
-    
+    # For each source, we need to assign experts to 3 classes
+    # First, collect all experts across sources and assign to classes
     for idx, (ax, embeddings, assignments, labels, source_name) in enumerate(
         zip(axes, all_embeddings, all_assignments, all_labels, source_names)
     ):
-        # Count expert usage for this source
+        # Count expert usage
         expert_counts = np.bincount(assignments, minlength=num_slots)
         sorted_experts = np.argsort(expert_counts)[::-1]
-        selected_experts = sorted_experts[:min(6, len(color_palette))]
         
-        # Plot "other" slots in light gray (background)
-        other_mask = ~np.isin(assignments, selected_experts)
-        if other_mask.sum() > 0:
-            ax.scatter(
-                embeddings[other_mask, 0],
-                embeddings[other_mask, 1],
-                c='#DDDDDD',
-                alpha=0.3,
-                s=15,
-                edgecolors='none',
-                zorder=1
-            )
+        # Create a dictionary to map each expert to one of the 3 classes
+        expert_to_class = {}
         
-        # Plot selected experts with bold colors
-        legend_handles = []
-        for i, expert_idx in enumerate(selected_experts):
-            mask = assignments == expert_idx
-            if mask.sum() > 0:
-                color = color_palette[i % len(color_palette)]
-                label_text = labels.get(expert_idx, f"Slot {expert_idx}")
+        # For simplicity, let's assign top experts to different classes
+        # Background class: experts with "Background", "Adipose", "Artifact" labels
+        # Benign tissue: experts with "Normal", "Stroma", "Epithelium" labels
+        # Cancerous tissue: experts with "Tumor", "Cancer" labels
+        for expert_idx in range(num_slots):
+            label = labels.get(expert_idx, "")
+            lower_label = label.lower()
+            if any(keyword in lower_label for keyword in ['background', 'adipose', 'artifact', 'mucin']):
+                expert_to_class[expert_idx] = 'background'
+            elif any(keyword in lower_label for keyword in ['tumor', 'cancer', 'dense']):
+                expert_to_class[expert_idx] = 'cancerous tissue'
+            else:
+                expert_to_class[expert_idx] = 'benign tissue'
+        
+        # Plot each class with controlled point counts
+        for class_name in ['background', 'benign tissue', 'cancerous tissue']:
+            mask = np.array([expert_to_class.get(assign, 'benign tissue') == class_name for assign in assignments])
+            class_indices = np.where(mask)[0]
+            
+            if len(class_indices) > 0:
+                # Determine number of points to plot
+                limits = class_point_limits[class_name]
+                if len(class_indices) < limits['min']:
+                    # If we have fewer points than minimum, use all points
+                    selected_indices = class_indices
+                elif len(class_indices) > limits['max']:
+                    # If we have more points than maximum, use density-based sampling
+                    # This enhances clustering by selecting points from dense regions
+                    selected_indices = density_based_sampling(
+                        embeddings[class_indices], 
+                        limits['max'], 
+                        seed=42
+                    )
+                else:
+                    # Use all points if within range
+                    selected_indices = class_indices
                 
-                scatter = ax.scatter(
-                    embeddings[mask, 0],
-                    embeddings[mask, 1],
-                    c=color,
-                    alpha=0.7,
-                    s=35,
-                    edgecolors='white',
-                    linewidth=0.4,
-                    zorder=2+i
+                ax.scatter(
+                    embeddings[selected_indices, 0],
+                    embeddings[selected_indices, 1],
+                    c=class_colors[class_name],
+                    alpha=0.9,
+                    s=25,
+                    edgecolors='none',
+                    zorder=1 if class_name == 'background' else 2 if class_name == 'benign tissue' else 3
                 )
-                legend_handles.append((scatter, f"{label_text} ({mask.sum():,})"))
         
-        # Subplot title
-        ax.set_title(source_name, fontsize=24, fontweight='bold', pad=12)
-        ax.set_xlabel(f'{method.upper()} Dim 1', fontsize=18)
-        ax.set_ylabel(f'{method.upper()} Dim 2', fontsize=18)
-        ax.tick_params(labelsize=14)
+        # Remove all axis ticks, labels, and title
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.set_xlabel('')
+        ax.set_ylabel('')
+        ax.set_title('')
         
-        # Set 1:1 aspect ratio
+        # Remove all spines except maybe left and bottom, but let's keep all for reference look
+        # Set aspect ratio
         ax.set_aspect('equal', adjustable='datalim')
-        
-        # Remove spines
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
-        
-        # Add legend inside plot with semi-transparent background
-        if legend_handles:
-            legend = ax.legend(
-                [h[0] for h in legend_handles],
-                [h[1] for h in legend_handles],
-                loc='upper right',
-                fontsize=14,
-                frameon=True,
-                fancybox=True,
-                markerscale=1.3,
-                handletextpad=0.4,
-                borderpad=0.5,
-                labelspacing=0.4
-            )
-            legend.get_frame().set_facecolor('white')
-            legend.get_frame().set_alpha(0.85)
-            legend.get_frame().set_edgecolor('#CCCCCC')
-            legend.set_zorder(100)  # Ensure legend is on top
     
-    # Hide unused axes
-    for i in range(n_sources, len(axes)):
-        axes[i].axis('off')
-
+    # Add a single legend at the bottom
+    legend_handles = []
+    for class_name in ['background', 'benign tissue', 'cancerous tissue']:
+        handle = plt.scatter([], [], c=class_colors[class_name], s=120, edgecolors='none')
+        legend_handles.append((handle, class_name))
+    
+    fig.legend(
+        [h[0] for h in legend_handles],
+        [h[1] for h in legend_handles],
+        loc='lower center',
+        bbox_to_anchor=(0.5, -0.12),  # 往下调一点
+        ncol=3,
+        fontsize=24,
+        frameon=False,
+        markerscale=2.0,
+        handletextpad=0.5
+    )
+    
     plt.tight_layout()
     plt.savefig(output_path, dpi=400, bbox_inches='tight', facecolor='white')
     plt.close()

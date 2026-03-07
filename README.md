@@ -17,7 +17,7 @@ Gigapixel Whole-Slide Images (WSIs) pose a fundamental challenge for vision-lang
 - **98.27% AUC** on TCGA-NSCLC  
 - **78.34% Overall Accuracy** on SlideChat VQA
 - **98.3% Token Reduction** (57.56× fewer visual tokens)
-- **120× Patch-to-Slot Aggregation Ratio** (when $N=3840$, $K=32$)
+- **120× Patch-to-Slot Aggregation Ratio** (when N=3840 and K=32)
 
 ---
 
@@ -49,31 +49,16 @@ TC-SSA is a mixture-of-experts (MoE) style token compressor that maps variable-l
 
 ### Pipeline Overview
 
-```
-Input: [B, N, D] (Variable N patches per slide, D=1024 from CONCH)
-    ↓
-┌─────────────────────────────────────────────────────────┐
-│ 1. Gated Routing                                        │
-│    z(x_j) = W_g · x_j  →  Softmax with Gaussian noise   │
-└─────────────────────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────────────────────┐
-│ 2. Top-2 Assignment                                     │
-│    Each patch → Top 2 highest-probability slots         │
-└─────────────────────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────────────────────┐
-│ 3. Weighted Slot Aggregation                            │
-│    c_k = Σ(P̃_{j,k} · x_j) / Σ(P̃_{j,k})                │
-└─────────────────────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────────────────────┐
-│ 4. Per-Slot Expert Refinement                           │
-│    y_k = c_k + LN(W_2 · Dropout(GELU(W_1 · c_k)))      │
-└─────────────────────────────────────────────────────────┘
-    ↓
-Output: [B, K, D] (Fixed K=32 semantic tokens)
-```
+- Input: $X \in \mathbb{R}^{B \times N \times D}$ (variable $N$ patches per slide, $D=1024$ from CONCH)
+- Step 1 (Gated Routing):
+    $$z(x_j) = W_g x_j, \quad \tilde{z}(x_j) = z(x_j) + \epsilon, \quad \epsilon \sim \mathcal{N}(0, \sigma^2)$$
+- Step 2 (Top-2 Assignment):
+    $$P(x_j) = \operatorname{Softmax}(\tilde{z}(x_j)), \quad \tilde{P}_{j,k} = \operatorname{Top2}(P_{j,k})$$
+- Step 3 (Weighted Slot Aggregation):
+    $$c_k = \frac{\sum_{j=1}^{N} \tilde{P}_{j,k}\,x_j}{\sum_{j=1}^{N} \tilde{P}_{j,k} + \delta}$$
+- Step 4 (Per-Slot Expert Refinement):
+    $$y_k = c_k + \operatorname{LN}\!\left(W_2\,\operatorname{Dropout}(\operatorname{GELU}(W_1 c_k))\right)$$
+- Output: $Y \in \mathbb{R}^{B \times K \times D}$ (fixed $K=32$ semantic tokens)
 
 ### Mathematical Formulation
 
@@ -167,7 +152,7 @@ Multi-dataset t-SNE of patch embeddings grouped by expert/slot (TCGA-BLCA, TCGA-
   <img src="docs/auc_chart.png" alt="Slots Ablation" width="80%"/>
 </p>
 
-- **TCGA-BRCA:** Stable for $K \in \{16, 32, 64\}$; drops at $K=128$ due to over-fragmentation
+- **TCGA-BRCA:** Stable for K ∈ {16, 32, 64}; drops at K=128 due to over-fragmentation
 - **TCGA-NSCLC:** Marginal gains beyond $K=32$
 - **Recommendation:** $K=32$ as balanced choice
 

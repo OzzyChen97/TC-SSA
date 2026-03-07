@@ -107,8 +107,8 @@ def parse_args():
     parser.add_argument('--model_type', type=str, default='moe',
                         choices=['moe', 'mil_baseline'],
                         help='Model architecture type')
-    parser.add_argument('--num_slots', type=int, default=64,
-                        help='Number of MoE expert slots (default: 64)')
+    parser.add_argument('--num_slots', type=int, default=32,
+                        help='Number of MoE expert slots (default: 32)')
     parser.add_argument('--num_classes', type=int, default=2,
                         help='Number of output classes (default: 2)')
 

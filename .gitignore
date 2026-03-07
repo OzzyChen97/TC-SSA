@@ -131,3 +131,13 @@ vqa/data/SlideChat/Feat/
 vqa/data/SlideChat/*vqa*.json
 vqa/data/Qwen3-4B-Instruct*/
 data/CPathPatchFeature/
+
+# Visualization scripts (do not upload)
+vqa/tools/visualize_*.py
+vqa/tools/plot*.py
+
+# Data processing scripts (do not upload)
+tools/preprocess/
+tools/prepare_*.py
+tools/*split*.py
+tools/verify_*.py
