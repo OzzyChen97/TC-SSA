@@ -70,11 +70,29 @@ TC-SSA is a mixture-of-experts (MoE) style token compressor that maps variable-l
 
 The auxiliary loss combines three terms to ensure balanced slot utilization:
 
-- **Switch Loss** (load balancing): $\mathcal{L}_{\mathrm{switch}} = K\sum_{i=1}^{K} P_i f_i$
-- **Entropy Loss** (prevent collapse): $\mathcal{L}_{\mathrm{ent}} = 1 - \frac{-\sum_{i=1}^{K} P_i\log(P_i+\eta)}{\log K}$
-- **Z-Loss** (stabilize logits): $\mathcal{L}_{z} = \gamma(\mathbb{E}_{j}[\log \sum_{i=1}^{K} \exp(z_i)])^2$
+**Switch Loss** (load balancing):
 
-**Total:** $\mathcal{L}_{\mathrm{aux}} = \mathcal{L}_{\mathrm{switch}} + 0.5\,\mathcal{L}_{\mathrm{ent}} + \mathcal{L}_{z}$
+```math
+\mathcal{L}_{\mathrm{switch}} = K\sum_{i=1}^{K} P_i f_i
+```
+
+**Entropy Loss** (prevent collapse):
+
+```math
+\mathcal{L}_{\mathrm{ent}} = 1 - \frac{-\sum_{i=1}^{K} P_i\log(P_i+\eta)}{\log K}
+```
+
+**Z-Loss** (stabilize logits):
+
+```math
+\mathcal{L}_{z} = \gamma\left(\mathbb{E}_{j}\left[\log \sum_{i=1}^{K} \exp(z_i)\right]\right)^2
+```
+
+**Total:**
+
+```math
+\mathcal{L}_{\mathrm{aux}} = \mathcal{L}_{\mathrm{switch}} + 0.5\,\mathcal{L}_{\mathrm{ent}} + \mathcal{L}_{z}
+```
 
 ### Computational Complexity
 
