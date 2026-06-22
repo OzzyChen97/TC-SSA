@@ -53,11 +53,11 @@ TC-SSA is a mixture-of-experts (MoE) style token compressor that maps variable-l
 - Step 1 (Gated Routing):
     $$z(x_j) = W_g x_j, \quad \tilde{z}(x_j) = z(x_j) + \epsilon, \quad \epsilon \sim \mathcal{N}(0, \sigma^2)$$
 - Step 2 (Top-2 Assignment):
-    $$P(x_j) = \operatorname{Softmax}(\tilde{z}(x_j)), \quad \tilde{P}_{j,k} = \operatorname{Top2}(P_{j,k})$$
+    $$P(x_j) = \mathrm{softmax}(\tilde{z}(x_j)), \quad \tilde{P}_{j,k} = \mathrm{Top2}(P_{j,k})$$
 - Step 3 (Weighted Slot Aggregation):
     $$c_k = \frac{\sum_{j=1}^{N} \tilde{P}_{j,k}\,x_j}{\sum_{j=1}^{N} \tilde{P}_{j,k} + \delta}$$
 - Step 4 (Per-Slot Expert Refinement):
-    $$y_k = c_k + \operatorname{LN}\!\left(W_2\,\operatorname{Dropout}(\operatorname{GELU}(W_1 c_k))\right)$$
+    $$y_k = c_k + \mathrm{LN}\!\left(W_2\,\mathrm{Dropout}(\mathrm{GELU}(W_1 c_k))\right)$$
 - Output: $Y \in \mathbb{R}^{B \times K \times D}$ (fixed $K=32$ semantic tokens)
 
 ### Mathematical Formulation
