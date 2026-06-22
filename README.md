@@ -50,39 +50,31 @@ TC-SSA is a mixture-of-experts (MoE) style token compressor that maps variable-l
 ### Pipeline Overview
 
 - Input: $X \in \mathbb{R}^{B \times N \times D}$ (variable $N$ patches per slide, $D=1024$ from CONCH)
-- Step 1 (Gated Routing):
-    $$z(x_j) = W_g x_j, \quad \tilde{z}(x_j) = z(x_j) + \epsilon, \quad \epsilon \sim \mathcal{N}(0, \sigma^2)$$
-- Step 2 (Top-2 Assignment):
-    $$P(x_j) = \mathrm{softmax}(\tilde{z}(x_j)), \quad \tilde{P}_{j,k} = \mathrm{Top2}(P_{j,k})$$
-- Step 3 (Weighted Slot Aggregation):
-    $$c_k = \frac{\sum_{j=1}^{N} \tilde{P}_{j,k}\,x_j}{\sum_{j=1}^{N} \tilde{P}_{j,k} + \delta}$$
-- Step 4 (Per-Slot Expert Refinement):
-    $$y_k = c_k + \mathrm{LN}\!\left(W_2\,\mathrm{Dropout}(\mathrm{GELU}(W_1 c_k))\right)$$
+- Step 1 (Gated Routing): $z(x_j) = W_g x_j$, $\tilde{z}(x_j) = z(x_j) + \epsilon$, $\epsilon \sim \mathcal{N}(0,\sigma^2)$
+- Step 2 (Top-2 Assignment): $P(x_j) = \mathrm{softmax}(\tilde{z}(x_j))$, $\tilde{P}_{j,k} = \mathrm{Top2}(P_{j,k})$
+- Step 3 (Weighted Slot Aggregation): $c_k = \frac{\sum_{j=1}^{N} \tilde{P}_{j,k}x_j}{\sum_{j=1}^{N} \tilde{P}_{j,k} + \delta}$
+- Step 4 (Per-Slot Expert Refinement): $y_k = c_k + \mathrm{LN}(W_2\,\mathrm{Dropout}(\mathrm{GELU}(W_1c_k)))$
 - Output: $Y \in \mathbb{R}^{B \times K \times D}$ (fixed $K=32$ semantic tokens)
 
 ### Mathematical Formulation
 
-**Gated Routing:**
-$$z(x_j) = W_g x_j, \quad W_g \in \mathbb{R}^{K \times D}$$
-$$\tilde{z}(x_j) = z(x_j) + \epsilon, \quad \epsilon \sim \mathcal{N}(0, \sigma^2), \; \sigma=0.1$$
+**Gated Routing:** $z(x_j) = W_g x_j$, $W_g \in \mathbb{R}^{K \times D}$
 
-**Routing Probabilities:**
-$$P(x_j) = \text{Softmax}(\tilde{z}(x_j)) \in \mathbb{R}^{K}$$
+**Noisy Logits:** $\tilde{z}(x_j) = z(x_j) + \epsilon$, $\epsilon \sim \mathcal{N}(0,\sigma^2)$, $\sigma=0.1$
 
-**Weighted Aggregation:**
-$$c_k = \frac{\sum_{j=1}^{N} \tilde{P}_{j,k}\,x_j}{\sum_{j=1}^{N} \tilde{P}_{j,k} + \delta}, \quad \delta = 10^{-9}$$
+**Routing Probabilities:** $P(x_j) = \mathrm{softmax}(\tilde{z}(x_j)) \in \mathbb{R}^{K}$
+
+**Weighted Aggregation:** $c_k = \frac{\sum_{j=1}^{N} \tilde{P}_{j,k}x_j}{\sum_{j=1}^{N} \tilde{P}_{j,k} + \delta}$, $\delta = 10^{-9}$
 
 ### Semantic Affinity Clustering Loss
 
 The auxiliary loss combines three terms to ensure balanced slot utilization:
 
-| Loss Term | Formula | Purpose |
-|-----------|---------|---------|
-| **Switch Loss** | $\mathcal{L}_{\text{switch}} = K\sum_{i=1}^{K} P_i f_i$ | Load balancing |
-| **Entropy Loss** | $\mathcal{L}_{\text{ent}} = 1 - \frac{-\sum_{i=1}^{K} P_i\log(P_i+\eta)}{\log K}$ | Prevent collapse |
-| **Z-Loss** | $\mathcal{L}_{z} = \gamma(\mathbb{E}_{j}[\log \sum_{i=1}^{K} \exp(z_i)])^2$ | Stabilize logits |
+- **Switch Loss** (load balancing): $\mathcal{L}_{\mathrm{switch}} = K\sum_{i=1}^{K} P_i f_i$
+- **Entropy Loss** (prevent collapse): $\mathcal{L}_{\mathrm{ent}} = 1 - \frac{-\sum_{i=1}^{K} P_i\log(P_i+\eta)}{\log K}$
+- **Z-Loss** (stabilize logits): $\mathcal{L}_{z} = \gamma(\mathbb{E}_{j}[\log \sum_{i=1}^{K} \exp(z_i)])^2$
 
-**Total:** $\mathcal{L}_{aux} = \mathcal{L}_{\text{switch}} + 0.5\,\mathcal{L}_{\text{ent}} + \mathcal{L}_{z}$
+**Total:** $\mathcal{L}_{\mathrm{aux}} = \mathcal{L}_{\mathrm{switch}} + 0.5\,\mathcal{L}_{\mathrm{ent}} + \mathcal{L}_{z}$
 
 ### Computational Complexity
 
