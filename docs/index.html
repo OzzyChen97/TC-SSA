@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TC-SSA | Token Compression via Semantic Slot Aggregation</title>
+    <meta
+      name="description"
+      content="TC-SSA compresses gigapixel whole-slide image features into compact semantic slots for pathology reasoning and vision-language models."
+    />
+    <meta property="og:title" content="TC-SSA" />
+    <meta
+      property="og:description"
+      content="Token Compression via Semantic Slot Aggregation for Gigapixel Pathology Reasoning."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://ozzychen97.github.io/TC-SSA/" />
+    <meta
+      property="og:image"
+      content="https://ozzychen97.github.io/TC-SSA/flowchart.png"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header" aria-label="Primary navigation">
+      <a class="brand" href="#top" aria-label="TC-SSA home">TC-SSA</a>
+      <nav>
+        <a href="#architecture">Architecture</a>
+        <a href="#results">Results</a>
+        <a href="#citation">Citation</a>
+        <a href="https://github.com/OzzyChen97/TC-SSA">Code</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-bg" role="img" aria-label="TC-SSA whole flow and architecture diagram"></div>
+        <div class="hero-content">
+          <p class="eyebrow">Gigapixel pathology reasoning</p>
+          <h1 id="hero-title">TC-SSA</h1>
+          <p class="subtitle">
+            Token Compression via Semantic Slot Aggregation compresses variable-length whole-slide image
+            features into a fixed budget of semantic slots for efficient vision-language reasoning.
+          </p>
+          <div class="actions" aria-label="Project links">
+            <a class="button primary" href="https://arxiv.org/pdf/2603.01143">Paper</a>
+            <a class="button" href="https://github.com/OzzyChen97/TC-SSA">GitHub</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="metrics" aria-label="Key results">
+        <div>
+          <strong>98.3%</strong>
+          <span>Token reduction</span>
+        </div>
+        <div>
+          <strong>78.34%</strong>
+          <span>SlideChat VQA accuracy</span>
+        </div>
+        <div>
+          <strong>95.83%</strong>
+          <span>TCGA-BRCA AUC</span>
+        </div>
+        <div>
+          <strong>98.27%</strong>
+          <span>TCGA-NSCLC AUC</span>
+        </div>
+      </section>
+
+      <section id="architecture" class="section">
+        <div class="section-copy">
+          <p class="eyebrow">Architecture</p>
+          <h2>Semantic aggregation instead of patch pruning</h2>
+          <p>
+            TC-SSA routes WSI patch embeddings through a gated Top-2 assignment module, aggregates
+            them into K semantic slots, and refines each slot independently. The design keeps all
+            slide evidence in the representation while reducing visual token count by 57.56x.
+          </p>
+        </div>
+        <figure class="wide-figure">
+          <img src="flowchart.png" alt="TC-SSA architecture and whole-flow diagram" />
+          <figcaption>
+            Whole-slide image features are routed into semantic slots with an auxiliary semantic
+            affinity clustering objective.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section id="results" class="section results">
+        <div class="section-copy">
+          <p class="eyebrow">Evaluation</p>
+          <h2>Efficient compression with competitive downstream performance</h2>
+          <p>
+            TC-SSA is evaluated on SlideChat VQA and TCGA MIL classification benchmarks, showing
+            strong accuracy while operating with a compact fixed token budget.
+          </p>
+        </div>
+        <div class="result-grid">
+          <figure>
+            <img src="optimize.png" alt="Efficiency and effectiveness comparison" />
+            <figcaption>Efficiency and effectiveness comparison on SlideChat VQA.</figcaption>
+          </figure>
+          <figure>
+            <img src="auc_chart.png" alt="Slot-count ablation chart" />
+            <figcaption>Slot-count ablation for TCGA-BRCA and TCGA-NSCLC.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-copy">
+          <p class="eyebrow">Expert specialization</p>
+          <h2>Slots learn coherent tissue semantics</h2>
+          <p>
+            Multi-dataset t-SNE visualizations show patch embeddings grouped by assigned expert or
+            slot. The resulting clusters indicate that semantic slot aggregation produces consistent
+            tissue-level organization across datasets.
+          </p>
+        </div>
+        <figure class="wide-figure">
+          <img src="expert_clustering_multi_tsne.png" alt="Expert clustering t-SNE visualization" />
+          <figcaption>Expert assignment induces coherent, dataset-consistent tissue clusters.</figcaption>
+        </figure>
+      </section>
+
+      <section id="citation" class="section citation">
+        <div class="section-copy">
+          <p class="eyebrow">Citation</p>
+          <h2>Paper and code</h2>
+          <p>
+            Read the paper on arXiv or use the GitHub repository for training, evaluation, and VQA
+            experiments.
+          </p>
+        </div>
+        <pre><code>@article{chen2026tcssa,
+  title={TC-SSA: Token Compression via Semantic Slot Aggregation for Gigapixel Pathology Reasoning},
+  author={Chen, Zhuo and Young, Shawn and Xu, Lijian},
+  journal={arXiv preprint arXiv:2603.01143},
+  year={2026}
+}</code></pre>
+      </section>
+    </main>
+
+    <footer>
+      <span>TC-SSA</span>
+      <a href="https://arxiv.org/pdf/2603.01143">arXiv</a>
+      <a href="https://github.com/OzzyChen97/TC-SSA">GitHub</a>
+    </footer>
+  </body>
+</html>

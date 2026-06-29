@@ -1,10 +1,14 @@
-# TC-SSA: Token Compression via Semantic Slot Aggregation for Gigapixel Spatial Reasoning
+# TC-SSA: Token Compression via Semantic Slot Aggregation for Gigapixel Pathology Reasoning
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-red.svg)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Project Page](https://img.shields.io/badge/Project-Homepage-007c89.svg)](https://ozzychen97.github.io/TC-SSA/)
+[![arXiv](https://img.shields.io/badge/arXiv-2603.01143-b31b1b.svg)](https://arxiv.org/pdf/2603.01143)
 
 Official PyTorch implementation of **TC-SSA**, a learnable token-budgeting mechanism that compresses gigapixel Whole Slide Images (WSIs) into compact semantic representations for vision-language models.
+
+**Links:** [Project homepage](https://ozzychen97.github.io/TC-SSA/) | [arXiv paper](https://arxiv.org/pdf/2603.01143) | [Code](https://github.com/OzzyChen97/TC-SSA)
 
 ---
 
@@ -187,7 +191,7 @@ Multi-dataset t-SNE of patch embeddings grouped by expert/slot (TCGA-BLCA, TCGA-
 ### Installation
 
 ```bash
-git clone https://github.com/your-repo/TC-SSA.git
+git clone https://github.com/OzzyChen97/TC-SSA.git
 cd TC-SSA
 pip install -r requirements.txt
 ```
@@ -264,6 +268,8 @@ TC-SSA/
 │   │   └── test_benchmark_csv.py      # Evaluation
 │   └── data/                    # Data and model checkpoints
 ├── docs/
+│   ├── index.html             # GitHub Pages homepage
+│   ├── styles.css             # Homepage styles
 │   ├── flowchart.png           # Architecture diagram
 │   ├── optimize.png            # Efficiency plot
 │   └── auc_chart.png           # Ablation plot
@@ -292,6 +298,17 @@ TC-SSA/
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 📝 Citation
+
+```bibtex
+@article{chen2026tcssa,
+  title={TC-SSA: Token Compression via Semantic Slot Aggregation for Gigapixel Pathology Reasoning},
+  author={Chen, Zhuo and Young, Shawn and Xu, Lijian},
+  journal={arXiv preprint arXiv:2603.01143},
+  year={2026}
+}
+```
 
 ---
 
