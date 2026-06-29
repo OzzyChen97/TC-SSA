@@ -10,6 +10,12 @@ Official PyTorch implementation of **TC-SSA**, a learnable token-budgeting mecha
 
 **Links:** [Project homepage](https://ozzychen97.github.io/TC-SSA/) | [arXiv paper](https://arxiv.org/pdf/2603.01143) | [Code](https://github.com/OzzyChen97/TC-SSA)
 
+**Authors:** [Zhuo Chen](https://orcid.org/0009-0000-6089-1368)<sup>1,2</sup>, [Xiaoyu Yang](https://orcid.org/0000-0003-0273-9573)<sup>1</sup>, and [Lijian Xu](https://orcid.org/0000-0002-6632-4011)<sup>1,*</sup>
+
+<sup>1</sup> Shenzhen University of Advanced Technology, Shenzhen, Guangdong, China  
+<sup>2</sup> University of Nottingham Ningbo China, FoSE, Ningbo, Zhejiang, China  
+<sup>*</sup> Corresponding author: [xulijian@suat-sz.edu.cn](mailto:xulijian@suat-sz.edu.cn)
+
 ---
 
 ## 🎯 Abstract
@@ -304,7 +310,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ```bibtex
 @article{chen2026tcssa,
   title={TC-SSA: Token Compression via Semantic Slot Aggregation for Gigapixel Pathology Reasoning},
-  author={Chen, Zhuo and Young, Shawn and Xu, Lijian},
+  author={Chen, Zhuo and Yang, Xiaoyu and Xu, Lijian},
   journal={arXiv preprint arXiv:2603.01143},
   year={2026}
 }

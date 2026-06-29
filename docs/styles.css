@@ -149,6 +149,24 @@ h2 {
   font-size: clamp(1rem, 1.7vw, 1.22rem);
 }
 
+.authors {
+  max-width: 760px;
+  color: var(--teal-dark);
+  font-size: 1.05rem;
+  font-weight: 750;
+}
+
+.authors-block {
+  margin-bottom: 76px;
+}
+
+.authors-block a {
+  color: var(--teal-dark);
+  font-weight: 750;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;
