@@ -54,20 +54,24 @@
 
       <section class="metrics" aria-label="Key results">
         <div>
-          <strong>98.3%</strong>
-          <span>Token reduction</span>
+          <strong>1.7%</strong>
+          <span>Visual tokens retained</span>
         </div>
         <div>
           <strong>78.34%</strong>
-          <span>SlideChat VQA accuracy</span>
+          <span>SlideBench TCGA overall</span>
         </div>
         <div>
-          <strong>95.83%</strong>
-          <span>TCGA-BRCA AUC</span>
+          <strong>77.14%</strong>
+          <span>Diagnosis accuracy</span>
         </div>
         <div>
           <strong>98.27%</strong>
           <span>TCGA-NSCLC AUC</span>
+        </div>
+        <div>
+          <strong>79.80%</strong>
+          <span>PANDA ISUP accuracy</span>
         </div>
       </section>
 
@@ -93,14 +97,14 @@
           <p>
             TC-SSA routes WSI patch embeddings through a gated Top-2 assignment module, aggregates
             them into K semantic slots, and refines each slot independently. The design keeps all
-            slide evidence in the representation while reducing visual token count by 57.56x.
+            slide evidence in the representation while retaining only 1.7% of visual tokens.
           </p>
         </div>
         <figure class="wide-figure">
           <img src="flowchart.png" alt="TC-SSA architecture and whole-flow diagram" />
           <figcaption>
-            Whole-slide image features are routed into semantic slots with an auxiliary semantic
-            affinity clustering objective.
+            Whole-slide image features are routed into semantic slots with robust semantic slot
+            regularization.
           </figcaption>
         </figure>
       </section>
@@ -110,14 +114,129 @@
           <p class="eyebrow">Evaluation</p>
           <h2>Efficient compression with competitive downstream performance</h2>
           <p>
-            TC-SSA is evaluated on SlideChat VQA and TCGA MIL classification benchmarks, showing
-            strong accuracy while operating with a compact fixed token budget.
+            TC-SSA is evaluated on SlideBench VQA, zero-shot pathology VQA, TCGA MIL classification,
+            and PANDA ISUP grading. It uses 1.72T FLOPs under token compression, compared with
+            133.3T FLOPs for the uncompressed SlideChat upper bound.
           </p>
+        </div>
+        <div class="table-wrap" aria-label="SlideBench VQA results">
+          <table>
+            <caption>SlideBench and zero-shot VQA results</caption>
+            <thead>
+              <tr>
+                <th>Method</th>
+                <th>FLOPs</th>
+                <th>Microscopy</th>
+                <th>Diagnosis</th>
+                <th>Overall</th>
+                <th>BCNB</th>
+                <th>WSI-VQA*</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>SlideChat</td>
+                <td>133.3T</td>
+                <td>87.64</td>
+                <td>73.27</td>
+                <td>81.17</td>
+                <td>54.14</td>
+                <td>60.18</td>
+              </tr>
+              <tr>
+                <td>LLaVA-Med</td>
+                <td>1.70T</td>
+                <td>47.34</td>
+                <td>32.78</td>
+                <td>42.00</td>
+                <td>30.10</td>
+                <td>26.31</td>
+              </tr>
+              <tr>
+                <td>Quilt-LLaVA</td>
+                <td>1.70T</td>
+                <td>57.76</td>
+                <td>35.96</td>
+                <td>48.07</td>
+                <td>32.19</td>
+                <td>44.43</td>
+              </tr>
+              <tr>
+                <td>MedDr</td>
+                <td>1.70T</td>
+                <td>73.30</td>
+                <td>57.78</td>
+                <td>67.70</td>
+                <td>33.67</td>
+                <td>54.36</td>
+              </tr>
+              <tr class="ours">
+                <td>TC-SSA</td>
+                <td>1.72T</td>
+                <td>81.94</td>
+                <td>77.14</td>
+                <td>78.34</td>
+                <td>55.94</td>
+                <td>56.62</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-wrap" aria-label="MIL and PANDA results">
+          <table>
+            <caption>MIL classification and PANDA grading</caption>
+            <thead>
+              <tr>
+                <th>Encoder</th>
+                <th>Method</th>
+                <th>TCGA-BRCA</th>
+                <th>TCGA-NSCLC</th>
+                <th>PANDA</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>GigaPath</td>
+                <td>RRTMIL</td>
+                <td>94.82</td>
+                <td>97.63</td>
+                <td>72.46</td>
+              </tr>
+              <tr>
+                <td>GigaPath</td>
+                <td>2DMamba</td>
+                <td>93.84</td>
+                <td>96.87</td>
+                <td>75.72</td>
+              </tr>
+              <tr>
+                <td>UNI</td>
+                <td>RRTMIL</td>
+                <td>94.61</td>
+                <td>97.88</td>
+                <td>74.93</td>
+              </tr>
+              <tr>
+                <td>UNI</td>
+                <td>2DMamba</td>
+                <td>93.08</td>
+                <td>97.14</td>
+                <td>76.37</td>
+              </tr>
+              <tr class="ours">
+                <td>UNI</td>
+                <td>TC-SSA</td>
+                <td>95.83</td>
+                <td>98.27</td>
+                <td>79.80</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <div class="result-grid">
           <figure>
             <img src="optimize.png" alt="Efficiency and effectiveness comparison" />
-            <figcaption>Efficiency and effectiveness comparison on SlideChat VQA.</figcaption>
+            <figcaption>Efficiency and effectiveness comparison on SlideBench VQA.</figcaption>
           </figure>
           <figure>
             <img src="auc_chart.png" alt="Slot-count ablation chart" />

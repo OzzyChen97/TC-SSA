@@ -197,7 +197,7 @@ h2 {
 
 .metrics {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 1px;
   margin-top: -40px;
   position: relative;
@@ -236,7 +236,8 @@ h2 {
 }
 
 .wide-figure,
-.result-grid {
+.result-grid,
+.table-wrap {
   margin-top: 34px;
 }
 
@@ -274,6 +275,52 @@ figcaption {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 22px;
+}
+
+.table-wrap {
+  width: min(1160px, calc(100vw - 56px));
+  margin-inline: auto;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  box-shadow: 0 12px 32px rgba(20, 23, 31, 0.08);
+}
+
+table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  font-size: 0.94rem;
+}
+
+caption {
+  padding: 16px 18px 10px;
+  color: var(--ink);
+  font-weight: 800;
+  text-align: left;
+}
+
+th,
+td {
+  padding: 12px 14px;
+  border-top: 1px solid var(--line);
+  text-align: left;
+  white-space: nowrap;
+}
+
+th {
+  color: var(--muted);
+  background: #f9fafc;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+tr.ours td {
+  color: var(--teal-dark);
+  font-weight: 850;
+  background: #edf8f8;
 }
 
 .result-grid figure {

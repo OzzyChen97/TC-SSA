@@ -20,14 +20,18 @@ Official PyTorch implementation of **TC-SSA**, a learnable token-budgeting mecha
 
 ## 🎯 Abstract
 
-Gigapixel Whole-Slide Images (WSIs) pose a fundamental challenge for vision-language assistants due to extreme sequence lengths. We propose **TC-SSA** (Token Compression via Semantic Slot Aggregation), a learnable token-budgeting mechanism that aggregates $N$ patch features into a fixed budget of $K$ semantic slots ($K \ll N$) via **gated Top-2 assignment**. TC-SSA is regularized by a **Semantic Affinity Clustering** objective.
+Gigapixel Whole-Slide Images (WSIs) pose a fundamental challenge for vision-language assistants due to extreme sequence lengths. We propose **TC-SSA** (Token Compression via Semantic Slot Aggregation), a learnable token-budgeting mechanism that aggregates $N$ patch features into a fixed budget of $K$ semantic slots ($K \ll N$) via **sparse Top-2 routing**. TC-SSA is regularized by a robust semantic slot objective that stabilizes slot utilization without forcing equal assignment.
 
 ### 🏆 Key Results
+- **78.34% Overall Accuracy** on SlideBench (TCGA)
+- **77.14% Diagnosis Accuracy** on SlideBench (TCGA)
+- **55.94% Zero-shot Accuracy** on SlideBench (BCNB)
+- **56.62% Zero-shot Accuracy** on WSI-VQA*
 - **95.83% AUC** on TCGA-BRCA
-- **98.27% AUC** on TCGA-NSCLC  
-- **78.34% Overall Accuracy** on SlideChat VQA
-- **98.3% Token Reduction** (57.56× fewer visual tokens)
-- **120× Patch-to-Slot Aggregation Ratio** (when N=3840 and K=32)
+- **98.27% AUC** on TCGA-NSCLC
+- **79.80% ISUP Grading Accuracy** on PANDA
+- **1.7% Visual Tokens Retained** (98.3% reduction; 58× compression)
+- **1.72T FLOPs** under token compression, compared with 133.3T for uncompressed SlideChat inference
 
 ---
 
@@ -60,62 +64,61 @@ TC-SSA is a mixture-of-experts (MoE) style token compressor that maps variable-l
 ### Pipeline Overview
 
 - Input: $X \in \mathbb{R}^{B \times N \times D}$ (variable $N$ patches per slide, $D=1024$ from CONCH)
-- Step 1 (Gated Routing): $z(x_j) = W_g x_j$, $\tilde{z}(x_j) = z(x_j) + \epsilon$, $\epsilon \sim \mathcal{N}(0,\sigma^2)$
+- Step 1 (Gated Routing): $g_{b,j} = x_{b,j} W_g + b_g$
 - Step 2 (Top-2 Assignment):
 
 ```math
-P(x_j) = \mathrm{softmax}(\tilde{z}(x_j)), \qquad \tilde{P}_{j,k} = \mathrm{Top2}(P_{j,k})
+P_{b,j,:} = \mathrm{softmax}(g_{b,j}), \qquad \tilde{P}_{b,j,k} = m_{b,j,k}P_{b,j,k}
 ```
 
 - Step 3 (Weighted Slot Aggregation):
 
 ```math
-c_k = \frac{\sum_{j=1}^{N} \tilde{P}_{j,k}x_j}{\sum_{j=1}^{N} \tilde{P}_{j,k} + \delta}
+X'_{b,k,:} = c_{b,k} = \frac{\sum_{j=1}^{N} \tilde{P}_{b,j,k}x_{b,j}}{\sum_{j=1}^{N} \tilde{P}_{b,j,k} + \delta}
 ```
 
-- Step 4 (Per-Slot Expert Refinement): $y_k = c_k + \mathrm{LN}(W_2\,\mathrm{Dropout}(\mathrm{GELU}(W_1c_k)))$
-- Output: $Y \in \mathbb{R}^{B \times K \times D}$ (fixed $K=32$ semantic tokens)
+- Output: $X' \in \mathbb{R}^{B \times K \times D}$ (fixed $K=32$ semantic tokens)
 
 ### Mathematical Formulation
 
-**Gated Routing:** $z(x_j) = W_g x_j$, $W_g \in \mathbb{R}^{K \times D}$
+**Gated Routing:** $g_{b,j} = x_{b,j} W_g + b_g$, $W_g \in \mathbb{R}^{D \times K}$, $b_g \in \mathbb{R}^{K}$
 
-**Noisy Logits:** $\tilde{z}(x_j) = z(x_j) + \epsilon$, $\epsilon \sim \mathcal{N}(0,\sigma^2)$, $\sigma=0.1$
+**Routing Probabilities:** $P_{b,j,:} = \mathrm{softmax}(g_{b,j}) \in \mathbb{R}^{K}$
 
-**Routing Probabilities:** $P(x_j) = \mathrm{softmax}(\tilde{z}(x_j)) \in \mathbb{R}^{K}$
+**Top-2 Routing:** $m_{b,j,k} \in \{0,1\}$ indicates whether slot $k$ is among the Top-2 choices for patch $j$, and $\tilde{P}_{b,j,k} = m_{b,j,k}P_{b,j,k}$
 
 **Weighted Aggregation:**
 
 ```math
-c_k = \frac{\sum_{j=1}^{N} \tilde{P}_{j,k}x_j}{\sum_{j=1}^{N} \tilde{P}_{j,k} + \delta}, \qquad \delta = 10^{-9}
+X'_{b,k,:} = c_{b,k} = \frac{\sum_{j=1}^{N} \tilde{P}_{b,j,k}x_{b,j}}{\sum_{j=1}^{N} \tilde{P}_{b,j,k} + \delta}, \qquad \delta = 10^{-9}
 ```
 
-### Semantic Affinity Clustering Loss
+### Robust Semantic Slot Regularization
 
-The auxiliary loss combines three terms to ensure balanced slot utilization:
+The auxiliary objective combines three soft regularizers to discourage routing collapse while preserving semantic specialization:
 
 **Switch Loss** (load balancing):
 
 ```math
-\mathcal{L}_{\mathrm{switch}} = K\sum_{i=1}^{K} P_i f_i
+\mathcal{L}_{\mathrm{switch}} = K\sum_{k=1}^{K} P_k f_k
 ```
 
 **Entropy Loss** (prevent collapse):
 
 ```math
-\mathcal{L}_{\mathrm{ent}} = 1 - \frac{-\sum_{i=1}^{K} P_i\log(P_i+\eta)}{\log K}
+\mathcal{L}_{\mathrm{ent}} = 1 - \frac{-\sum_{k=1}^{K} P_k\log(P_k+\epsilon)}{\log K}, \qquad \epsilon = 10^{-8}
 ```
 
 **Z-Loss** (stabilize logits):
 
 ```math
-\mathcal{L}_{z} = \gamma\left(\mathbb{E}_{j}\left[\log \sum_{i=1}^{K} \exp(z_i)\right]\right)^2
+\mathcal{L}_{z} = \alpha \left(\frac{1}{BN}\sum_{b=1}^{B}\sum_{j=1}^{N}\log\sum_{k=1}^{K}\exp(g_{b,j,k})\right)^2, \qquad \alpha = 10^{-4}
 ```
 
 **Total:**
 
 ```math
-\mathcal{L}_{\mathrm{aux}} = \mathcal{L}_{\mathrm{switch}} + 0.5\,\mathcal{L}_{\mathrm{ent}} + \mathcal{L}_{z}
+\mathcal{L}_{\mathrm{total}} = \mathcal{L}_{\mathrm{task}} + \lambda(\mathcal{L}_{\mathrm{switch}} + 0.5\,\mathcal{L}_{\mathrm{ent}} + \mathcal{L}_{z})
 ```
 
 ### Computational Complexity
@@ -129,34 +132,44 @@ The auxiliary loss combines three terms to ensure balanced slot utilization:
 
 ## 📊 Experimental Results
 
-### SlideChat VQA Benchmark
+### SlideBench VQA Benchmark
 
 <p align="center">
   <img src="docs/optimize.png" alt="Efficiency vs Effectiveness" width="90%"/>
 </p>
 
-| Methods | Microscopy | Diagnosis | Clinical | Overall | SlideBench(BCNB) | WSI-VQA* |
-|---------|------------|-----------|----------|---------|------------------|----------|
-| *SlideChat (Upper Bound)* | *87.64* | *73.27* | *84.26* | *81.17* | *54.14* | *60.18* |
-| Random Baseline | 24.44 | 24.91 | 26.44 | 25.02 | 24.40 | 24.14 |
-| GPT-4o | 62.89 | 46.69 | 66.77 | 57.91 | 41.43 | 30.41 |
-| LLaVA-Med | 47.34 | 32.78 | 47.96 | 42.00 | 30.10 | 26.31 |
-| Quilt-LLaVA | 57.76 | 35.96 | 53.07 | 48.07 | 32.19 | 44.43 |
-| MedDr | 73.30 | 57.78 | 74.25 | 67.70 | 33.67 | 54.36 |
-| **TC-SSA (Ours)** | **81.94** | **77.14** | **76.53** | **78.34** | **55.94** | **56.62** |
+| Methods | FLOPs | Microscopy | Diagnosis | Overall | SlideBench (BCNB) | WSI-VQA* |
+|---------|-------|------------|-----------|---------|-------------------|----------|
+| *SlideChat (Uncompressed Upper Bound)* | *133.3T* | *87.64* | *73.27* | *81.17* | *54.14* | *60.18* |
+| Random Baseline | - | 24.44 | 24.91 | 25.02 | 24.40 | 24.14 |
+| GPT-4o | - | 62.89 | 46.69 | 57.91 | 41.43 | 30.41 |
+| LLaVA-Med | 1.70T | 47.34 | 32.78 | 42.00 | 30.10 | 26.31 |
+| Quilt-LLaVA | 1.70T | 57.76 | 35.96 | 48.07 | 32.19 | 44.43 |
+| MedDr | 1.70T | 73.30 | 57.78 | 67.70 | 33.67 | 54.36 |
+| **TC-SSA (Ours)** | **1.72T** | **81.94** | **77.14** | **78.34** | **55.94** | **56.62** |
 
-> 💡 **Key Finding:** In the challenging *Diagnosis* task, TC-SSA achieves **77.14%**, exceeding SlideChat (73.27%). Our aggregation-based compression acts as a semantic filter — while uncompressed sparse attention may retain redundancy, our gated slot mechanism clusters homogeneous tissue patterns and suppresses background noise.
+> 💡 **Key Finding:** In the challenging *Diagnosis* task, TC-SSA achieves **77.14%**, exceeding the uncompressed SlideChat upper bound (73.27%) while using only 32 visual tokens. Compared with sampling baselines such as LLaVA-Med and Quilt-LLaVA, TC-SSA preserves global evidence through semantic aggregation instead of discarding patches.
 
-### TCGA MIL Classification (AUC)
+### MIL Classification and PANDA Grading
 
-| Method | TCGA-BRCA | TCGA-NSCLC |
-|--------|-----------|------------|
-| ABMIL | 94.05±3.49 | 97.04±1.60 |
-| TransMIL | 93.33±3.50 | 97.27±1.58 |
-| RRTMIL | 94.61±3.18 | 97.88±1.18 |
-| 2DMamba | 93.08±4.20 | 97.14±1.48 |
-| ResNet-50+ABMILX | 95.17 | 97.06 |
-| **TC-SSA (Ours)** | **95.83** | **98.27** |
+BRCA and NSCLC are reported by AUC, while PANDA is reported by ISUP grading accuracy. Baseline values are means from the camera-ready version.
+
+| Encoder | Method | TCGA-BRCA | TCGA-NSCLC | PANDA |
+|---------|--------|-----------|------------|-------|
+| ResNet-50 | ABMIL | 83.80 | 92.32 | 58.89 |
+| ResNet-50 | TransMIL | 88.52 | 92.49 | 56.42 |
+| ResNet-50 | RRTMIL | 89.35 | 94.43 | 61.97 |
+| ResNet-50 | 2DMamba | 87.22 | 95.21 | 61.56 |
+| GigaPath | ABMIL | 94.39 | 96.54 | 71.85 |
+| GigaPath | TransMIL | 93.97 | 97.61 | 65.45 |
+| GigaPath | GigaPath | 93.72 | 97.53 | 65.86 |
+| GigaPath | RRTMIL | 94.82 | 97.63 | 72.46 |
+| GigaPath | 2DMamba | 93.84 | 96.87 | 75.72 |
+| UNI | ABMIL | 94.05 | 97.04 | 74.69 |
+| UNI | TransMIL | 93.33 | 97.27 | 68.06 |
+| UNI | RRTMIL | 94.61 | 97.88 | 74.93 |
+| UNI | 2DMamba | 93.08 | 97.14 | 76.37 |
+| UNI | **TC-SSA (Ours)** | **95.83** | **98.27** | **79.80** |
 
 ### Expert Specialization Visualization
 
@@ -172,13 +185,13 @@ Multi-dataset t-SNE of patch embeddings grouped by expert/slot (TCGA-BLCA, TCGA-
 
 | Parameter | Value | Description |
 |-----------|-------|-------------|
-| Visual Backbone | CONCH (frozen) | Patch feature extractor |
+| Visual Backbone | CONCH (VQA), UNI (MIL/PANDA) | Patch feature extractors used in the camera-ready experiments |
 | Feature Dimension | 1024 | Input/output dimension |
 | Number of Slots (K) | 32 | Default semantic slot budget |
 | Routing | Top-2 Gated | Assignment strategy |
 | Expert Hidden Dim | 512 | MLP hidden dimension |
 | Dropout | 0.25 | Expert MLP dropout |
-| Aux Loss Weight (λ) | 0.1 | Semantic Affinity Clustering |
+| Aux Loss Weight (λ) | 0.1 | Robust semantic slot regularization |
 
 ### Ablation: Number of Slots
 
@@ -324,6 +337,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - SlideChat benchmark for VQA evaluation
 - TCGA for public pathology datasets
 - Built with PyTorch and Hugging Face Transformers
+- Zhuo Chen and Xiaoyu Yang contributed equally to this work
+- Zhuo Chen conducted this work during an internship at Shenzhen University of Advanced Technology
 
 ---
 
